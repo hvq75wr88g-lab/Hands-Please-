@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hands Please - Restaurant App</title>
+    <title>Hands Please - Boulevard Kitchen & Oyster Bar</title>
     <style>
         :root {
             --color-bg-primary: #fcfcf9;
@@ -14,6 +14,8 @@
             --color-accent-hover: #1d7480;
             --color-border: rgba(94, 82, 64, 0.2);
             --color-card-bg: #ffffff;
+            --color-danger: #dc2626;
+            --color-success: #059669;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -45,55 +47,153 @@
         .header {
             background: var(--color-accent);
             color: white;
-            padding: 1.5rem 1rem;
+            padding: 1rem 1rem 0.75rem;
             text-align: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: relative;
         }
 
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto 0.5rem;
+            padding: 0 0.5rem;
+        }
+
+        .header-title {
+            text-align: left;
+        }
+
         .header h1 {
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: 600;
-            margin-bottom: 0.25rem;
         }
 
         .header p {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             opacity: 0.95;
         }
 
-        .header .admin-login-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
+        .header-meta {
+            font-size: 0.75rem;
+            opacity: 0.85;
         }
 
-        .header .admin-login-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .header-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            align-items: flex-end;
+        }
+
+        .admin-btn {
+            padding: 0.3rem 0.7rem;
+            font-size: 0.75rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.6);
+            background: rgba(0,0,0,0.12);
+            color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .admin-btn span.status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+        }
+
+        .admin-btn span.status-dot.online {
+            background: #4ade80;
+        }
+
+        .wifi-text {
+            font-size: 0.7rem;
+            text-align: right;
+            opacity: 0.9;
+        }
+
+        .header-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 0.5rem 0.6rem;
+            font-size: 0.8rem;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 1.5rem 1rem 3rem;
+        }
+
+        .edit-notice {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #f59e0b;
+            font-size: 0.9rem;
+        }
+
+        .edit-notice h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .edit-notice p {
+            margin-bottom: 0.25rem;
+        }
+
+        .edit-notice code {
+            background: #fde68a;
+            padding: 0.1rem 0.35rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .edit-notice .admin-tip {
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid var(--color-border);
+            background: var(--color-card-bg);
+            color: var(--color-text-primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .tab-btn.active {
+            background: var(--color-accent);
+            color: #fff;
+            border-color: var(--color-accent);
         }
 
         .search-bar {
-            margin-bottom: 2rem;
-            position: relative;
+            margin-bottom: 1rem;
         }
 
         .search-bar input {
             width: 100%;
-            padding: 0.875rem 1rem;
-            font-size: 1rem;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.95rem;
             border: 1px solid var(--color-border);
             border-radius: 8px;
             background: var(--color-card-bg);
@@ -107,106 +207,158 @@
 
         .filters {
             display: flex;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
             flex-wrap: wrap;
         }
 
         .filter-btn {
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.9rem;
             border: 1px solid var(--color-border);
             background: var(--color-card-bg);
             color: var(--color-text-primary);
-            border-radius: 20px;
+            border-radius: 999px;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .filter-btn:hover {
-            background: var(--color-accent);
-            color: white;
-            border-color: var(--color-accent);
+            font-size: 0.8rem;
         }
 
         .filter-btn.active {
             background: var(--color-accent);
-            color: white;
+            color: #fff;
             border-color: var(--color-accent);
         }
 
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
+            gap: 1.2rem;
         }
 
-        .dish-card {
+        .card {
             background: var(--color-card-bg);
             border: 1px solid var(--color-border);
             border-radius: 12px;
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card.clickable {
             cursor: pointer;
         }
 
-        .dish-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        .card.clickable:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
         }
 
         .dish-image {
             width: 100%;
-            height: 200px;
+            height: 190px;
             object-fit: cover;
             background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
         }
 
-        .dish-content {
-            padding: 1.25rem;
+        .card-body {
+            padding: 1rem 1.1rem 1.1rem;
         }
 
-        .dish-name {
-            font-size: 1.25rem;
+        .card-title {
+            font-size: 1.1rem;
             font-weight: 600;
-            color: var(--color-text-primary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.35rem;
         }
 
         .dietary-tags {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.35rem;
             flex-wrap: wrap;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .dietary-tag {
-            padding: 0.25rem 0.625rem;
+            padding: 0.15rem 0.55rem;
             background: rgba(33, 128, 141, 0.12);
             color: var(--color-accent);
-            border-radius: 12px;
-            font-size: 0.75rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
             font-weight: 500;
         }
 
-        .dish-preview {
+        .card-preview {
             color: var(--color-text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.5;
+            font-size: 0.85rem;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.1rem 0.45rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            margin-left: 0.3rem;
+        }
+
+        .badge-danger {
+            background: rgba(220,38,38,0.1);
+            color: var(--color-danger);
+        }
+
+        .badge-success {
+            background: rgba(5,150,105,0.12);
+            color: var(--color-success);
+        }
+
+        .section-block {
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.1rem;
+            border-radius: 10px;
+            background: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-accent);
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0.35rem;
+        }
+
+        .section-content {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+
+        .section-content p {
+            margin-bottom: 0.3rem;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: minmax(0,1.2fr) minmax(0,1fr);
+            gap: 1rem;
+        }
+
+        .info-chip {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            background: rgba(33,128,141,0.08);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
         }
 
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            inset: 0;
+            background: rgba(0,0,0,0.72);
             z-index: 1000;
             overflow-y: auto;
             padding: 2rem 1rem;
@@ -221,11 +373,11 @@
         .modal-content {
             background: var(--color-card-bg);
             border-radius: 12px;
-            max-width: 800px;
+            max-width: 860px;
             width: 100%;
             margin: auto;
             position: relative;
-            max-height: 90vh;
+            max-height: 92vh;
             overflow-y: auto;
         }
 
@@ -242,48 +394,38 @@
             font-size: 1.5rem;
             cursor: pointer;
             float: right;
-            margin: 1rem 1rem 0 0;
+            margin: 0.8rem 0.8rem 0 0;
             z-index: 10;
-        }
-
-        .modal-close:hover {
-            background: var(--color-accent-hover);
         }
 
         .modal-image {
             width: 100%;
-            height: 300px;
+            height: 260px;
             object-fit: cover;
         }
 
         .modal-body {
-            padding: 2rem;
+            padding: 1.7rem 1.8rem 2rem;
             clear: both;
         }
 
         .modal-title {
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--color-text-primary);
+            margin-bottom: 0.8rem;
         }
 
         .section {
-            margin-bottom: 2rem;
+            margin-bottom: 1.4rem;
         }
 
-        .section-title {
-            font-size: 1.1rem;
+        .section h3 {
+            font-size: 1rem;
             font-weight: 600;
             color: var(--color-accent);
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.3rem;
             border-bottom: 2px solid var(--color-border);
-        }
-
-        .section-content {
-            color: var(--color-text-secondary);
-            line-height: 1.7;
         }
 
         .section-content ul {
@@ -292,8 +434,8 @@
         }
 
         .section-content li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
+            padding: 0.35rem 0;
+            padding-left: 1.4rem;
             position: relative;
         }
 
@@ -306,10 +448,11 @@
         }
 
         .modification-item {
-            background: rgba(33, 128, 141, 0.08);
-            padding: 0.75rem;
+            background: rgba(33,128,141,0.08);
+            padding: 0.6rem 0.75rem;
             border-radius: 8px;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.45rem;
+            font-size: 0.85rem;
         }
 
         .modification-item strong {
@@ -317,47 +460,143 @@
         }
 
         .available {
-            color: #059669;
+            color: var(--color-success);
             font-weight: 500;
         }
 
         .not-available {
-            color: #dc2626;
+            color: var(--color-danger);
             font-weight: 500;
         }
 
         .info-box {
-            background: linear-gradient(135deg, rgba(33, 128, 141, 0.1) 0%, rgba(33, 128, 141, 0.05) 100%);
-            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(33,128,141,0.10) 0%, rgba(33,128,141,0.04) 100%);
+            padding: 1.05rem;
             border-radius: 8px;
             border-left: 4px solid var(--color-accent);
-        }
-
-        .edit-notice {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            border-left: 4px solid #f59e0b;
-        }
-
-        .edit-notice h3 {
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .edit-notice p {
             font-size: 0.9rem;
+        }
+
+        .pill-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--color-text-secondary);
+        }
+
+        .admin-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--color-bg-secondary);
+            border-top: 1px solid var(--color-border);
+            padding: 0.6rem 1rem 0.8rem;
+            display: none;
+            z-index: 900;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-panel-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .admin-panel button {
+            padding: 0.4rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid var(--color-accent);
+            background: var(--color-accent);
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.78rem;
+        }
+
+        .admin-panel button.secondary {
+            background: transparent;
+            color: var(--color-accent);
+        }
+
+        .admin-login-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-login-modal.active {
+            display: flex;
+        }
+
+        .admin-login-card {
+            background: var(--color-card-bg);
+            border-radius: 12px;
+            padding: 1.4rem 1.5rem 1.6rem;
+            width: 95%;
+            max-width: 360px;
+            border: 1px solid var(--color-border);
+        }
+
+        .admin-login-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .admin-login-card label {
+            display: block;
+            font-size: 0.8rem;
             margin-bottom: 0.25rem;
         }
 
-        .edit-notice code {
-            background: #fde68a;
-            padding: 0.125rem 0.375rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
+        .admin-login-card input {
+            width: 100%;
+            padding: 0.5rem 0.6rem;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-secondary);
+            margin-bottom: 0.6rem;
+        }
+
+        .admin-login-card button {
+            width: 100%;
+            margin-top: 0.3rem;
+            padding: 0.55rem 0.7rem;
+            border-radius: 999px;
+            border: none;
+            background: var(--color-accent);
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .admin-login-meta {
+            font-size: 0.75rem;
+            margin-top: 0.4rem;
+            color: var(--color-text-secondary);
+        }
+
+        .error-text {
+            color: var(--color-danger);
+            font-size: 0.78rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .success-text {
+            color: var(--color-success);
+            font-size: 0.78rem;
+            margin-bottom: 0.4rem;
         }
 
         @media (max-width: 768px) {
@@ -370,43 +609,136 @@
             }
 
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <button class="admin-login-btn" onclick="showLogin()">🔒 Admin</button>
-        <h1>🖐️ Hands Please</h1>
-        <p>Restaurant Food Menu Syllabus</p>
-        <p style="font-size: 0.85rem; opacity: 0.9; margin-top: 0.5rem;">&copy; 2026 K Iyer. All rights reserved.</p>
+        <div class="header-top">
+            <div class="header-title">
+                <h1>🖐️ Hands Please</h1>
+                <p>Boulevard Kitchen &amp; Oyster Bar – Food &amp; Beverage Syllabus</p>
+                <div class="header-meta">
+                    © 2026 K Iyer. All rights reserved.
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="admin-btn" id="adminBtn">
+                    <span class="status-dot" id="adminStatusDot"></span>
+                    <span id="adminBtnLabel">Admin</span>
+                </button>
+                <div class="wifi-text">
+                    <div><strong>WiFi:</strong> Boulevard</div>
+                    <div><strong>Password:</strong> vancouver</div>
+                </div>
+            </div>
+        </div>
+        <div class="header-bottom">
+            Internal training tool for front-of-house &amp; back-of-house teams. Designed to keep mise en place, ingredients, dietaries, and talking points in one place.
+        </div>
     </div>
 
     <div class="container">
         <div class="edit-notice">
-            <h3>📝 Easy Weekly Updates</h3>
-            <p><strong>To update dishes:</strong> Open this HTML file in a text editor (like Notepad or TextEdit)</p>
-            <p>Scroll down to the <code>&lt;script&gt;</code> section and find the <code>menuData</code> array</p>
-            <p>Copy an existing dish object and modify the details - no coding knowledge needed!</p>
-            <p>Change the image URL, dish name, ingredients, mise en place, dietaries, and interesting facts</p>
+            <h3>📝 Easy Updates (No Coding Needed)</h3>
+            <p>1. Log in with your syllabus admin login using the <strong>Admin</strong> button above.</p>
+            <p>2. Use the <strong>Export / Import JSON</strong> tools at the bottom bar to back up or replace menu data.</p>
+            <p>3. For structural changes (new sections, layout), continue editing this <code>index.html</code> file as you did before.</p>
+            <p class="admin-tip">Admin login (for managers only): username <code>BLVD845</code> &nbsp; password <code>Krisisthebest</code></p>
         </div>
 
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="🔍 Search dishes...">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="food">Food syllabus</button>
+            <button class="tab-btn" data-tab="wine">Wine syllabus</button>
+            <button class="tab-btn" data-tab="cocktails">Cocktails syllabus</button>
+            <button class="tab-btn" data-tab="beers">Beers syllabus</button>
+            <button class="tab-btn" data-tab="info">General restaurant info</button>
         </div>
 
-        <div class="filters">
-            <button class="filter-btn active" data-filter="all">All Dishes</button>
-            <button class="filter-btn" data-filter="vegan">Vegan</button>
-            <button class="filter-btn" data-filter="vegetarian">Vegetarian</button>
-            <button class="filter-btn" data-filter="gluten-free">Gluten Free</button>
-            <button class="filter-btn" data-filter="dairy-free">Dairy Free</button>
+        <div id="tab-food">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="🔍 Search dishes, ingredients, or dietaries…">
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All Dishes</button>
+                <button class="filter-btn" data-filter="vegetarian">Vegetarian</button>
+                <button class="filter-btn" data-filter="vegan">Vegan possible</button>
+                <button class="filter-btn" data-filter="gluten-free">Gluten Free</button>
+                <button class="filter-btn" data-filter="dairy-free">Dairy Free</button>
+                <button class="filter-btn" data-filter="shellfish">Shellfish</button>
+                <button class="filter-btn" data-filter="fin-fish">Fin Fish</button>
+            </div>
+
+            <div class="menu-grid" id="menuGrid"></div>
         </div>
 
-        <div class="menu-grid" id="menuGrid"></div>
+        <div id="tab-wine" style="display:none;">
+            <div class="section-block">
+                <div class="section-title">Wine syllabus</div>
+                <div class="section-content">
+                    <p>Use this space for your wine list syllabus – key by-the-glass pours, bottle highlights, regions, and talking points.</p>
+                    <p>For now this is a blank template. You can add wine entries later by extending the <code>wineData</code> section in the script if you’d like structured cards similar to food.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-cocktails" style="display:none;">
+            <div class="section-block">
+                <div class="section-title">Cocktails syllabus</div>
+                <div class="section-content">
+                    <p>List your house cocktails, specs, glassware, garnish, and storytelling notes here.</p>
+                    <p>This section is intentionally simple text for now so it’s easy to update on your phone.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-beers" style="display:none;">
+            <div class="section-block">
+                <div class="section-title">Beers syllabus</div>
+                <div class="section-content">
+                    <p>Add your draft list, bottles, and cans, with style, origin, and quick flavour notes.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-info" style="display:none;">
+            <div class="section-block">
+                <div class="section-title">General restaurant info</div>
+                <div class="section-content two-column">
+                    <div>
+                        <p class="pill-label">Venue</p>
+                        <p><strong>Boulevard Kitchen &amp; Oyster Bar</strong></p>
+                        <p>Sutton Place Hotel<br>845 Burrard Street<br>Vancouver, BC</p>
+
+                        <p class="pill-label" style="margin-top:0.8rem;">Contact</p>
+                        <p>Phone, email, and any other contact details can go here.</p>
+
+                        <p class="pill-label" style="margin-top:0.8rem;">WiFi</p>
+                        <p><strong>Network:</strong> Boulevard<br><strong>Password:</strong> vancouver</p>
+                    </div>
+                    <div>
+                        <p class="pill-label">Hours of operation</p>
+                        <p>Update these to match your current hours.</p>
+                        <p>
+                            Lunch: Mon–Fri – 11:30am–2:30pm<br>
+                            Dinner: Daily – 5:00pm–10:00pm<br>
+                            Bar / Happy Hour: Please confirm current times.
+                        </p>
+                        <p style="margin-top:0.6rem;font-size:0.8rem;">You can update this text directly in the HTML or, later, move it into a JSON section if you’d like to edit purely from the browser.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Dish detail modal -->
     <div class="modal" id="dishModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -414,283 +746,488 @@
         </div>
     </div>
 
+    <!-- Admin login modal -->
+    <div class="admin-login-modal" id="adminLoginModal">
+        <div class="admin-login-card">
+            <h2>Admin login</h2>
+            <div id="adminLoginMessage"></div>
+            <label for="adminUser">Username</label>
+            <input id="adminUser" type="text" autocomplete="username">
+            <label for="adminPass">Password</label>
+            <input id="adminPass" type="password" autocomplete="current-password">
+            <button id="adminLoginBtn">Log in</button>
+            <div class="admin-login-meta">
+                Boulevard syllabus admin access. For managers and trainers only.
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin bottom panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-panel-inner">
+            <div>
+                <strong>Admin mode</strong> – you can back up or restore your syllabus JSON here.
+            </div>
+            <div>
+                <button class="secondary" id="exportJsonBtn">Export JSON</button>
+                <button id="importJsonBtn">Import JSON</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // ========================================
-        // EASY EDIT SECTION - UPDATE YOUR MENU HERE
-        // ========================================
-        // Copy this dish template and modify it for each new dish
-        // Just change the values between the quotes!
+        // ================================
+        //  DATA SETUP
+        // ================================
+
+        // FOOD DATA
+        // For now, this is a smaller curated example set pulled from your matrix.
+        // You can extend with more dishes later by following the same structure.
 
         const menuData = [
             {
-                name: "Pan-Seared Atlantic Salmon",
-                image: "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=800&h=600&fit=crop",
-                dietaries: ["gluten-free", "dairy-free"],
+                name: "Fresh Shucked Oysters",
+                image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=800&h=600&fit=crop",
+                dietaries: ["shellfish"],
                 ingredients: [
-                    "Fresh Atlantic salmon fillet (6oz)",
-                    "Extra virgin olive oil",
-                    "Sea salt & black pepper",
-                    "Fresh lemon",
-                    "Fresh dill",
-                    "Garlic cloves",
-                    "Baby spinach",
-                    "Cherry tomatoes"
+                    "Daily oyster selection",
+                    "Grated horseradish",
+                    "Shallot mignonette (shallots, cracked pepper, red wine vinegar)",
+                    "Thai chili espuma (fish sauce, lime juice, chili, gelatin)",
+                    "House cocktail sauce (chili, horseradish, shallots, lemon, ketchup, Worcestershire)"
                 ],
                 miseEnPlace: [
-                    "Portion salmon fillets to 6oz each",
-                    "Pat dry and season with salt 30 min before service",
-                    "Bring to room temperature 20 minutes before cooking",
-                    "Prep lemon wedges",
-                    "Pick and wash fresh dill",
-                    "Peel and slice garlic",
-                    "Wash and dry spinach",
-                    "Halve cherry tomatoes"
+                    "Dinner fork and knife",
+                    "Oyster fork",
+                    "Shell bowls for discards",
+                    "Share plates as needed",
+                    "Ensure mignonette, espuma, and cocktail sauce are stocked and cold"
                 ],
                 modifications: [
-                    { dietary: "Vegan", available: false, note: "Cannot substitute - fish-based protein" },
-                    { dietary: "Vegetarian", available: false, note: "Cannot substitute - fish-based protein" },
-                    { dietary: "Gluten-Free", available: true, note: "Already gluten-free as prepared" },
-                    { dietary: "Dairy-Free", available: true, note: "Already dairy-free as prepared" },
-                    { dietary: "Nut Allergies", available: true, note: "No nuts in dish" }
+                    { dietary: "Vegetarian", available: false, note: "Cannot be made vegetarian – oysters are shellfish" },
+                    { dietary: "Vegan", available: false, note: "Cannot be made vegan – oysters are animal protein" },
+                    { dietary: "Dairy-Free", available: true, note: "No dairy in standard prep" },
+                    { dietary: "Gluten-Free", available: true, note: "No gluten in standard prep" },
+                    { dietary: "Shellfish", available: false, note: "Main component – cannot be removed" },
+                    { dietary: "Fin Fish", available: true, note: "Remove cocktail sauce (Worcestershire) if needed" },
+                    { dietary: "Alcohol", available: true, note: "Remove mignonette to avoid red wine vinegar" }
                 ],
-                interestingInfo: "Our Atlantic salmon is sustainably sourced from Norwegian fjords where the cold, pristine waters produce fish with exceptional omega-3 content. The traditional pan-searing technique creates a perfect crispy skin while keeping the interior moist and tender. Chef's tip: we rest the salmon for 3 minutes after cooking to allow the juices to redistribute throughout the fillet."
+                interestingInfo: "Classic raw bar presentation with Thai-inspired espuma and house cocktail sauce. Emphasise freshness, provenance, and that oyster varieties rotate daily. Great chance to talk about mignonette vs cocktail sauce preferences."
             },
             {
-                name: "Wild Mushroom Risotto",
-                image: "https://images.unsplash.com/photo-1476124369491-c4ba3e6dee7e?w=800&h=600&fit=crop",
-                dietaries: ["vegetarian", "gluten-free"],
+                name: "Seafood Tower (for 2 or 4)",
+                image: "https://images.unsplash.com/photo-1558030006-450675393462?w=800&h=600&fit=crop",
+                dietaries: ["shellfish", "fin-fish"],
                 ingredients: [
-                    "Arborio rice",
-                    "Mixed wild mushrooms (porcini, shiitake, oyster)",
-                    "Vegetable stock",
-                    "White wine",
-                    "Parmesan cheese",
-                    "Butter",
-                    "Shallots",
-                    "Garlic",
-                    "Fresh thyme",
-                    "Truffle oil"
+                    "Smoked steelhead trout with white kimchi turnip and miso mayo",
+                    "Albacore tuna tataki with yuzu vinaigrette and avocado",
+                    "Mussel escabèche with carrots, celery, red onion, mussel nectar",
+                    "Crab Louie salad and snow crab legs",
+                    "Poached wild shrimp",
+                    "Local and imported oysters",
+                    "Chipotle tortilla chips and taro root chips"
                 ],
                 miseEnPlace: [
-                    "Clean and slice all mushrooms",
-                    "Finely dice shallots",
-                    "Mince garlic",
-                    "Prepare hot vegetable stock (keep warm)",
-                    "Grate Parmesan cheese fresh",
-                    "Pick thyme leaves",
-                    "Measure rice portions (80g per serving)",
-                    "Have white wine measured and ready"
+                    "Dinner fork and knife for each guest",
+                    "Oyster forks",
+                    "Shell bowls and shell crackers",
+                    "Share plates and mother-of-pearl spoons for royale",
+                    "Ensure all components are chilled and neatly arranged on crushed ice"
                 ],
                 modifications: [
-                    { dietary: "Vegan", available: true, note: "Substitute nutritional yeast for Parmesan, use olive oil instead of butter" },
-                    { dietary: "Dairy-Free", available: true, note: "Omit Parmesan and butter, add extra truffle oil for richness" },
-                    { dietary: "Gluten-Free", available: true, note: "Already gluten-free - ensure stock is GF certified" },
-                    { dietary: "Nut Allergies", available: true, note: "No nuts in dish" }
+                    { dietary: "Vegetarian", available: false, note: "Seafood-based platter – cannot be vegetarian" },
+                    { dietary: "Vegan", available: false, note: "Seafood-based platter – cannot be vegan" },
+                    { dietary: "Dairy", available: true, note: "Remove furikake from tuna to remove dairy/egg content" },
+                    { dietary: "Gluten", available: true, note: "Remove tuna tataki component, chips, and any dashi with gluten" },
+                    { dietary: "Shellfish", available: false, note: "Main focus of the dish – cannot remove" },
+                    { dietary: "Fin Fish", available: true, note: "Remove tataki, cocktail sauce, and dashi for fin-fish concerns" },
+                    { dietary: "Alcohol", available: true, note: "Remove mignonette and dashi components with alcohol" }
                 ],
-                interestingInfo: "This risotto uses the traditional Mantecatura technique - vigorously stirring butter and cheese into the rice at the end creates a wave-like movement that emulsifies the starches, giving that signature creamy texture without cream. We use a blend of three wild mushrooms foraged seasonally from local forests, each bringing distinct earthy notes. The risotto should flow like lava when plated - 'all'onda' as the Italians say!"
+                interestingInfo: "Highlight that 'tataki' refers to a Japanese style of lightly searing and thinly slicing fish. Taro chips give a nutty, chestnut-like crunch. Escabèche is a Mediterranean/Latin technique of marinating cooked seafood in an acidic mixture and serving it cold."
             },
             {
-                name: "Heritage Tomato Caprese",
-                image: "https://images.unsplash.com/photo-1592417817038-d13fd7ab0ea4?w=800&h=600&fit=crop",
-                dietaries: ["vegetarian", "gluten-free"],
+                name: "BLVD Baked Oysters",
+                image: "https://images.unsplash.com/photo-1471189641895-16c58a695bcb?w=800&h=600&fit=crop",
+                dietaries: ["shellfish"],
                 ingredients: [
-                    "Heritage tomatoes (mixed varieties)",
-                    "Fresh buffalo mozzarella",
-                    "Fresh basil leaves",
-                    "Extra virgin olive oil",
-                    "Aged balsamic vinegar",
-                    "Sea salt flakes",
-                    "Cracked black pepper"
+                    "Sunseeker oysters",
+                    "Creamed spinach base with white wine and oyster juice",
+                    "Le Sauvagine cheese",
+                    "Garlic bread crumb",
+                    "Wild oregano",
+                    "Lemon zest"
                 ],
                 miseEnPlace: [
-                    "Slice tomatoes into 1/2 inch rounds",
-                    "Drain and slice mozzarella",
-                    "Wash and dry basil leaves (keep whole)",
-                    "Bring mozzarella to room temperature",
-                    "Prepare serving plates",
-                    "Have finishing oil and vinegar ready",
-                    "Portion salt and pepper"
+                    "Dinner fork, knife, and oyster fork",
+                    "Discard bowl for shells",
+                    "Ensure creamed spinach and crumbs are hot and ready for pickup",
+                    "Additional oyster portioning for +$8 add-ons"
                 ],
                 modifications: [
-                    { dietary: "Vegan", available: true, note: "Substitute cashew-based mozzarella or omit cheese entirely" },
-                    { dietary: "Dairy-Free", available: true, note: "Omit mozzarella, double the basil for flavor" },
-                    { dietary: "Gluten-Free", available: true, note: "Already gluten-free" },
-                    { dietary: "Nut Allergies", available: true, note: "No nuts unless vegan substitution requested" }
+                    { dietary: "Vegetarian", available: false, note: "Main component is oyster (shellfish)" },
+                    { dietary: "Vegan", available: false, note: "Contains oysters, cream, cheese, and butter" },
+                    { dietary: "Dairy", available: false, note: "Dairy is built into spinach and crumbs – cannot remove" },
+                    { dietary: "Gluten", available: false, note: "Garlic bread crumb is integral – cannot remove" },
+                    { dietary: "Shellfish", available: false, note: "Oysters are the main ingredient" },
+                    { dietary: "Alcohol", available: false, note: "White wine in spinach base cannot be removed" }
                 ],
-                interestingInfo: "We source our heritage tomatoes from a fourth-generation family farm just 30 miles away. These heirloom varieties - including Cherokee Purple, Brandywine, and Green Zebra - have been cultivated for flavor rather than shelf life, making them exponentially more delicious than commercial tomatoes. The buffalo mozzarella arrives three times weekly from a local creamery and is never refrigerated to preserve its delicate texture. True Caprese is about the quality of ingredients, not complexity of technique!"
+                interestingInfo: "Inspired by Oysters Rockefeller and classic escargot. Garlicky, herbaceous, and rich – a gateway dish for guests who are nervous about raw oysters but curious about trying them cooked."
             },
             {
-                name: "Grilled Lamb Chops",
-                image: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&h=600&fit=crop",
-                dietaries: ["gluten-free", "dairy-free"],
+                name: "BLVD Clam Chowder",
+                image: "https://images.unsplash.com/photo-1528712306091-ed0763094c98?w=800&h=600&fit=crop",
+                dietaries: ["shellfish", "fin-fish"],
                 ingredients: [
-                    "Frenched lamb chops (3 per portion)",
-                    "Fresh rosemary",
-                    "Fresh thyme",
-                    "Garlic",
-                    "Olive oil",
-                    "Dijon mustard",
-                    "Sea salt",
-                    "Black pepper",
-                    "Mint leaves"
+                    "Manila clams in the shell",
+                    "Yukon Gold potatoes",
+                    "Leeks, mirepoix, fennel pollen, dill",
+                    "Fish stock base with flour and cream"
                 ],
                 miseEnPlace: [
-                    "French trim lamb chops if needed",
-                    "Bring lamb to room temp 30 min before service",
-                    "Prepare herb marinade (rosemary, thyme, garlic, oil)",
-                    "Marinate chops minimum 2 hours",
-                    "Preheat grill to high heat",
-                    "Prep mint garnish",
-                    "Have finishing salt ready"
+                    "Dinner fork and knife",
+                    "Soup spoon",
+                    "Small discard bowl for shells",
+                    "Ensure chowder is hot and clams are opening properly"
                 ],
                 modifications: [
-                    { dietary: "Vegan", available: false, note: "Cannot substitute - meat-based protein" },
-                    { dietary: "Vegetarian", available: false, note: "Cannot substitute - meat-based protein" },
-                    { dietary: "Gluten-Free", available: true, note: "Already gluten-free" },
-                    { dietary: "Dairy-Free", available: true, note: "Already dairy-free" },
-                    { dietary: "Nut Allergies", available: true, note: "No nuts in dish" }
+                    { dietary: "Vegetarian", available: false, note: "Contains clams and fish stock" },
+                    { dietary: "Vegan", available: false, note: "Contains shellfish, dairy, and flour" },
+                    { dietary: "Dairy", available: false, note: "Cream is built into chowder base" },
+                    { dietary: "Gluten", available: false, note: "Flour in base cannot be removed" },
+                    { dietary: "Shellfish", available: false, note: "Clams are the main ingredient" },
+                    { dietary: "Fin Fish", available: false, note: "Fish stock is core to the flavour" }
                 ],
-                interestingInfo: "Our lamb comes from a heritage breed farm in the hills where the sheep graze on wild herbs, which naturally flavors the meat. The 'Frenching' technique - where the meat is scraped from the bone ends - isn't just for presentation; it prevents burning during high-heat grilling and creates a handle for elegant eating. We rest the chops for exactly 5 minutes after grilling, which is crucial - cutting too early would lose up to 40% of the juices!"
+                interestingInfo: "Classic New England-style chowder with Pacific Northwest clams. Fennel pollen adds a delicate anise note and elevates the aromatics."
+            },
+            {
+                name: "Asparagus Salad",
+                image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop",
+                dietaries: ["contains-nuts"],
+                ingredients: [
+                    "Green and white asparagus",
+                    "Grainy mustard dressing",
+                    "Egg yolk gel",
+                    "Almond tuille and marcona almonds",
+                    "Pickled shallot",
+                    "Prosciutto chips",
+                    "Sherry vinaigrette and Pedro Ximénez reduction"
+                ],
+                miseEnPlace: [
+                    "Appetizer fork and knife",
+                    "Ensure asparagus is blanched and chilled/tempered according to service style",
+                    "Have dressing, egg gel, almonds, and prosciutto chips prepped separately for plating"
+                ],
+                modifications: [
+                    { dietary: "Vegetarian", available: true, note: "Remove prosciutto" },
+                    { dietary: "Vegan", available: false, note: "Contains egg, dairy-based components" },
+                    { dietary: "Dairy", available: true, note: "Remove dairy tuille/cheese elements" },
+                    { dietary: "Gluten-Free", available: true, note: "Gluten-free as composed" },
+                    { dietary: "Nut Allergies", available: true, note: "Remove almond tuille and marcona almonds" },
+                    { dietary: "Alcohol", available: false, note: "Pedro Ximénez/sherry components contain alcohol" }
+                ],
+                interestingInfo: "Pedro Ximénez is a super-sweet Andalusian dessert sherry made from sun-dried grapes. Use this to sell the dish as both savoury and slightly dessert-like, with nutty and caramelised notes."
             }
         ];
 
-        // ========================================
-        // APP FUNCTIONALITY - DO NOT EDIT BELOW
-        // ========================================
+        // Placeholder objects for future extension
+        const wineData = [];
+        const cocktailData = [];
+        const beerData = [];
 
-        let currentFilter = 'all';
-        let searchTerm = '';
+        // ================================
+        //  APP STATE
+        // ================================
+        let currentFilter = "all";
+        let searchTerm = "";
+        let isAdmin = false;
+
+        // ================================
+        //  RENDER FUNCTIONS
+        // ================================
+        function formatDietaryTag(tag) {
+            const map = {
+                "gluten-free": "Gluten Free",
+                "dairy-free": "Dairy Free",
+                "shellfish": "Contains shellfish",
+                "fin-fish": "Contains fin fish",
+                "vegetarian": "Vegetarian",
+                "vegan": "Vegan",
+                "contains-nuts": "Contains nuts"
+            };
+            return map[tag] || tag;
+        }
+
+        function buildPreview(dish) {
+            return dish.interestingInfo || (dish.ingredients && dish.ingredients.join(", "));
+        }
 
         function renderMenu() {
-            const menuGrid = document.getElementById('menuGrid');
-            let filteredData = menuData;
+            const grid = document.getElementById("menuGrid");
+            let data = menuData.slice();
 
-            if (currentFilter !== 'all') {
-                filteredData = filteredData.filter(dish => 
-                    dish.dietaries.includes(currentFilter)
-                );
+            if (currentFilter !== "all") {
+                data = data.filter(dish => dish.dietaries && dish.dietaries.includes(currentFilter));
             }
 
             if (searchTerm) {
-                filteredData = filteredData.filter(dish =>
-                    dish.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    dish.ingredients.some(ing => ing.toLowerCase().includes(searchTerm.toLowerCase()))
-                );
+                const t = searchTerm.toLowerCase();
+                data = data.filter(dish => {
+                    const inName = dish.name.toLowerCase().includes(t);
+                    const inIngredients = (dish.ingredients || []).some(i => i.toLowerCase().includes(t));
+                    const inInfo = (dish.interestingInfo || "").toLowerCase().includes(t);
+                    return inName || inIngredients || inInfo;
+                });
             }
 
-            menuGrid.innerHTML = filteredData.map(dish => `
-                <div class="dish-card" onclick="openDishModal('${dish.name.replace(/'/g, "\\'")}')">
-                    <img src="${dish.image}" alt="${dish.name}" class="dish-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect fill=%22%23e2e8f0%22 width=%22800%22 height=%22600%22/%3E%3Ctext fill=%22%2394a3b8%22 font-family=%22Arial%22 font-size=%2224%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E${dish.name}%3C/text%3E%3C/svg%3E'">
-                    <div class="dish-content">
-                        <h3 class="dish-name">${dish.name}</h3>
-                        <div class="dietary-tags">
-                            ${dish.dietaries.map(d => `<span class="dietary-tag">${formatDietary(d)}</span>`).join('')}
+            if (!data.length) {
+                grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--color-text-secondary);padding:2.5rem 0;">No dishes found. Try another search or filter.</p>';
+                return;
+            }
+
+            grid.innerHTML = data.map(dish => `
+                <div class="card clickable" onclick="openDishModal('${dish.name.replace(/'/g, "\\'")}')">
+                    <img src="${dish.image || ''}" alt="${dish.name}" class="dish-image"
+                         onerror="this.src='image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect fill=%22%23e2e8f0%22 width=%22800%22 height=%22600%22/%3E%3Ctext fill=%22%2394a3b8%22 font-family=%22Arial%22 font-size=%2224%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E${encodeURIComponent(dish.name)}%3C/text%3E%3C/svg%3E'">
+                    <div class="card-body">
+                        <div class="card-title">
+                            ${dish.name}
+                            ${(dish.dietaries || []).includes("shellfish") ? '<span class="badge badge-danger">Shellfish</span>' : ''}
+                            ${(dish.dietaries || []).includes("fin-fish") ? '<span class="badge badge-danger">Fin fish</span>' : ''}
                         </div>
-                        <p class="dish-preview">${dish.interestingInfo}</p>
+                        <div class="dietary-tags">
+                            ${(dish.dietaries || []).map(d => `<span class="dietary-tag">${formatDietaryTag(d)}</span>`).join("")}
+                        </div>
+                        <div class="card-preview">${buildPreview(dish)}</div>
                     </div>
                 </div>
-            `).join('');
-
-            if (filteredData.length === 0) {
-                menuGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--color-text-secondary); padding: 3rem;">No dishes found matching your criteria.</p>';
-            }
+            `).join("");
         }
 
-        function formatDietary(dietary) {
-            return dietary.split('-').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-        }
-
-        function openDishModal(dishName) {
-            const dish = menuData.find(d => d.name === dishName);
+        function openDishModal(name) {
+            const dish = menuData.find(d => d.name === name);
             if (!dish) return;
 
-            const modal = document.getElementById('dishModal');
-            const modalContent = document.getElementById('modalContent');
+            const modal = document.getElementById("dishModal");
+            const content = document.getElementById("modalContent");
 
-            modalContent.innerHTML = `
-                <img src="${dish.image}" alt="${dish.name}" class="modal-image" onerror="this.style.display='none'">
+            content.innerHTML = `
+                <img src="${dish.image || ''}" alt="${dish.name}" class="modal-image" onerror="this.style.display='none'">
                 <div class="modal-body">
                     <h2 class="modal-title">${dish.name}</h2>
-                    
-                    <div class="dietary-tags" style="margin-bottom: 1.5rem;">
-                        ${dish.dietaries.map(d => `<span class="dietary-tag">${formatDietary(d)}</span>`).join('')}
+
+                    <div class="dietary-tags" style="margin-bottom:1.1rem;">
+                        ${(dish.dietaries || []).map(d => `<span class="dietary-tag">${formatDietaryTag(d)}</span>`).join("")}
                     </div>
 
                     <div class="section">
-                        <h3 class="section-title">📋 Mise en Place for Service</h3>
+                        <h3>📋 Mise en place for service</h3>
                         <div class="section-content">
-                            <ul>
-                                ${dish.miseEnPlace.map(item => `<li>${item}</li>`).join('')}
-                            </ul>
+                            <ul>${(dish.miseEnPlace || []).map(i => `<li>${i}</li>`).join("")}</ul>
                         </div>
                     </div>
 
                     <div class="section">
-                        <h3 class="section-title">🥘 Ingredients</h3>
+                        <h3>🥘 Ingredients / description</h3>
                         <div class="section-content">
-                            <ul>
-                                ${dish.ingredients.map(item => `<li>${item}</li>`).join('')}
-                            </ul>
+                            <ul>${(dish.ingredients || []).map(i => `<li>${i}</li>`).join("")}</ul>
                         </div>
                     </div>
 
                     <div class="section">
-                        <h3 class="section-title">🔄 Dietary Modifications</h3>
+                        <h3>🔄 Dietaries & modifications</h3>
                         <div class="section-content">
-                            ${dish.modifications.map(mod => `
+                            ${(dish.modifications || []).map(m => `
                                 <div class="modification-item">
-                                    <strong>${mod.dietary}:</strong> 
-                                    <span class="${mod.available ? 'available' : 'not-available'}">
-                                        ${mod.available ? '✓ Available' : '✗ Not Available'}
+                                    <strong>${m.dietary}:</strong>
+                                    <span class="${m.available ? 'available' : 'not-available'}">
+                                        ${m.available ? '✓ Available' : '✗ Not available'}
                                     </span>
                                     <br>
-                                    <small>${mod.note}</small>
+                                    <small>${m.note}</small>
                                 </div>
-                            `).join('')}
+                            `).join("")}
                         </div>
                     </div>
 
                     <div class="section">
-                        <h3 class="section-title">💡 Interesting Information</h3>
+                        <h3>💡 Talking points</h3>
                         <div class="info-box">
-                            ${dish.interestingInfo}
+                            ${dish.interestingInfo || "Use this section for origin stories, cooking techniques, and pairing suggestions."}
                         </div>
                     </div>
                 </div>
             `;
 
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            modal.classList.add("active");
+            document.body.style.overflow = "hidden";
         }
 
         function closeModal() {
-            const modal = document.getElementById('dishModal');
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            const modal = document.getElementById("dishModal");
+            modal.classList.remove("active");
+            document.body.style.overflow = "auto";
         }
 
-        document.getElementById('searchInput').addEventListener('input', (e) => {
+        // ================================
+        //  TABS
+        // ================================
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                const tab = btn.getAttribute("data-tab");
+                ["food","wine","cocktails","beers","info"].forEach(id => {
+                    document.getElementById("tab-" + id).style.display = (id === tab) ? "block" : "none";
+                });
+            });
+        });
+
+        // ================================
+        //  SEARCH & FILTERS
+        // ================================
+        document.getElementById("searchInput").addEventListener("input", (e) => {
             searchTerm = e.target.value;
             renderMenu();
         });
 
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                currentFilter = e.target.getAttribute('data-filter');
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentFilter = btn.getAttribute("data-filter");
                 renderMenu();
             });
         });
 
-        document.getElementById('dishModal').addEventListener('click', (e) => {
-            if (e.target.id === 'dishModal') {
-                closeModal();
+        document.getElementById("dishModal").addEventListener("click", (e) => {
+            if (e.target.id === "dishModal") closeModal();
+        });
+
+        // ================================
+        //  ADMIN LOGIN
+        // ================================
+        const ADMIN_USER = "BLVD845";
+        const ADMIN_PASS = "Krisisthebest";
+
+        function setAdminState(on) {
+            isAdmin = on;
+            const dot = document.getElementById("adminStatusDot");
+            const label = document.getElementById("adminBtnLabel");
+            const panel = document.getElementById("adminPanel");
+
+            if (on) {
+                dot.classList.add("online");
+                label.textContent = "Admin (on)";
+                panel.classList.add("active");
+                try {
+                    localStorage.setItem("handsPleaseAdmin","1");
+                } catch {}
+            } else {
+                dot.classList.remove("online");
+                label.textContent = "Admin";
+                panel.classList.remove("active");
+                try {
+                    localStorage.removeItem("handsPleaseAdmin");
+                } catch {}
+            }
+        }
+
+        document.getElementById("adminBtn").addEventListener("click", () => {
+            if (isAdmin) {
+                if (confirm("Turn admin mode off?")) setAdminState(false);
+                return;
+            }
+            document.getElementById("adminLoginMessage").innerHTML = "";
+            document.getElementById("adminUser").value = "";
+            document.getElementById("adminPass").value = "";
+            document.getElementById("adminLoginModal").classList.add("active");
+        });
+
+        document.getElementById("adminLoginBtn").addEventListener("click", () => {
+            const u = document.getElementById("adminUser").value.trim();
+            const p = document.getElementById("adminPass").value;
+
+            const msg = document.getElementById("adminLoginMessage");
+            if (u === ADMIN_USER && p === ADMIN_PASS) {
+                msg.innerHTML = '<div class="success-text">Login successful. Admin tools enabled.</div>';
+                setAdminState(true);
+                setTimeout(() => {
+                    document.getElementById("adminLoginModal").classList.remove("active");
+                }, 600);
+            } else {
+                msg.innerHTML = '<div class="error-text">Incorrect username or password.</div>';
             }
         });
 
+        document.getElementById("adminLoginModal").addEventListener("click", (e) => {
+            if (e.target.id === "adminLoginModal") {
+                document.getElementById("adminLoginModal").classList.remove("active");
+            }
+        });
+
+        // Restore admin from previous session if possible
+        try {
+            if (localStorage.getItem("handsPleaseAdmin") === "1") {
+                setAdminState(true);
+            }
+        } catch {}
+
+        // ================================
+        //  ADMIN JSON IMPORT / EXPORT
+        // ================================
+        document.getElementById("exportJsonBtn").addEventListener("click", () => {
+            if (!isAdmin) {
+                alert("Admin login required.");
+                return;
+            }
+            const payload = {
+                menuData,
+                wineData,
+                cocktailData,
+                beerData
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "hands-please-syllabus.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById("importJsonBtn").addEventListener("click", () => {
+            if (!isAdmin) {
+                alert("Admin login required.");
+                return;
+            }
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "application/json";
+            input.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const json = JSON.parse(ev.target.result);
+                        if (Array.isArray(json.menuData)) {
+                            window.menuData = json.menuData;
+                        }
+                        renderMenu();
+                        alert("JSON imported. Remember: to make this permanent for everyone, also update index.html in GitHub later.");
+                    } catch (err) {
+                        alert("Could not read JSON file. Please check the format.");
+                    }
+                };
+                reader.readAsText(file);
+            });
+            input.click();
+        });
+
+        // Initial render
         renderMenu();
     </script>
 </body>
