@@ -1216,22 +1216,23 @@ async function sbSaveQuestions(questionsArr){
     let playerName = '';
 
     // === NAME ENTRY ===
-    function startQuiz(){
-      const input = document.getElementById('playerNameInput');
-      const name = input.value.trim();
-      
-      if(!name){
-        alert('Please enter your name!');
-        return;
-      }
-      
-      playerName = name;
-      document.getElementById('playerNameDisplay').innerText = `Player: ${playerName}`;
-      document.getElementById('nameEntryScreen').style.display = 'none';
-      document.getElementById('mainContainer').style.display = 'flex';
-      
-      init();
-    }
+  async function startQuiz(){
+  const input = document.getElementById('playerNameInput');
+  const name = input.value.trim();
+
+  if(!name){
+    alert('Please enter your name!');
+    return;
+  }
+
+  playerName = name;
+  document.getElementById('playerNameDisplay').innerText = `Player: ${playerName}`;
+  document.getElementById('nameEntryScreen').style.display = 'none';
+  document.getElementById('mainContainer').style.display = 'flex';
+
+  await init();
+}
+
 
     // Allow Enter key to start quiz
     document.addEventListener('DOMContentLoaded', () => {
