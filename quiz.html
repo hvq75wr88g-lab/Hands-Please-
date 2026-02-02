@@ -1,615 +1,716 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hands Please Breakfast Quiz</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --brand: #d35400;
-            --brand-dark: #a04000;
-            --egg: #f39c12;
-            --bg: #fdfbf7;
-            --text: #2c3e50;
-            --white: #ffffff;
-            --success: #27ae60;
-            --danger: #c0392b;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <title>Hands Please Breakfast Quiz</title>
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+  <!-- Supabase v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        .screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow-y: auto;
-            z-index: 10;
-        }
+  <style>
+    :root {
+      --brand: #d35400;
+      --brand-dark: #a04000;
+      --egg: #f39c12;
+      --bg: #fdfbf7;
+      --text: #2c3e50;
+      --white: #ffffff;
+      --success: #27ae60;
+      --danger: #c0392b;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
 
-        .screen.active { display: flex; z-index: 20; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 
-        .card {
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            padding: 30px 20px;
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-        h1 { font-size: 26px; color: var(--brand); margin-bottom: 10px; line-height: 1.3; }
-        h2 { font-size: 22px; margin-bottom: 15px; color: var(--text); }
-        p { color: #666; margin-bottom: 20px; line-height: 1.5; font-size: 15px; }
+    .screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+    .screen.active { display: flex; z-index: 20; }
 
-        .btn {
-            background: var(--brand);
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            width: 100%;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            margin-top: 10px;
-        }
-        .btn:active { transform: scale(0.98); }
-        .btn:disabled { background: #ccc; cursor: not-allowed; }
-        .btn:hover { background: var(--brand-dark); }
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
 
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 17px;
-            text-align: center;
-            margin-bottom: 15px;
-            outline: none;
-            font-family: inherit;
-        }
-        input:focus { border-color: var(--brand); }
+    h1 { font-size: 26px; color: var(--brand); margin-bottom: 10px; line-height: 1.3; }
+    h2 { font-size: 22px; margin-bottom: 15px; color: var(--text); }
+    p { color: #666; margin-bottom: 20px; line-height: 1.5; font-size: 15px; }
 
-        .hud {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 450px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #7f8c8d;
-            font-size: 14px;
-        }
+    .btn {
+      background: var(--brand);
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      width: 100%;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+      margin-top: 10px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
+    .btn:hover { background: var(--brand-dark); }
 
-        .question-text {
-            font-size: 19px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text);
-            text-align: left;
-            line-height: 1.4;
-        }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 17px;
+      text-align: center;
+      margin-bottom: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+    input:focus { border-color: var(--brand); }
 
-        .options-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            margin-bottom: 15px;
-        }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 450px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      color: #7f8c8d;
+      font-size: 14px;
+    }
 
-        .option-btn {
-            background: var(--white);
-            border: 2px solid #eee;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: left;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            font-weight: 500;
-        }
+    .question-text {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text);
+      text-align: left;
+      line-height: 1.4;
+    }
 
-        .option-btn.selected { border-color: var(--brand); background: #fff5eb; }
-        .option-btn.correct { border-color: var(--success); background: #e8f8f5; color: var(--success); font-weight: 700; }
-        .option-btn.wrong { border-color: var(--danger); background: #fdedec; color: var(--danger); }
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 15px;
+    }
 
-        .leaderboard-container {
-            width: 100%;
-            max-width: 450px;
-            max-height: 55vh;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            background: #fafafa;
-            padding: 10px;
-        }
+    .option-btn {
+      background: var(--white);
+      border: 2px solid #eee;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: left;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      font-weight: 500;
+    }
+    .option-btn.selected { border-color: var(--brand); background: #fff5eb; }
+    .option-btn.correct { border-color: var(--success); background: #e8f8f5; color: var(--success); font-weight: 700; }
+    .option-btn.wrong { border-color: var(--danger); background: #fdedec; color: var(--danger); }
 
-        .leaderboard-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 15px;
-        }
+    .leaderboard-container {
+      width: 100%;
+      max-width: 450px;
+      max-height: 55vh;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      background: #fafafa;
+      padding: 10px;
+    }
 
-        .leaderboard-row:last-child { border-bottom: none; }
+    .leaderboard-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 10px;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+    }
+    .leaderboard-row:last-child { border-bottom: none; }
 
-        .leaderboard-row.champion {
-            background: linear-gradient(135deg, #fff9e6 0%, #ffe6b3 100%);
-            border-radius: 12px;
-            border: 2px solid #ffd700;
-            margin-bottom: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 8px rgba(241, 196, 15, 0.3);
-        }
-        
-        .rank-1-badge { font-size: 24px; margin-right: 8px; }
+    .leaderboard-row.champion {
+      background: linear-gradient(135deg, #fff9e6 0%, #ffe6b3 100%);
+      border-radius: 12px;
+      border: 2px solid #ffd700;
+      margin-bottom: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(241, 196, 15, 0.3);
+    }
 
-        .champion-title {
-            display: block;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--brand);
-            font-weight: 800;
-            margin-top: 3px;
-        }
+    .rank-1-badge { font-size: 24px; margin-right: 8px; }
 
-        .chicken-stage {
-            height: 100px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .chicken-emoji { font-size: 70px; transition: all 0.3s; }
-        .chicken-emoji.bounce { animation: bounce 0.5s infinite alternate; }
-        .chicken-emoji.shake { animation: shake 0.3s; }
-        @keyframes bounce { to { transform: translateY(-10px); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    .champion-title {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--brand);
+      font-weight: 800;
+      margin-top: 3px;
+    }
 
-        .admin-toggle {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            opacity: 0.3;
-            font-size: 10px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            z-index: 100;
-            color: #999;
-        }
-        
-        .delete-btn {
-            background: none;
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .admin-list {
-            text-align: left;
-            max-height: 400px;
-            overflow-y: auto;
-            width: 100%;
-            margin-top: 15px;
-        }
-        
-        .admin-item {
-            border-bottom: 1px solid #eee;
-            padding: 12px 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-        }
+    .chicken-stage {
+      height: 100px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chicken-emoji { font-size: 70px; transition: all 0.3s; }
+    .chicken-emoji.bounce { animation: bounce 0.5s infinite alternate; }
+    .chicken-emoji.shake { animation: shake 0.3s; }
+    @keyframes bounce { to { transform: translateY(-10px); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        .link-btn {
-            background: none;
-            border: none;
-            color: var(--brand);
-            text-decoration: underline;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 15px;
-            margin-top: 15px;
-        }
+    .admin-toggle {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      opacity: 0.3;
+      font-size: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 100;
+      color: #999;
+    }
 
-        @media (max-width: 400px) {
-            .card { padding: 25px 15px; }
-            h1 { font-size: 24px; }
-            .question-text { font-size: 17px; }
-            .option-btn { font-size: 14px; padding: 12px; }
-        }
-    </style>
+    .delete-btn {
+      background: none;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .admin-list {
+      text-align: left;
+      max-height: 400px;
+      overflow-y: auto;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .admin-item {
+      border-bottom: 1px solid #eee;
+      padding: 12px 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--brand);
+      text-decoration: underline;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 15px;
+      margin-top: 15px;
+    }
+
+    .tiny-note { font-size: 12px; color:#999; margin-top: 10px; }
+
+    @media (max-width: 400px) {
+      .card { padding: 25px 15px; }
+      h1 { font-size: 24px; }
+      .question-text { font-size: 17px; }
+      .option-btn { font-size: 14px; padding: 12px; }
+    }
+  </style>
 </head>
+
 <body>
+  <!-- SCREEN 1: WELCOME -->
+  <div id="startScreen" class="screen active">
+    <div class="card">
+      <div class="chicken-stage"><div class="chicken-emoji">🐔</div></div>
+      <h1>Hands Please<br/>Breakfast Quiz</h1>
+      <p>Prove your menu knowledge and become the Superduper Breakfast Champion!</p>
 
-    <!-- SCREEN 1: WELCOME & NAME ENTRY -->
-    <div id="startScreen" class="screen active">
-        <div class="card">
-            <div class="chicken-stage"><div class="chicken-emoji">🐔</div></div>
-            <h1>Hands Please<br>Breakfast Quiz</h1>
-            <p>Prove your menu knowledge and become the Superduper Breakfast Champion!</p>
-            
-            <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
-            
-            <button class="btn" onclick="startGame()">Start Quiz</button>
-            <button class="link-btn" onclick="showLeaderboard()">View Leaderboard</button>
-        </div>
+      <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" autocomplete="off" />
+      <button class="btn" id="startBtn">Start Quiz</button>
+      <button class="link-btn" id="viewLeaderboardBtn">View Leaderboard</button>
+
+      <div class="tiny-note" id="statusNote"></div>
     </div>
+  </div>
 
-    <!-- SCREEN 2: QUIZ -->
-    <div id="quizScreen" class="screen">
-        <div class="hud">
-            <span id="playerDisplay">Player</span>
-            <span id="scoreDisplay">0 / 0</span>
-        </div>
-        <div class="card">
-            <div class="chicken-stage"><div id="quizChicken" class="chicken-emoji">🥚</div></div>
-            <div id="questionContainer">
-                <div class="question-text" id="questionText">Loading...</div>
-                <div class="options-grid" id="optionsGrid"></div>
+  <!-- SCREEN 2: QUIZ -->
+  <div id="quizScreen" class="screen">
+    <div class="hud">
+      <span id="playerDisplay">Player</span>
+      <span id="scoreDisplay">0 / 0</span>
+    </div>
+    <div class="card">
+      <div class="chicken-stage"><div id="quizChicken" class="chicken-emoji">🥚</div></div>
+      <div id="questionContainer">
+        <div class="question-text" id="questionText">Loading...</div>
+        <div class="options-grid" id="optionsGrid"></div>
+      </div>
+      <button id="nextBtn" class="btn" style="display:none;">Next Question</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: RESULTS -->
+  <div id="resultScreen" class="screen">
+    <div class="card">
+      <div class="chicken-stage"><div id="resultChicken" class="chicken-emoji">🐣</div></div>
+      <h2 id="resultTitle">Quiz Complete!</h2>
+      <p id="resultMessage"></p>
+      <div class="leaderboard-container" id="leaderboardContent"></div>
+      <button class="btn" onclick="location.reload()">Play Again</button>
+    </div>
+  </div>
+
+  <!-- ADMIN MODAL -->
+  <div id="adminModal" class="screen" style="background:rgba(0,0,0,0.9);">
+    <div class="card">
+      <h2>Admin Access</h2>
+      <input type="password" id="adminPass" placeholder="Password" />
+      <button class="btn" id="adminLoginBtn">Login</button>
+      <button class="btn" id="adminCancelBtn" style="background:#7f8c8d; margin-top:10px;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="screen">
+    <div class="card" style="max-width:600px;">
+      <h2>Admin Control Panel</h2>
+      <p style="font-size:14px; color:#999;">Manage Leaderboard Scores</p>
+      <div id="adminLeaderboardList" class="admin-list"></div>
+      <button class="btn" style="margin-top:20px;" onclick="location.reload()">Exit Admin</button>
+    </div>
+  </div>
+
+  <button class="admin-toggle" id="adminToggleBtn">Admin</button>
+
+  <script>
+    // =====================
+    // CONFIGURATION
+    // =====================
+    const SUPABASE_URL = 'https://beyeqxromrqoiruejddp.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJleWVxeHJvbXJxb2lydWVqZGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MjcwMDEsImV4cCI6MjA4NTUwMzAwMX0.LIt8CG0DYeQDXE1RhvGPNyjVdK8SarSGuXJJJd2Ku7o';
+    const ADMIN_PASSWORD = 'Iworkfortips';
+
+    // Local fallback storage key
+    const LOCAL_KEY = 'hp_breakfast_leaderboard_v1';
+
+    // Create Supabase client safely
+    const supabaseAvailable = !!(window.supabase && window.supabase.createClient);
+    const supabase = supabaseAvailable ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+    // =====================
+    // QUIZ DATA
+    // =====================
+    const questions = [
+      { q: "What meats come with the Farmhouse Breakfast?", options: ["Bacon or Sausage","Ham or Bacon","Sausage or Turkey","Bacon only"], a: 0 },
+      { q: "Is the Farmhouse Breakfast suitable for Celiacs?", options: ["Yes, completely","No, fryer cross-contamination","Yes, if no toast","Only if vegan"], a: 1 },
+      { q: "What is in the BLVD Power Bowl?", options: ["Oatmeal & berries","Yoghurt, smoothie, granola, fruit","Just fruit salad","Cornflakes & milk"], a: 1 },
+      { q: "Is the Power Bowl Vegan?", options: ["Yes","No (contains yoghurt/honey)","Only without granola","Yes if no milk"], a: 1 },
+      { q: "What nut is in the Steel-cut Oatmeal crumble?", options: ["Walnuts","Peanuts","Almonds & Pumpkin Seeds","Macadamia"], a: 2 },
+      { q: "How are the eggs cooked in 'Over Hard'?", options: ["Runny yolk","Un-flipped","Flipped, fully cooked yolk","Poached"], a: 2 },
+      { q: "The Deluxe Continental includes which pastries?", options: ["Muffin & Toast","Croissant, Danish, Cornbread","Bagel & Cream Cheese","Scone & Jam"], a: 1 },
+      { q: "Where are the sausages sourced from?", options: ["Costco","Two Rivers (North Van)","Sysco","Homemade"], a: 1 }
+    ];
+
+    // =====================
+    // STATE
+    // =====================
+    let currentPlayer = "";
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let isAdmin = false;
+
+    // =====================
+    // DOM HELPERS
+    // =====================
+    const $ = (id) => document.getElementById(id);
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      $(id).classList.add('active');
+    }
+
+    function setStatus(msg) {
+      const el = $('statusNote');
+      if (!el) return;
+      el.textContent = msg || '';
+    }
+
+    // =====================
+    // LOCAL FALLBACK STORAGE
+    // =====================
+    function readLocalScores() {
+      try {
+        const raw = localStorage.getItem(LOCAL_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function writeLocalScores(scores) {
+      try {
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(scores.slice(0, 200)));
+      } catch {}
+    }
+
+    function addLocalScore(name, score, total) {
+      const scores = readLocalScores();
+      scores.push({
+        id: Date.now(),
+        player_name: name,
+        score: score,
+        total_questions: total,
+        created_at: new Date().toISOString()
+      });
+      // Keep best sorting behavior consistent with DB view
+      scores.sort((a,b) => (b.score - a.score) || (new Date(a.created_at) - new Date(b.created_at)));
+      writeLocalScores(scores);
+    }
+
+    // =====================
+    // GAMEPLAY
+    // =====================
+    function loadQuestion() {
+      const q = questions[currentQuestionIndex];
+      $('questionText').textContent = q.q;
+      $('scoreDisplay').textContent = `${score} / ${questions.length}`;
+
+      const grid = $('optionsGrid');
+      grid.innerHTML = '';
+
+      $('nextBtn').style.display = 'none';
+      $('quizChicken').className = 'chicken-emoji';
+      $('quizChicken').textContent = "🥚";
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => selectAnswer(idx, btn);
+        grid.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(selectedIndex, btnElement) {
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(b => b.disabled = true);
+
+      const correctIndex = questions[currentQuestionIndex].a;
+
+      if (selectedIndex === correctIndex) {
+        btnElement.classList.add('correct');
+        score++;
+        $('quizChicken').classList.add('bounce');
+        $('quizChicken').textContent = "🐣";
+      } else {
+        btnElement.classList.add('wrong');
+        buttons[correctIndex].classList.add('correct');
+        $('quizChicken').classList.add('shake');
+        $('quizChicken').textContent = "🍗";
+      }
+
+      $('nextBtn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) loadQuestion();
+      else finishQuiz();
+    }
+
+    async function finishQuiz() {
+      showScreen('resultScreen');
+      $('resultMessage').textContent = `You scored ${score} out of ${questions.length}`;
+
+      const chicken = $('resultChicken');
+      chicken.style.display = '';
+      if (score === questions.length) {
+        chicken.textContent = "🦅";
+        $('resultTitle').textContent = "FLAWLESS VICTORY!";
+      } else if (score > questions.length / 2) {
+        chicken.textContent = "🐔";
+        $('resultTitle').textContent = "Nice work!";
+      } else {
+        chicken.textContent = "🍳";
+        $('resultTitle').textContent = "Good try!";
+      }
+
+      // Save score (Supabase if possible, always local fallback)
+      await saveScore(currentPlayer, score, questions.length);
+
+      // Load leaderboard (Supabase if possible, else local)
+      await loadLeaderboard();
+    }
+
+    // =====================
+    // SUPABASE / LEADERBOARD
+    // =====================
+    async function saveScore(name, score, total) {
+      // always store locally so game works offline
+      addLocalScore(name, score, total);
+
+      if (!supabaseAvailable) return;
+
+      try {
+        const { error } = await supabase
+          .from('leaderboard')
+          .insert([{ player_name: name, score: score, total_questions: total }]);
+
+        if (error) throw error;
+      } catch (err) {
+        console.error("Supabase save failed (using local fallback):", err);
+      }
+    }
+
+    async function loadLeaderboard() {
+      const container = $('leaderboardContent');
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Loading scores...</div>';
+
+      // Try Supabase first
+      if (supabaseAvailable) {
+        try {
+          const { data, error } = await supabase
+            .from('leaderboard')
+            .select('*')
+            .order('score', { ascending: false })
+            .order('created_at', { ascending: true })
+            .limit(50);
+
+          if (error) throw error;
+
+          renderLeaderboard(data || [], container);
+          return;
+        } catch (err) {
+          console.error("Supabase load failed (using local fallback):", err);
+        }
+      }
+
+      // Fallback to local
+      const local = readLocalScores().slice(0, 50);
+      renderLeaderboard(local, container, true);
+    }
+
+    // Multiple champions, and ranks continue after all champions
+    function renderLeaderboard(data, container, isLocal = false) {
+      container.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">No scores yet.<br/>Be the first champion!</div>';
+        return;
+      }
+
+      // Ensure consistent order
+      data = [...data].sort((a,b) => (b.score - a.score) || (new Date(a.created_at) - new Date(b.created_at)));
+
+      const topScore = data[0].score;
+      const championCount = data.filter(r => r.score === topScore).length;
+
+      let normalRank = championCount + 1; // first non-champion rank
+
+      data.forEach((entry, index) => {
+        const isChampion = entry.score === topScore;
+
+        const row = document.createElement('div');
+        row.className = 'leaderboard-row';
+        if (isChampion) row.classList.add('champion');
+
+        let leftHTML = '';
+        if (isChampion) {
+          leftHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="rank-1-badge">👑</span>
+              <div>
+                <span style="font-weight:800; font-size:17px;">${escapeHtml(entry.player_name || 'Player')}</span>
+                <span class="champion-title">🏆 Superduper Breakfast Champion!</span>
+              </div>
             </div>
-            <button id="nextBtn" class="btn" style="display:none;" onclick="nextQuestion()">Next Question</button>
-        </div>
-    </div>
-
-    <!-- SCREEN 3: RESULTS & LEADERBOARD -->
-    <div id="resultScreen" class="screen">
-        <div class="card">
-            <div class="chicken-stage"><div id="resultChicken" class="chicken-emoji">🐣</div></div>
-            <h2 id="resultTitle">Quiz Complete!</h2>
-            <p id="resultMessage"></p>
-            <div class="leaderboard-container" id="leaderboardContent"></div>
-            <button class="btn" onclick="location.reload()">Play Again</button>
-        </div>
-    </div>
-    
-    <!-- ADMIN MODAL -->
-    <div id="adminModal" class="screen" style="background:rgba(0,0,0,0.9);">
-        <div class="card">
-            <h2>Admin Access</h2>
-            <input type="password" id="adminPass" placeholder="Password">
-            <button class="btn" onclick="verifyAdmin()">Login</button>
-            <button class="btn" style="background:#7f8c8d; margin-top:10px;" onclick="closeAdmin()">Cancel</button>
-        </div>
-    </div>
-    
-    <!-- ADMIN PANEL -->
-    <div id="adminPanel" class="screen">
-         <div class="card" style="max-width:600px;">
-            <h2>Admin Control Panel</h2>
-            <p style="font-size:14px; color:#999;">Manage Leaderboard Scores</p>
-            <div id="adminLeaderboardList" class="admin-list"></div>
-            <button class="btn" style="margin-top:20px;" onclick="location.reload()">Exit Admin</button>
-         </div>
-    </div>
-
-    <button class="admin-toggle" onclick="openAdmin()">Admin</button>
-
-    <script>
-        // CONFIGURATION
-        const SUPABASE_URL = 'https://beyeqxromrqoiruejddp.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJleWVxeHJvbXJxb2lydWVqZGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MjcwMDEsImV4cCI6MjA4NTUwMzAwMX0.LIt8CG0DYeQDXE1RhvGPNyjVdK8SarSGuXJJJd2Ku7o';
-        const ADMIN_PASSWORD = 'Iworkfortips';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // QUIZ DATA
-        const questions = [
-            {
-                q: "What meats come with the Farmhouse Breakfast?",
-                options: ["Bacon or Sausage", "Ham or Bacon", "Sausage or Turkey", "Bacon only"],
-                a: 0
-            },
-            {
-                q: "Is the Farmhouse Breakfast suitable for Celiacs?",
-                options: ["Yes, completely", "No, fryer cross-contamination", "Yes, if no toast", "Only if vegan"],
-                a: 1
-            },
-            {
-                q: "What is in the BLVD Power Bowl?",
-                options: ["Oatmeal & berries", "Yoghurt, smoothie, granola, fruit", "Just fruit salad", "Cornflakes & milk"],
-                a: 1
-            },
-            {
-                q: "Is the Power Bowl Vegan?",
-                options: ["Yes", "No (contains yoghurt/honey)", "Only without granola", "Yes if no milk"],
-                a: 1
-            },
-            {
-                q: "What nut is in the Steel-cut Oatmeal crumble?",
-                options: ["Walnuts", "Peanuts", "Almonds & Pumpkin Seeds", "Macadamia"],
-                a: 2
-            },
-            {
-                q: "How are the eggs cooked in 'Over Hard'?",
-                options: ["Runny yolk", "Un-flipped", "Flipped, fully cooked yolk", "Poached"],
-                a: 2
-            },
-            {
-                q: "The Deluxe Continental includes which pastries?",
-                options: ["Muffin & Toast", "Croissant, Danish, Cornbread", "Bagel & Cream Cheese", "Scone & Jam"],
-                a: 1
-            },
-            {
-                q: "Where are the sausages sourced from?",
-                options: ["Costco", "Two Rivers (North Van)", "Sysco", "Homemade"],
-                a: 1
-            }
-        ];
-
-        // STATE
-        let currentPlayer = "";
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let isAdmin = false;
-
-        // NAVIGATION
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+          `;
+        } else {
+          leftHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:bold; width:30px; color:#aaa;">${normalRank}</span>
+              <span style="font-weight:600;">${escapeHtml(entry.player_name || 'Player')}</span>
+            </div>
+          `;
+          normalRank++;
         }
 
-        async function startGame() {
-            const nameInput = document.getElementById('playerName');
-            if (!nameInput.value.trim()) {
-                alert("Please enter your name!");
-                return;
-            }
-            currentPlayer = nameInput.value.trim();
-            document.getElementById('playerDisplay').textContent = currentPlayer;
-            currentQuestionIndex = 0;
-            score = 0;
-            showScreen('quizScreen');
-            loadQuestion();
-        }
+        row.innerHTML = `
+          ${leftHTML}
+          <strong style="color:var(--brand); font-size:16px;">${entry.score}/${entry.total_questions}</strong>
+        `;
 
-        // GAMEPLAY
-        function loadQuestion() {
-            const q = questions[currentQuestionIndex];
-            document.getElementById('questionText').textContent = q.q;
-            document.getElementById('scoreDisplay').textContent = `${score} / ${questions.length}`;
-            
-            const grid = document.getElementById('optionsGrid');
-            grid.innerHTML = '';
-            
-            document.getElementById('nextBtn').style.display = 'none';
-            document.getElementById('quizChicken').className = 'chicken-emoji';
-            
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
-                btn.onclick = () => selectAnswer(idx, btn);
-                grid.appendChild(btn);
-            });
-        }
+        container.appendChild(row);
+      });
 
-        function selectAnswer(selectedIndex, btnElement) {
-            const buttons = document.querySelectorAll('.option-btn');
-            buttons.forEach(b => b.disabled = true);
-            
-            const correctIndex = questions[currentQuestionIndex].a;
-            
-            if (selectedIndex === correctIndex) {
-                btnElement.classList.add('correct');
-                score++;
-                document.getElementById('quizChicken').classList.add('bounce');
-                document.getElementById('quizChicken').textContent = "🐣";
-            } else {
-                btnElement.classList.add('wrong');
-                buttons[correctIndex].classList.add('correct');
-                document.getElementById('quizChicken').classList.add('shake');
-                document.getElementById('quizChicken').textContent = "🍗";
-            }
-            
-            document.getElementById('nextBtn').style.display = 'block';
-        }
+      if (isLocal) {
+        const note = document.createElement('div');
+        note.style.cssText = "text-align:center;color:#999;font-size:12px;padding:10px 0 0;";
+        note.textContent = "Showing offline/local scores (Supabase unavailable).";
+        container.appendChild(note);
+      }
+    }
 
-        function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                loadQuestion();
-            } else {
-                finishQuiz();
-            }
-        }
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
 
-        async function finishQuiz() {
-            showScreen('resultScreen');
-            document.getElementById('resultMessage').textContent = `You scored ${score} out of ${questions.length}`;
-            
-            const chicken = document.getElementById('resultChicken');
-            if(score === questions.length) {
-                chicken.textContent = "🦅";
-                document.getElementById('resultTitle').textContent = "FLAWLESS VICTORY!";
-            } else if (score > questions.length / 2) {
-                chicken.textContent = "🐔";
-            } else {
-                chicken.textContent = "🍳";
-            }
+    // =====================
+    // LEADERBOARD VIEW
+    // =====================
+    async function showLeaderboard() {
+      showScreen('resultScreen');
+      $('resultTitle').textContent = "🏆 Leaderboard";
+      $('resultMessage').textContent = "Top players across all devices";
+      $('resultChicken').style.display = 'none';
+      await loadLeaderboard();
+    }
 
-            await saveScoreToSupabase(currentPlayer, score, questions.length);
-            loadLeaderboard();
-        }
+    // =====================
+    // ADMIN
+    // =====================
+    function openAdmin() { showScreen('adminModal'); }
+    function closeAdmin() { showScreen('startScreen'); }
 
-        // SUPABASE INTEGRATION
-        async function saveScoreToSupabase(name, score, total) {
-            try {
-                const { error } = await supabase
-                    .from('leaderboard')
-                    .insert([{ player_name: name, score: score, total_questions: total }]);
-                
-                if (error) throw error;
-            } catch (err) {
-                console.error("Error saving score:", err);
-                alert("Could not save score. Check console for details.");
-            }
-        }
+    function verifyAdmin() {
+      const pass = $('adminPass').value;
+      if (pass === ADMIN_PASSWORD) {
+        isAdmin = true;
+        loadAdminPanel();
+      } else {
+        alert("Wrong password!");
+      }
+    }
 
-        async function loadLeaderboard() {
-            const container = document.getElementById('leaderboardContent');
-            container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Loading scores...</div>';
-            
-            try {
-                const { data, error } = await supabase
-                    .from('leaderboard')
-                    .select('*')
-                    .order('score', { ascending: false })
-                    .order('created_at', { ascending: true })
-                    .limit(50);
+    async function loadAdminPanel() {
+      showScreen('adminPanel');
+      const list = $('adminLeaderboardList');
+      list.innerHTML = '<div style="text-align:center; color:#999;">Loading...</div>';
 
-                if (error) throw error;
+      // Admin panel only works with Supabase (by design)
+      if (!supabaseAvailable) {
+        list.innerHTML = '<div style="color:#c0392b; text-align:center;">Supabase not available, admin disabled.</div>';
+        return;
+      }
 
-                renderLeaderboard(data, container);
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-            } catch (err) {
-                console.error("Error loading leaderboard:", err);
-                container.innerHTML = '<div style="color:red; text-align:center; padding:20px;">Failed to load. Check your internet connection and refresh the page.</div>';
-            }
-        }
+      if (error) {
+        console.error(error);
+        list.innerHTML = '<div style="color:red; text-align:center;">Error loading data</div>';
+        return;
+      }
 
-        function renderLeaderboard(data, container) {
-            container.innerHTML = '';
-            
-            if (data.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">No scores yet.<br>Be the first champion! 🏆</div>';
-                return;
-            }
+      list.innerHTML = '';
+      if (!data || data.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">No scores to manage yet.</div>';
+        return;
+      }
 
-            // Find the highest score
-            const topScore = data[0].score;
+      data.forEach(entry => {
+        const item = document.createElement('div');
+        item.className = 'admin-item';
+        item.innerHTML = `
+          <span><b>${escapeHtml(entry.player_name)}</b> - ${entry.score}/${entry.total_questions}</span>
+          <button class="delete-btn" data-id="${entry.id}">Delete</button>
+        `;
+        item.querySelector('button').onclick = () => deleteScore(entry.id);
+        list.appendChild(item);
+      });
+    }
 
-            data.forEach((entry, index) => {
-                const row = document.createElement('div');
-                row.className = 'leaderboard-row';
-                
-                // Check if this entry has the top score (could be multiple champions!)
-                const isChampion = entry.score === topScore;
-                
-                // Add champion class if this is a top scorer
-                if (isChampion) {
-                    row.classList.add('champion');
-                }
-                
-                let rankHTML = `<span style="font-weight:bold; width:30px; color:#aaa;">${index + 1}</span>`;
-                let contentHTML = `<span style="font-weight:600;">${entry.player_name}</span>`;
-                
-                if (isChampion) {
-                    rankHTML = `<span class="rank-1-badge">👑</span>`;
-                    contentHTML = `
-                        <div>
-                            <span style="font-weight:800; font-size:17px;">${entry.player_name}</span>
-                            <span class="champion-title">🏆 Superduper Breakfast Champion!</span>
-                        </div>
-                    `;
-                }
+    async function deleteScore(id) {
+      if (!confirm("Delete this score?")) return;
 
-                row.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        ${rankHTML}
-                        ${contentHTML}
-                    </div>
-                    <strong style="color:var(--brand); font-size:16px;">${entry.score}/${entry.total_questions}</strong>
-                `;
-                
-                container.appendChild(row);
-            });
-        }
-        
-        function showLeaderboard() {
-            showScreen('resultScreen');
-            document.getElementById('resultTitle').textContent = "🏆 Leaderboard";
-            document.getElementById('resultMessage').textContent = "Top players across all devices";
-            document.getElementById('resultChicken').style.display = 'none';
-            loadLeaderboard();
-        }
+      const { error } = await supabase
+        .from('leaderboard')
+        .delete()
+        .eq('id', id);
 
-        // ADMIN FUNCTIONS
-        function openAdmin() { showScreen('adminModal'); }
-        function closeAdmin() { showScreen('startScreen'); }
+      if (!error) loadAdminPanel();
+      else alert("Error deleting score");
+    }
 
-        function verifyAdmin() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === ADMIN_PASSWORD) {
-                isAdmin = true;
-                loadAdminPanel();
-            } else {
-                alert("Wrong password!");
-            }
-        }
+    // =====================
+    // INIT (prevents “landing page does nothing”)
+    // =====================
+    function init() {
+      // Wire buttons via addEventListener so nothing depends on inline handlers
+      $('startBtn').addEventListener('click', () => startGame());
+      $('viewLeaderboardBtn').addEventListener('click', () => showLeaderboard());
+      $('nextBtn').addEventListener('click', () => nextQuestion());
 
-        async function loadAdminPanel() {
-            showScreen('adminPanel');
-            const list = document.getElementById('adminLeaderboardList');
-            list.innerHTML = '<div style="text-align:center; color:#999;">Loading...</div>';
+      $('adminToggleBtn').addEventListener('click', () => openAdmin());
+      $('adminLoginBtn').addEventListener('click', () => verifyAdmin());
+      $('adminCancelBtn').addEventListener('click', () => closeAdmin());
 
-            const { data, error } = await supabase
-                .from('leaderboard')
-                .select('*')
-                .order('created_at', { ascending: false });
+      // Let user press Enter to start
+      $('playerName').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') startGame();
+      });
 
-            if (data) {
-                list.innerHTML = '';
-                if (data.length === 0) {
-                    list.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">No scores to manage yet.</div>';
-                    return;
-                }
-                data.forEach(entry => {
-                    const item = document.createElement('div');
-                    item.className = 'admin-item';
-                    item.innerHTML = `
-                        <span><b>${entry.player_name}</b> - ${entry.score}/${entry.total_questions}</span>
-                        <button class="delete-btn" onclick="deleteScore(${entry.id})">Delete</button>
-                    `;
-                    list.appendChild(item);
-                });
-            } else {
-                list.innerHTML = '<div style="color:red; text-align:center;">Error loading data</div>';
-            }
-        }
+      // Status hint
+      if (supabaseAvailable) setStatus("Online mode enabled.");
+      else setStatus("Offline mode (Supabase not loaded).");
+    }
 
-        async function deleteScore(id) {
-            if(!confirm("Delete this score?")) return;
-            
-            const { error } = await supabase
-                .from('leaderboard')
-                .delete()
-                .eq('id', id);
-                
-            if (!error) {
-                loadAdminPanel();
-            } else {
-                alert("Error deleting score");
-            }
-        }
-    </script>
+    function startGame() {
+      const nameInput = $('playerName');
+      if (!nameInput.value.trim()) {
+        alert("Please enter your name!");
+        return;
+      }
+
+      currentPlayer = nameInput.value.trim();
+      $('playerDisplay').textContent = currentPlayer;
+      currentQuestionIndex = 0;
+      score = 0;
+
+      showScreen('quizScreen');
+      loadQuestion();
+    }
+
+    // Run init after DOM ready
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
