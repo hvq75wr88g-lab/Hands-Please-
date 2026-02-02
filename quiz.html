@@ -11,6 +11,7 @@
       --accent: #d35400;
       --danger: #c0392b;
       --ok: #27ae60;
+      --gold: #f39c12;
     }
 
     *{ box-sizing: border-box; margin: 0; padding: 0; }
@@ -125,6 +126,14 @@
       margin-bottom: 20px;
       text-transform: uppercase;
       letter-spacing: 1px;
+    }
+
+    .playerName{
+      text-align: center;
+      font-size: 16px;
+      color: var(--gold);
+      margin-bottom: 15px;
+      font-weight: 600;
     }
 
     .questionText{
@@ -253,6 +262,57 @@
       100%{ transform: scale(1) translateY(0); }
     }
 
+    /* NAME ENTRY SCREEN */
+    .nameEntryScreen{
+      position: fixed;
+      inset: 0;
+      background: var(--eggshell);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      padding: 20px;
+    }
+
+    .nameEntryCard{
+      background: white;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .nameEntryCard h2{
+      font-size: 28px;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .nameEntryCard p{
+      font-size: 16px;
+      color: #7f8c8d;
+      margin-bottom: 30px;
+    }
+
+    .nameEntryCard input{
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      border: 2px solid #ecf0f1;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-family: inherit;
+    }
+
+    .nameEntryCard input:focus{
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* GAME OVER POPUP */
     .gameOverPopup{
       position: fixed;
       top: 50%;
@@ -294,6 +354,212 @@
       cursor: pointer;
     }
 
+    /* VICTORY POPUP */
+    .victoryPopup{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 500px;
+      background: white;
+      border: 5px solid var(--ok);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+      z-index: 100;
+      display: none;
+    }
+
+    .victoryPopup h2{
+      font-size: 32px;
+      color: var(--ok);
+      margin-bottom: 15px;
+    }
+
+    .victoryPopup .finalScore{
+      font-size: 48px;
+      font-weight: bold;
+      color: var(--gold);
+      margin: 20px 0;
+    }
+
+    .victoryPopup p{
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .victoryPopup button{
+      margin-top: 20px;
+      padding: 16px 40px;
+      background: var(--ok);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    /* LEADERBOARD */
+    .leaderboardBtn{
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: 10px 20px;
+      background: var(--gold);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 200;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .leaderboardBtn:hover{
+      background: #e67e22;
+    }
+
+    .leaderboardModal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .leaderboardPanel{
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .leaderboardHeader{
+      padding: 20px;
+      border-bottom: 2px solid #ecf0f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, var(--gold), var(--accent));
+      color: white;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .leaderboardHeader h2{
+      font-size: 24px;
+    }
+
+    .leaderboardBody{
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .leaderboardList{
+      display: grid;
+      gap: 12px;
+    }
+
+    .leaderboardItem{
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background: #fafafa;
+      border-radius: 12px;
+      border: 2px solid #ecf0f1;
+      transition: 0.2s;
+    }
+
+    .leaderboardItem.champion{
+      background: linear-gradient(135deg, #fff9e6, #ffe6cc);
+      border-color: var(--gold);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .leaderboardItem.champion::before{
+      content: '👑';
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 32px;
+      opacity: 0.3;
+    }
+
+    .leaderboardRank{
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--gold);
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .leaderboardItem.champion .leaderboardRank{
+      color: var(--gold);
+      font-size: 28px;
+    }
+
+    .leaderboardInfo{
+      flex: 1;
+    }
+
+    .leaderboardName{
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+
+    .leaderboardItem.champion .leaderboardName{
+      color: var(--gold);
+      font-size: 20px;
+    }
+
+    .leaderboardItem.champion .leaderboardName::after{
+      content: ' 🏆 Superduper Breakfast Champion!';
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .leaderboardDate{
+      font-size: 12px;
+      color: #95a5a6;
+    }
+
+    .leaderboardScore{
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--ok);
+    }
+
+    .emptyLeaderboard{
+      text-align: center;
+      padding: 40px 20px;
+      color: #95a5a6;
+    }
+
+    .emptyLeaderboard p{
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    /* ADMIN */
     .adminLink{
       position: fixed;
       bottom: 10px;
@@ -316,7 +582,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 300;
+      z-index: 400;
       overflow-y: auto;
       padding: 20px;
     }
@@ -344,10 +610,42 @@
       font-size: 24px;
     }
 
+    .adminTabs{
+      display: flex;
+      gap: 10px;
+      padding: 15px 20px;
+      border-bottom: 2px solid #ecf0f1;
+      background: #fafafa;
+    }
+
+    .adminTab{
+      padding: 10px 20px;
+      background: white;
+      border: 2px solid #ecf0f1;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .adminTab.active{
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
     .adminBody{
       padding: 20px;
       overflow-y: auto;
       flex: 1;
+    }
+
+    .adminSection{
+      display: none;
+    }
+
+    .adminSection.active{
+      display: block;
     }
 
     .adminControls{
@@ -440,7 +738,8 @@
     }
 
     .formField input[type="text"],
-    .formField textarea{
+    .formField textarea,
+    .formField input[type="password"]{
       width: 100%;
       padding: 10px;
       border: 2px solid #ecf0f1;
@@ -498,6 +797,49 @@
       margin-top: 15px;
     }
 
+    .leaderboardAdminList{
+      display: grid;
+      gap: 10px;
+    }
+
+    .leaderboardAdminItem{
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      background: #fafafa;
+      border: 2px solid #ecf0f1;
+      border-radius: 10px;
+    }
+
+    .leaderboardAdminItem.champion{
+      background: #fff9e6;
+      border-color: var(--gold);
+    }
+
+    .leaderboardAdminInfo{
+      flex: 1;
+    }
+
+    .leaderboardAdminName{
+      font-weight: bold;
+      font-size: 16px;
+      color: var(--ink);
+    }
+
+    .leaderboardAdminDate{
+      font-size: 12px;
+      color: #95a5a6;
+    }
+
+    .leaderboardAdminScore{
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--ok);
+      margin-right: 10px;
+    }
+
+    /* MOBILE RESPONSIVE */
     @media (max-width: 1200px) {
       .mainContainer{ gap: 20px; }
       .chickenStage{ width: 250px; height: 250px; }
@@ -506,9 +848,73 @@
     }
 
     @media (max-width: 900px) {
-      .mainContainer{ flex-direction: column; gap: 30px; }
-      .eggsHUD{ flex-direction: row; gap: 30px; }
-      .chickenStage{ width: 200px; height: 200px; }
+      .mainContainer{
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+      }
+      .eggsHUD{
+        flex-direction: row;
+        gap: 20px;
+      }
+      .egg{
+        width: 60px;
+        height: 75px;
+      }
+      .chickenStage{
+        width: 180px;
+        height: 180px;
+      }
+      .quizCard{
+        padding: 20px;
+        max-height: none;
+      }
+      .questionText{
+        font-size: 18px;
+      }
+      .choice{
+        font-size: 14px;
+        padding: 12px;
+      }
+      .leaderboardBtn{
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+      body{
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .quizTitle{
+        font-size: 18px;
+      }
+      .questionText{
+        font-size: 16px;
+      }
+      .choice{
+        font-size: 13px;
+      }
+      .submitBtn{
+        font-size: 16px;
+        padding: 14px;
+      }
+      .nameEntryCard{
+        padding: 30px 20px;
+      }
+      .nameEntryCard h2{
+        font-size: 24px;
+      }
+      .gameOverPopup, .victoryPopup{
+        padding: 30px 20px;
+      }
+      .leaderboardRank{
+        font-size: 20px;
+        min-width: 35px;
+      }
+      .leaderboardScore{
+        font-size: 24px;
+      }
     }
 
   </style>
@@ -516,7 +922,18 @@
 
 <body class="wink">
 
-  <div class="mainContainer">
+  <!-- NAME ENTRY SCREEN -->
+  <div class="nameEntryScreen" id="nameEntryScreen">
+    <div class="nameEntryCard">
+      <h2>🐔 Hands Please! Quiz</h2>
+      <p>Enter your name to join the competition!</p>
+      <input type="text" id="playerNameInput" placeholder="Your name..." maxlength="30" />
+      <button class="submitBtn" onclick="startQuiz()">Start Quiz</button>
+    </div>
+  </div>
+
+  <!-- MAIN QUIZ -->
+  <div class="mainContainer" id="mainContainer" style="display: none;">
     
     <div class="eggsHUD">
       <div class="egg" id="egg1"></div>
@@ -531,6 +948,7 @@
       </div>
       
       <div class="quizTitle">Hands Please!</div>
+      <div class="playerName" id="playerNameDisplay"></div>
       
       <div class="questionText" id="questionText">Loading...</div>
       
@@ -548,60 +966,115 @@
     </div>
   </div>
 
+  <!-- GAME OVER POPUP -->
   <div class="gameOverPopup" id="gameOverPopup">
     <h2>Strike 3!</h2>
     <p>Oh oh! The chicken is NOT happy.</p>
+    <p id="gameOverScore"></p>
     <p>Study hard and try again!</p>
-    <button onclick="location.reload()">Restart Quiz</button>
+    <button onclick="location.reload()">Try Again</button>
   </div>
 
+  <!-- VICTORY POPUP -->
+  <div class="victoryPopup" id="victoryPopup">
+    <h2>🎉 Quiz Complete!</h2>
+    <div class="finalScore" id="finalScore">9/9</div>
+    <p id="victoryMessage">Amazing! Perfect score!</p>
+    <button onclick="location.reload()">Play Again</button>
+    <button onclick="openLeaderboard()" style="background: var(--gold);">View Leaderboard</button>
+  </div>
+
+  <!-- LEADERBOARD BUTTON -->
+  <button class="leaderboardBtn" onclick="openLeaderboard()">🏆 Leaderboard</button>
+
+  <!-- LEADERBOARD MODAL -->
+  <div class="leaderboardModal" id="leaderboardModal">
+    <div class="leaderboardPanel">
+      
+      <div class="leaderboardHeader">
+        <h2>🏆 Leaderboard</h2>
+        <button class="btnSecondary" style="background: rgba(255,255,255,0.2); color: white;" onclick="closeLeaderboard()">Close</button>
+      </div>
+
+      <div class="leaderboardBody">
+        <div class="leaderboardList" id="leaderboardList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADMIN LINK -->
   <a href="#" class="adminLink" onclick="event.preventDefault(); openAdmin();">Admin</a>
 
+  <!-- ADMIN MODAL -->
   <div class="adminModal" id="adminModal">
     <div class="adminPanel">
       
       <div class="adminHeader">
-        <h2>Question Bank Editor</h2>
+        <h2>Admin Panel</h2>
         <button class="btnSecondary" onclick="closeAdmin()">Close</button>
+      </div>
+
+      <div class="adminTabs">
+        <div class="adminTab active" onclick="switchAdminTab('questions')">Questions</div>
+        <div class="adminTab" onclick="switchAdminTab('leaderboard')">Manage Leaderboard</div>
       </div>
 
       <div class="adminBody">
         
-        <div class="adminControls">
-          <button class="btnPrimary" onclick="showAddForm()">➕ Add New Question</button>
-          <button class="btnSecondary" onclick="resetToDefaults()">Reset to Defaults</button>
-          <button class="btnSecondary" onclick="exportQuestions()">Export JSON</button>
-          <button class="btnSecondary" onclick="importQuestions()">Import JSON</button>
+        <!-- QUESTIONS TAB -->
+        <div class="adminSection active" id="adminQuestionsTab">
+          <div class="adminControls">
+            <button class="btnPrimary" onclick="showAddForm()">➕ Add New Question</button>
+            <button class="btnSecondary" onclick="resetToDefaults()">Reset to Defaults</button>
+            <button class="btnSecondary" onclick="exportQuestions()">Export JSON</button>
+            <button class="btnSecondary" onclick="importQuestions()">Import JSON</button>
+          </div>
+
+          <div class="editorForm" id="editorForm">
+            <h3 style="margin-bottom:15px; color:var(--accent);">Edit Question</h3>
+            
+            <div class="formField">
+              <label>Question Text:</label>
+              <textarea id="editQuestionText" placeholder="Enter your question..."></textarea>
+            </div>
+
+            <div class="formField">
+              <label>Answer Choices (check the correct one):</label>
+              <div class="choiceEditor" id="choiceEditor"></div>
+              <button class="btnSecondary" onclick="addChoiceRow()" style="margin-top:10px; padding:8px 12px; font-size:13px;">+ Add Choice</button>
+            </div>
+
+            <div class="formActions">
+              <button class="btnPrimary" onclick="saveQuestion()">Save Question</button>
+              <button class="btnSecondary" onclick="cancelEdit()">Cancel</button>
+              <button class="btnDanger" onclick="deleteCurrentQuestion()" id="deleteBtn" style="display:none;">Delete Question</button>
+            </div>
+          </div>
+
+          <div class="questionsList" id="questionsList"></div>
         </div>
 
-        <div class="editorForm" id="editorForm">
-          <h3 style="margin-bottom:15px; color:var(--accent);">Edit Question</h3>
-          
-          <div class="formField">
-            <label>Question Text:</label>
-            <textarea id="editQuestionText" placeholder="Enter your question..."></textarea>
+        <!-- LEADERBOARD TAB -->
+        <div class="adminSection" id="adminLeaderboardTab">
+          <div class="adminControls">
+            <button class="btnDanger" onclick="clearAllScores()">Clear All Scores</button>
           </div>
 
-          <div class="formField">
-            <label>Answer Choices (check the correct one):</label>
-            <div class="choiceEditor" id="choiceEditor"></div>
-            <button class="btnSecondary" onclick="addChoiceRow()" style="margin-top:10px; padding:8px 12px; font-size:13px;">+ Add Choice</button>
-          </div>
-
-          <div class="formActions">
-            <button class="btnPrimary" onclick="saveQuestion()">Save Question</button>
-            <button class="btnSecondary" onclick="cancelEdit()">Cancel</button>
-            <button class="btnDanger" onclick="deleteCurrentQuestion()" id="deleteBtn" style="display:none;">Delete Question</button>
+          <div class="leaderboardAdminList" id="leaderboardAdminList">
+            <!-- Populated by JS -->
           </div>
         </div>
-
-        <div class="questionsList" id="questionsList"></div>
 
       </div>
     </div>
   </div>
 
   <script>
+    const ADMIN_PASSWORD = 'breakfast2026'; // Change this to your desired password
+
     const CHICKEN_IMAGES = {
       happy: [
         'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png',
@@ -675,7 +1148,34 @@
     let strikes = 0;
     let gameOver = false;
     let editingId = null;
+    let playerName = '';
 
+    // === NAME ENTRY ===
+    function startQuiz(){
+      const input = document.getElementById('playerNameInput');
+      const name = input.value.trim();
+      
+      if(!name){
+        alert('Please enter your name!');
+        return;
+      }
+      
+      playerName = name;
+      document.getElementById('playerNameDisplay').innerText = `Player: ${playerName}`;
+      document.getElementById('nameEntryScreen').style.display = 'none';
+      document.getElementById('mainContainer').style.display = 'flex';
+      
+      init();
+    }
+
+    // Allow Enter key to start quiz
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('playerNameInput').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') startQuiz();
+      });
+    });
+
+    // === INIT ===
     function init(){
       const stored = localStorage.getItem('handsPlease_quiz_v5');
       questions = stored ? JSON.parse(stored) : [...DEFAULT_BANK];
@@ -693,6 +1193,7 @@
       
       setChickenMood('wink');
       document.getElementById('gameOverPopup').style.display = 'none';
+      document.getElementById('victoryPopup').style.display = 'none';
       document.querySelectorAll('.egg').forEach(e => e.className = 'egg');
       
       renderQuestion();
@@ -763,8 +1264,7 @@
         if(strikes >= 3){
           gameOver = true;
           setTimeout(() => {
-            document.getElementById('gameOverPopup').style.display = 'block';
-            setChickenMood('peck');
+            finishQuiz(false);
           }, 1000);
         } else {
           setTimeout(() => {
@@ -779,20 +1279,173 @@
     });
 
     function finishQuiz(completed){
-      if(strikes < 3 && completed){
-        alert(`🎉 Quiz Complete!\n\nYour Score: ${score}/${questions.length}\n\nGreat job! 🐔`);
-        location.reload();
+      if(strikes >= 3){
+        // Game Over
+        document.getElementById('gameOverScore').innerText = `Your Score: ${score}/${questions.length}`;
+        document.getElementById('gameOverPopup').style.display = 'block';
+        setChickenMood('peck');
+        saveScore(score, questions.length);
+      } else if(completed){
+        // Victory
+        document.getElementById('finalScore').innerText = `${score}/${questions.length}`;
+        
+        let message = '';
+        const percent = (score / questions.length) * 100;
+        if(percent === 100) message = 'Perfect score! You are a breakfast LEGEND! 🏆';
+        else if(percent >= 80) message = 'Excellent work! Almost there!';
+        else if(percent >= 60) message = 'Good job! Keep studying!';
+        else message = 'Nice try! Review the material and try again!';
+        
+        document.getElementById('victoryMessage').innerText = message;
+        document.getElementById('victoryPopup').style.display = 'block';
+        setChickenMood('happy');
+        saveScore(score, questions.length);
       }
     }
 
+    // === LEADERBOARD ===
+    function saveScore(score, total){
+      const leaderboard = getLeaderboard();
+      
+      leaderboard.push({
+        name: playerName,
+        score: score,
+        total: total,
+        date: new Date().toISOString()
+      });
+      
+      // Sort by score descending
+      leaderboard.sort((a, b) => b.score - a.score);
+      
+      localStorage.setItem('handsPlease_leaderboard', JSON.stringify(leaderboard));
+    }
+
+    function getLeaderboard(){
+      const stored = localStorage.getItem('handsPlease_leaderboard');
+      return stored ? JSON.parse(stored) : [];
+    }
+
+    function openLeaderboard(){
+      document.getElementById('leaderboardModal').style.display = 'flex';
+      renderLeaderboard();
+    }
+
+    function closeLeaderboard(){
+      document.getElementById('leaderboardModal').style.display = 'none';
+    }
+
+    function renderLeaderboard(){
+      const list = document.getElementById('leaderboardList');
+      const leaderboard = getLeaderboard();
+      
+      if(leaderboard.length === 0){
+        list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet!</p><p>Be the first to complete the quiz!</p></div>';
+        return;
+      }
+      
+      list.innerHTML = '';
+      
+      leaderboard.forEach((entry, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboardItem';
+        if(index === 0) item.classList.add('champion');
+        
+        const date = new Date(entry.date);
+        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        item.innerHTML = `
+          <div class="leaderboardRank">${index + 1}</div>
+          <div class="leaderboardInfo">
+            <div class="leaderboardName">${entry.name}</div>
+            <div class="leaderboardDate">${dateStr}</div>
+          </div>
+          <div class="leaderboardScore">${entry.score}/${entry.total}</div>
+        `;
+        
+        list.appendChild(item);
+      });
+    }
+
+    // === ADMIN ===
     function openAdmin(){
+      const password = prompt('Enter admin password:');
+      if(password !== ADMIN_PASSWORD){
+        alert('Incorrect password!');
+        return;
+      }
+      
       document.getElementById('adminModal').style.display = 'flex';
+      switchAdminTab('questions');
       refreshQuestionsList();
+      renderLeaderboardAdmin();
     }
 
     function closeAdmin(){
       document.getElementById('adminModal').style.display = 'none';
       cancelEdit();
+    }
+
+    function switchAdminTab(tab){
+      document.querySelectorAll('.adminTab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.adminSection').forEach(s => s.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      
+      if(tab === 'questions'){
+        document.getElementById('adminQuestionsTab').classList.add('active');
+        refreshQuestionsList();
+      } else if(tab === 'leaderboard'){
+        document.getElementById('adminLeaderboardTab').classList.add('active');
+        renderLeaderboardAdmin();
+      }
+    }
+
+    function renderLeaderboardAdmin(){
+      const list = document.getElementById('leaderboardAdminList');
+      const leaderboard = getLeaderboard();
+      
+      if(leaderboard.length === 0){
+        list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet</p></div>';
+        return;
+      }
+      
+      list.innerHTML = '';
+      
+      leaderboard.forEach((entry, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboardAdminItem';
+        if(index === 0) item.classList.add('champion');
+        
+        const date = new Date(entry.date);
+        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        item.innerHTML = `
+          <div class="leaderboardAdminInfo">
+            <div class="leaderboardAdminName">${index === 0 ? '👑 ' : ''}${entry.name}</div>
+            <div class="leaderboardAdminDate">${dateStr}</div>
+          </div>
+          <div class="leaderboardAdminScore">${entry.score}/${entry.total}</div>
+          <button class="btnDanger" style="padding: 8px 12px; font-size: 13px;" onclick="deleteScore(${index})">Delete</button>
+        `;
+        
+        list.appendChild(item);
+      });
+    }
+
+    function deleteScore(index){
+      if(!confirm('Delete this score?')) return;
+      
+      const leaderboard = getLeaderboard();
+      leaderboard.splice(index, 1);
+      localStorage.setItem('handsPlease_leaderboard', JSON.stringify(leaderboard));
+      renderLeaderboardAdmin();
+    }
+
+    function clearAllScores(){
+      if(!confirm('Clear ALL scores from the leaderboard? This cannot be undone!')) return;
+      
+      localStorage.removeItem('handsPlease_leaderboard');
+      renderLeaderboardAdmin();
     }
 
     function refreshQuestionsList(){
@@ -982,8 +1635,6 @@
       
       input.click();
     }
-
-    init();
   </script>
 </body>
 </html>
