@@ -29,7 +29,6 @@
       padding: 20px;
     }
 
-    /* MAIN CONTAINER - Centered Horizontal Layout */
     .mainContainer{
       display: flex;
       align-items: center;
@@ -40,7 +39,6 @@
       height: 100%;
     }
 
-    /* LEFT SIDE - Eggs */
     .eggsHUD{
       display: flex;
       flex-direction: column;
@@ -71,7 +69,6 @@
       transform: rotate(-30deg);
     }
 
-    /* REALISTIC CRACK with lighter grey, more irregular pattern */
     .egg.cracked{
       background: #e8e8e8;
       border-color: #999;
@@ -92,15 +89,13 @@
       inset: 0;
       border-radius: inherit;
       background-image:
-        /* Multiple irregular cracks spreading across egg - lighter grey */
-        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><path d="M40 5 L42 12 L38 18 L41 25 L39 32 L42 40 L38 48 L40 55 L43 63 L39 72 L41 80 L40 90" stroke="%23888" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M40 15 L35 20 M40 22 L45 28 M39 35 L33 40 M42 45 L48 50 M38 58 L32 63 M43 68 L49 72" stroke="%23999" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M25 30 L40 35 M55 30 L40 35 M30 50 L40 48 M50 50 L40 48 M28 70 L40 72 M52 70 L40 72" stroke="%23aaa" stroke-width="0.8" fill="none" stroke-linecap="round"/><path d="M20 25 Q25 30 30 28 M60 25 Q55 30 50 28 M22 60 Q27 65 32 63 M58 60 Q53 65 48 63" stroke="%23bbb" stroke-width="0.6" fill="none"/></svg>');
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><path d="M40 8 L41 14 L38 19 L42 26 L39 33 L43 41 L38 49 L41 57 L44 65 L39 73 L42 82 L40 92" stroke="%23999" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M40 12 L34 17 M40 20 L46 26 M39 30 L32 36 M43 38 L49 44 M38 52 L31 58 M41 60 L48 66 M44 70 L50 75 M39 78 L33 83" stroke="%23aaa" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M25 25 Q30 28 35 26 M55 25 Q50 28 45 26 M20 40 Q25 43 30 41 M60 40 Q55 43 50 41 M22 55 Q27 58 32 56 M58 55 Q53 58 48 56 M24 70 Q29 73 34 71 M56 70 Q51 73 46 71 M28 85 Q33 88 38 86 M52 85 Q47 88 42 86" stroke="%23bbb" stroke-width="0.9" fill="none"/><path d="M15 30 L25 35 L20 40 M65 30 L55 35 L60 40 M18 50 L28 55 L23 60 M62 50 L52 55 L57 60 M16 68 L26 73 L21 78 M64 68 L54 73 L59 78" stroke="%23ccc" stroke-width="0.7" fill="none" stroke-linecap="round"/><path d="M30 15 Q35 18 40 16 Q45 18 50 15 M28 35 Q33 38 38 36 Q43 38 48 35 M26 55 Q31 58 36 56 Q41 58 46 55 M29 75 Q34 78 39 76 Q44 78 49 75" stroke="%23aaa" stroke-width="0.8" fill="none"/><path d="M35 22 L38 28 L34 32 M46 22 L43 28 L47 32 M33 44 L36 50 L32 54 M48 44 L45 50 L49 54 M31 64 L34 70 L30 74 M50 64 L47 70 L51 74" stroke="%23bbb" stroke-width="0.6" fill="none" stroke-linecap="round"/></svg>');
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
       opacity: 1;
     }
 
-    /* CENTER - Quiz Card */
     .quizCard{
       width: 100%;
       max-width: 600px;
@@ -194,34 +189,52 @@
       min-height: 24px;
     }
 
-    /* RIGHT SIDE - Chicken Stage */
     .chickenStage{
       display: flex;
       align-items: center;
       justify-content: center;
       width: 300px;
       height: 300px;
+      position: relative;
     }
 
-    .chickenSVG{
+    .chickenImage{
       width: 100%;
       height: 100%;
+      object-fit: contain;
       display: none;
-      filter: drop-shadow(0 15px 20px rgba(0,0,0,0.15));
     }
 
-    /* Moods */
-    body.happy .happy{ display: block; animation: bounce 0.6s ease-in-out infinite alternate; }
-    body.angry .angry{ display: block; animation: shake 0.12s linear infinite; }
-    body.wink .wink{ display: block; animation: breathe 3s ease-in-out infinite; }
-    body.peck .angry{ display: block; animation: peckAttack 0.5s ease-in-out infinite; }
+    .chickenImage.active{
+      display: block;
+    }
 
-    @keyframes bounce{
+    body.happy .chickenImage.happy{ 
+      display: block;
+      animation: bounceChicken 0.6s ease-in-out infinite alternate;
+    }
+
+    body.angry .chickenImage.angry{ 
+      display: block;
+      animation: shakeChicken 0.12s linear infinite;
+    }
+
+    body.wink .chickenImage.wink{ 
+      display: block;
+      animation: breatheChicken 3s ease-in-out infinite;
+    }
+
+    body.peck .chickenImage.angry{ 
+      display: block;
+      animation: peckChicken 0.5s ease-in-out infinite;
+    }
+
+    @keyframes bounceChicken{
       from{ transform: translateY(0); }
       to{ transform: translateY(-30px); }
     }
 
-    @keyframes shake{
+    @keyframes shakeChicken{
       0%{ transform: translate(2px, 1px) rotate(0deg); }
       25%{ transform: translate(-2px, -2px) rotate(-1deg); }
       50%{ transform: translate(2px, 2px) rotate(1deg); }
@@ -229,18 +242,17 @@
       100%{ transform: translate(2px, -1px) rotate(0deg); }
     }
 
-    @keyframes breathe{
+    @keyframes breatheChicken{
       0%, 100%{ transform: scale(1); }
       50%{ transform: scale(1.03); }
     }
 
-    @keyframes peckAttack{
+    @keyframes peckChicken{
       0%{ transform: scale(1) translateY(0); }
       50%{ transform: scale(1.5) translateY(30px); }
       100%{ transform: scale(1) translateY(0); }
     }
 
-    /* Game Over Popup */
     .gameOverPopup{
       position: fixed;
       top: 50%;
@@ -282,7 +294,6 @@
       cursor: pointer;
     }
 
-    /* Admin Link */
     .adminLink{
       position: fixed;
       bottom: 10px;
@@ -298,7 +309,6 @@
 
     .adminLink:hover{ color: var(--accent); }
 
-    /* Admin Modal - FULL EDITOR */
     .adminModal{
       position: fixed;
       inset: 0;
@@ -406,7 +416,6 @@
       margin-top: 10px;
     }
 
-    /* Editor Form */
     .editorForm{
       display: none;
       background: white;
@@ -489,37 +498,17 @@
       margin-top: 15px;
     }
 
-    /* Responsive adjustments */
     @media (max-width: 1200px) {
-      .mainContainer{
-        gap: 20px;
-      }
-      .chickenStage{
-        width: 250px;
-        height: 250px;
-      }
-      .eggsHUD{
-        gap: 20px;
-      }
-      .egg{
-        width: 70px;
-        height: 87px;
-      }
+      .mainContainer{ gap: 20px; }
+      .chickenStage{ width: 250px; height: 250px; }
+      .eggsHUD{ gap: 20px; }
+      .egg{ width: 70px; height: 87px; }
     }
 
     @media (max-width: 900px) {
-      .mainContainer{
-        flex-direction: column;
-        gap: 30px;
-      }
-      .eggsHUD{
-        flex-direction: row;
-        gap: 30px;
-      }
-      .chickenStage{
-        width: 200px;
-        height: 200px;
-      }
+      .mainContainer{ flex-direction: column; gap: 30px; }
+      .eggsHUD{ flex-direction: row; gap: 30px; }
+      .chickenStage{ width: 200px; height: 200px; }
     }
 
   </style>
@@ -527,17 +516,14 @@
 
 <body class="wink">
 
-  <!-- MAIN CENTERED CONTAINER -->
   <div class="mainContainer">
     
-    <!-- LEFT: Eggs -->
     <div class="eggsHUD">
       <div class="egg" id="egg1"></div>
       <div class="egg" id="egg2"></div>
       <div class="egg" id="egg3"></div>
     </div>
 
-    <!-- CENTER: Quiz Card -->
     <div class="quizCard">
       <div class="quizHeader">
         <span id="qNum">Q 1/9</span>
@@ -555,53 +541,13 @@
       <div class="feedback" id="feedbackText"></div>
     </div>
 
-    <!-- RIGHT: Chicken Stage -->
     <div class="chickenStage">
-      
-      <!-- HAPPY (White, Wings Up) -->
-      <svg class="chickenSVG happy" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
-        <ellipse cx="200" cy="260" rx="100" ry="105" fill="#ffffff" stroke="#222" stroke-width="6"/>
-        <path d="M110 210 Q60 120 90 100" fill="none" stroke="#fff" stroke-width="20" stroke-linecap="round"/>
-        <path d="M110 210 Q60 120 90 100" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round"/>
-        <path d="M290 210 Q340 120 310 100" fill="none" stroke="#fff" stroke-width="20" stroke-linecap="round"/>
-        <path d="M290 210 Q340 120 310 100" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round"/>
-        <path d="M170 350 L165 380 M230 350 L235 380" stroke="#f39c12" stroke-width="10" stroke-linecap="round"/>
-        <circle cx="200" cy="160" r="70" fill="#fff" stroke="#222" stroke-width="6"/>
-        <path d="M170 110 Q200 70 230 110" fill="#e74c3c" stroke="#222" stroke-width="5"/>
-        <path d="M175 150 Q185 140 195 150 M205 150 Q215 140 225 150" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round"/>
-        <path d="M185 175 Q200 190 215 175" fill="none" stroke="#f39c12" stroke-width="5" stroke-linecap="round"/>
-      </svg>
-
-      <!-- ANGRY (Brown, Rage) -->
-      <svg class="chickenSVG angry" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
-        <ellipse cx="200" cy="260" rx="110" ry="100" fill="#8B4513" stroke="#222" stroke-width="6"/>
-        <path d="M70 220 Q30 200 50 270" fill="#A0522D" stroke="#222" stroke-width="5"/>
-        <path d="M330 220 Q370 200 350 270" fill="#A0522D" stroke="#222" stroke-width="5"/>
-        <path d="M170 350 L165 380 M230 350 L235 380" stroke="#f39c12" stroke-width="10" stroke-linecap="round"/>
-        <circle cx="200" cy="150" r="68" fill="#8B4513" stroke="#222" stroke-width="6"/>
-        <path d="M175 95 L182 75 L189 95 L196 75 L203 95 L210 75 L217 95" fill="#e74c3c" stroke="#222" stroke-width="3"/>
-        <path d="M160 130 L185 145 M240 130 L215 145" stroke="#222" stroke-width="6" stroke-linecap="round"/>
-        <circle cx="175" cy="150" r="5" fill="#ff0000"/>
-        <circle cx="225" cy="150" r="5" fill="#ff0000"/>
-        <path d="M185 170 L215 170 L200 190 Z" fill="#f39c12" stroke="#222" stroke-width="4"/>
-      </svg>
-
-      <!-- WINK (Tan, Chill) -->
-      <svg class="chickenSVG wink" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
-        <ellipse cx="200" cy="260" rx="95" ry="100" fill="#DEB887" stroke="#222" stroke-width="6"/>
-        <path d="M115 250 Q95 270 125 285" fill="none" stroke="#CD853F" stroke-width="6" stroke-linecap="round"/>
-        <path d="M170 350 L170 380 M230 350 L230 380" stroke="#f39c12" stroke-width="10" stroke-linecap="round"/>
-        <circle cx="200" cy="150" r="65" fill="#DEB887" stroke="#222" stroke-width="6"/>
-        <path d="M170 100 Q200 70 230 100" fill="#e74c3c" stroke="#222" stroke-width="5"/>
-        <circle cx="175" cy="145" r="6" fill="#222"/>
-        <path d="M210 145 Q220 150 230 145" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round"/>
-        <path d="M185 170 L215 170 L200 185 Z" fill="#f39c12" stroke="#222" stroke-width="4"/>
-      </svg>
-
+      <img class="chickenImage happy" id="happyImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png" alt="Happy Chicken">
+      <img class="chickenImage angry" id="angryImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2036a4c0-36eb-4538-bfd4-94ccb3f03b24.png" alt="Angry Chicken">
+      <img class="chickenImage wink" id="winkImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png" alt="Wink Chicken">
     </div>
   </div>
 
-  <!-- Game Over Popup -->
   <div class="gameOverPopup" id="gameOverPopup">
     <h2>Strike 3!</h2>
     <p>Oh oh! The chicken is NOT happy.</p>
@@ -611,7 +557,6 @@
 
   <a href="#" class="adminLink" onclick="event.preventDefault(); openAdmin();">Admin</a>
 
-  <!-- Admin Modal with FULL EDITOR -->
   <div class="adminModal" id="adminModal">
     <div class="adminPanel">
       
@@ -629,7 +574,6 @@
           <button class="btnSecondary" onclick="importQuestions()">Import JSON</button>
         </div>
 
-        <!-- Editor Form (Hidden by default) -->
         <div class="editorForm" id="editorForm">
           <h3 style="margin-bottom:15px; color:var(--accent);">Edit Question</h3>
           
@@ -640,9 +584,7 @@
 
           <div class="formField">
             <label>Answer Choices (check the correct one):</label>
-            <div class="choiceEditor" id="choiceEditor">
-              <!-- Dynamic choice rows -->
-            </div>
+            <div class="choiceEditor" id="choiceEditor"></div>
             <button class="btnSecondary" onclick="addChoiceRow()" style="margin-top:10px; padding:8px 12px; font-size:13px;">+ Add Choice</button>
           </div>
 
@@ -653,7 +595,6 @@
           </div>
         </div>
 
-        <!-- Questions List -->
         <div class="questionsList" id="questionsList"></div>
 
       </div>
@@ -661,7 +602,61 @@
   </div>
 
   <script>
-    // === DATA ===
+    const CHICKEN_IMAGES = {
+      happy: [
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png',
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5cf3e5fe-edb5-4d16-98b8-d45e90eef68e.png',
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/b498ce6d-decf-4441-8f26-57074747b8f5.png'
+      ],
+      angry: [
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2036a4c0-36eb-4538-bfd4-94ccb3f03b24.png',
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/43f53595-f8e6-49ff-8bdf-7cfa8fb1e359.png',
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/bd76b9ab-3a56-49bf-a5e8-6aa9d74a16dd.png'
+      ],
+      wink: [
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png',
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/37753db4-6856-47fe-9f66-f652f7506e99.png',
+        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/fa393d61-fd60-4e86-9889-d6e25461711f.png'
+      ]
+    };
+
+    let currentFrame = 0;
+    let animationInterval = null;
+
+    function startChickenAnimation(mood) {
+      stopChickenAnimation();
+      
+      const images = CHICKEN_IMAGES[mood];
+      if (!images || images.length === 0) return;
+      
+      currentFrame = 0;
+      updateChickenFrame(mood);
+      
+      animationInterval = setInterval(() => {
+        currentFrame = (currentFrame + 1) % images.length;
+        updateChickenFrame(mood);
+      }, 200);
+    }
+
+    function updateChickenFrame(mood) {
+      const img = document.querySelector(`.chickenImage.${mood}`);
+      if (img) {
+        img.src = CHICKEN_IMAGES[mood][currentFrame];
+      }
+    }
+
+    function stopChickenAnimation() {
+      if (animationInterval) {
+        clearInterval(animationInterval);
+        animationInterval = null;
+      }
+    }
+
+    function setChickenMood(mood) {
+      document.body.className = mood;
+      startChickenAnimation(mood);
+    }
+
     const DEFAULT_BANK = [
       { id: '1', q: "Describe Loop juices to a guest:", c: ["Imperfect produce, cold pressed, circular economy", "Fresh squeezed daily in-house", "Concentrate from cartons"], a: 0 },
       { id: '2', q: "Is the Farmhouse Breakfast gluten free?", c: ["Yes, it's naturally gluten free", "No - potatoes cooked in shared fryer (cross-contamination)", "Only if you remove the eggs"], a: 1 },
@@ -674,7 +669,6 @@
       { id: '9', q: "Can Celiac guests have potatoes/fries?", c: ["Yes, totally safe", "No - cooked in shared fryer with gluten items", "Only baked potatoes"], a: 1 }
     ];
 
-    // === STATE ===
     let questions = [];
     let currentIdx = 0;
     let score = 0;
@@ -682,33 +676,28 @@
     let gameOver = false;
     let editingId = null;
 
-    // === INIT ===
     function init(){
       const stored = localStorage.getItem('handsPlease_quiz_v5');
       questions = stored ? JSON.parse(stored) : [...DEFAULT_BANK];
       
-      // Ensure IDs exist
       questions.forEach((q, i) => {
         if(!q.id) q.id = 'q' + Date.now() + i;
       });
       
-      // Shuffle slightly
       questions.sort(() => Math.random() - 0.5);
       
-      // Reset
       currentIdx = 0;
       score = 0;
       strikes = 0;
       gameOver = false;
       
-      document.body.className = 'wink';
+      setChickenMood('wink');
       document.getElementById('gameOverPopup').style.display = 'none';
       document.querySelectorAll('.egg').forEach(e => e.className = 'egg');
       
       renderQuestion();
     }
 
-    // === RENDER QUIZ ===
     function renderQuestion(){
       if(currentIdx >= questions.length){
         finishQuiz(true);
@@ -735,7 +724,6 @@
       document.getElementById('submitBtn').disabled = false;
     }
 
-    // === SUBMIT ANSWER ===
     document.getElementById('submitBtn').addEventListener('click', () => {
       if(gameOver) return;
 
@@ -750,43 +738,39 @@
       const correct = (answer === q.a);
 
       if(correct){
-        // CORRECT
         score++;
         document.getElementById('feedbackText').innerText = '✅ Correct!';
         document.getElementById('feedbackText').style.color = 'var(--ok)';
-        document.body.className = 'happy';
+        setChickenMood('happy');
         
         setTimeout(() => {
           currentIdx++;
           renderQuestion();
-          document.body.className = 'wink';
+          setChickenMood('wink');
         }, 1500);
       } else {
-        // WRONG
         strikes++;
         document.getElementById('feedbackText').innerText = `❌ Wrong! Correct: ${q.c[q.a]}`;
         document.getElementById('feedbackText').style.color = 'var(--danger)';
         
-        // Crack egg
         if(strikes <= 3){
           const egg = document.getElementById('egg' + strikes);
           egg.classList.add('cracked');
         }
 
-        // Angry chicken
-        document.body.className = 'angry';
+        setChickenMood('angry');
 
         if(strikes >= 3){
           gameOver = true;
           setTimeout(() => {
             document.getElementById('gameOverPopup').style.display = 'block';
-            document.body.className = 'peck';
+            setChickenMood('peck');
           }, 1000);
         } else {
           setTimeout(() => {
             currentIdx++;
             renderQuestion();
-            document.body.className = 'wink';
+            setChickenMood('wink');
           }, 2000);
         }
       }
@@ -794,7 +778,6 @@
       document.getElementById('submitBtn').disabled = true;
     });
 
-    // === FINISH QUIZ ===
     function finishQuiz(completed){
       if(strikes < 3 && completed){
         alert(`🎉 Quiz Complete!\n\nYour Score: ${score}/${questions.length}\n\nGreat job! 🐔`);
@@ -802,7 +785,6 @@
       }
     }
 
-    // === ADMIN FUNCTIONS ===
     function openAdmin(){
       document.getElementById('adminModal').style.display = 'flex';
       refreshQuestionsList();
@@ -842,7 +824,6 @@
       document.getElementById('editQuestionText').value = '';
       document.getElementById('choiceEditor').innerHTML = '';
       
-      // Add 3 default empty choices
       for(let i = 0; i < 3; i++){
         addChoiceRow('', i === 0);
       }
@@ -873,8 +854,6 @@
       const editor = document.getElementById('choiceEditor');
       const row = document.createElement('div');
       row.className = 'choiceRow';
-      
-      const uniqueId = 'choice_' + Date.now() + Math.random();
       
       row.innerHTML = `
         <input type="text" value="${text}" placeholder="Choice text...">
@@ -920,13 +899,11 @@
       }
       
       if(editingId){
-        // Update existing
         const q = questions.find(x => x.id === editingId);
         q.q = qText;
         q.c = choices;
         q.a = correctIdx;
       } else {
-        // Add new
         questions.push({
           id: 'q' + Date.now(),
           q: qText,
@@ -1006,7 +983,6 @@
       input.click();
     }
 
-    // === START ===
     init();
   </script>
 </body>
