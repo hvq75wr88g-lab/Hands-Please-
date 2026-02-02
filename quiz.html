@@ -24,30 +24,93 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       color: var(--ink);
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
-    /* TOP HALF - Questions (50%) */
-    .topHalf{
-      flex: 1;
+    /* MAIN CONTAINER - Centered Horizontal Layout */
+    .mainContainer{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      max-width: 1400px;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* LEFT SIDE - Eggs */
+    .eggsHUD{
       display: flex;
       flex-direction: column;
-      padding: 30px 20px 20px 20px;
-      justify-content: flex-start;
+      gap: 30px;
       align-items: center;
-      overflow-y: auto;
     }
 
+    .egg{
+      width: 80px;
+      height: 100px;
+      background: linear-gradient(145deg, #fff, #f0f0f0);
+      border: 3px solid #ddd;
+      border-radius: 50% 50% 45% 45%;
+      box-shadow: 0 6px 0 #ccc, inset 0 2px 0 rgba(255,255,255,0.8);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .egg::after{
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 16px;
+      height: 20px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 50%;
+      transform: rotate(-30deg);
+    }
+
+    /* REALISTIC CRACK with lighter grey, more irregular pattern */
+    .egg.cracked{
+      background: #e8e8e8;
+      border-color: #999;
+      transform: rotate(8deg);
+      animation: crackShake 0.3s ease-out;
+    }
+
+    @keyframes crackShake{
+      0%, 100%{ transform: rotate(8deg); }
+      25%{ transform: rotate(12deg); }
+      50%{ transform: rotate(4deg); }
+      75%{ transform: rotate(10deg); }
+    }
+
+    .egg.cracked::before{
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background-image:
+        /* Multiple irregular cracks spreading across egg - lighter grey */
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><path d="M40 5 L42 12 L38 18 L41 25 L39 32 L42 40 L38 48 L40 55 L43 63 L39 72 L41 80 L40 90" stroke="%23888" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M40 15 L35 20 M40 22 L45 28 M39 35 L33 40 M42 45 L48 50 M38 58 L32 63 M43 68 L49 72" stroke="%23999" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M25 30 L40 35 M55 30 L40 35 M30 50 L40 48 M50 50 L40 48 M28 70 L40 72 M52 70 L40 72" stroke="%23aaa" stroke-width="0.8" fill="none" stroke-linecap="round"/><path d="M20 25 Q25 30 30 28 M60 25 Q55 30 50 28 M22 60 Q27 65 32 63 M58 60 Q53 65 48 63" stroke="%23bbb" stroke-width="0.6" fill="none"/></svg>');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 1;
+    }
+
+    /* CENTER - Quiz Card */
     .quizCard{
       width: 100%;
       max-width: 600px;
       background: white;
       border: 2px solid rgba(0,0,0,0.1);
       border-radius: 20px;
-      padding: 20px;
+      padding: 30px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      margin-top: auto;
-      margin-bottom: auto;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .quizHeader{
@@ -131,95 +194,18 @@
       min-height: 24px;
     }
 
-    /* BOTTOM HALF - Chicken Show (50%) */
-    .bottomHalf{
-      flex: 1;
-      position: relative;
-      display: flex;
-      flex-direction: row;
-      align-items: flex-end;
-      justify-content: space-between;
-      padding: 0 30px 30px;
-      overflow: visible;
-      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3));
-    }
-
-    /* Eggs HUD - LEFT SIDE */
-    .eggsHUD{
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      z-index: 20;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .egg{
-      width: 60px;
-      height: 75px;
-      background: linear-gradient(145deg, #fff, #f0f0f0);
-      border: 3px solid #ddd;
-      border-radius: 50% 50% 45% 45%;
-      box-shadow: 0 6px 0 #ccc, inset 0 2px 0 rgba(255,255,255,0.8);
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .egg::after{
-      content: '';
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      width: 12px;
-      height: 16px;
-      background: rgba(255,255,255,0.6);
-      border-radius: 50%;
-      transform: rotate(-30deg);
-    }
-
-    /* REALISTIC CRACK using SVG pattern */
-    .egg.cracked{
-      background: #e8e8e8;
-      border-color: #999;
-      transform: rotate(8deg);
-      animation: crackShake 0.3s ease-out;
-    }
-
-    @keyframes crackShake{
-      0%, 100%{ transform: rotate(8deg); }
-      25%{ transform: rotate(12deg); }
-      50%{ transform: rotate(4deg); }
-      75%{ transform: rotate(10deg); }
-    }
-
-    .egg.cracked::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background-image:
-        /* Main jagged vertical crack */
-        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 75"><path d="M30 10 L32 18 L28 25 L31 32 L29 40 L32 48 L28 55 L30 65" stroke="%23555" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M30 15 L26 20 M30 22 L34 28 M29 35 L25 38 M31 42 L35 46 M28 52 L24 56" stroke="%23666" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>');
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 0.9;
-    }
-
-    /* Chicken Stage - RIGHT SIDE */
+    /* RIGHT SIDE - Chicken Stage */
     .chickenStage{
-      flex: 1;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
-      position: relative;
-      max-width: 500px;
+      width: 300px;
+      height: 300px;
     }
 
     .chickenSVG{
       width: 100%;
-      height: auto;
-      max-height: 95%;
+      height: 100%;
       display: none;
       filter: drop-shadow(0 15px 20px rgba(0,0,0,0.15));
     }
@@ -250,16 +236,16 @@
 
     @keyframes peckAttack{
       0%{ transform: scale(1) translateY(0); }
-      50%{ transform: scale(1.8) translateY(40px); }
+      50%{ transform: scale(1.5) translateY(30px); }
       100%{ transform: scale(1) translateY(0); }
     }
 
     /* Game Over Popup */
     .gameOverPopup{
-      position: absolute;
-      top: 15%;
+      position: fixed;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       width: 90%;
       max-width: 450px;
       background: white;
@@ -503,13 +489,55 @@
       margin-top: 15px;
     }
 
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      .mainContainer{
+        gap: 20px;
+      }
+      .chickenStage{
+        width: 250px;
+        height: 250px;
+      }
+      .eggsHUD{
+        gap: 20px;
+      }
+      .egg{
+        width: 70px;
+        height: 87px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .mainContainer{
+        flex-direction: column;
+        gap: 30px;
+      }
+      .eggsHUD{
+        flex-direction: row;
+        gap: 30px;
+      }
+      .chickenStage{
+        width: 200px;
+        height: 200px;
+      }
+    }
+
   </style>
 </head>
 
 <body class="wink">
 
-  <!-- TOP HALF -->
-  <div class="topHalf">
+  <!-- MAIN CENTERED CONTAINER -->
+  <div class="mainContainer">
+    
+    <!-- LEFT: Eggs -->
+    <div class="eggsHUD">
+      <div class="egg" id="egg1"></div>
+      <div class="egg" id="egg2"></div>
+      <div class="egg" id="egg3"></div>
+    </div>
+
+    <!-- CENTER: Quiz Card -->
     <div class="quizCard">
       <div class="quizHeader">
         <span id="qNum">Q 1/9</span>
@@ -526,23 +554,12 @@
       
       <div class="feedback" id="feedbackText"></div>
     </div>
-  </div>
-
-  <!-- BOTTOM HALF - Split Layout -->
-  <div class="bottomHalf">
-    
-    <!-- LEFT: Eggs -->
-    <div class="eggsHUD">
-      <div class="egg" id="egg1"></div>
-      <div class="egg" id="egg2"></div>
-      <div class="egg" id="egg3"></div>
-    </div>
 
     <!-- RIGHT: Chicken Stage -->
     <div class="chickenStage">
       
       <!-- HAPPY (White, Wings Up) -->
-      <svg class="chickenSVG happy" viewBox="0 0 400 400" preserveAspectRatio="xMidYMax meet">
+      <svg class="chickenSVG happy" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
         <ellipse cx="200" cy="260" rx="100" ry="105" fill="#ffffff" stroke="#222" stroke-width="6"/>
         <path d="M110 210 Q60 120 90 100" fill="none" stroke="#fff" stroke-width="20" stroke-linecap="round"/>
         <path d="M110 210 Q60 120 90 100" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round"/>
@@ -556,7 +573,7 @@
       </svg>
 
       <!-- ANGRY (Brown, Rage) -->
-      <svg class="chickenSVG angry" viewBox="0 0 400 400" preserveAspectRatio="xMidYMax meet">
+      <svg class="chickenSVG angry" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
         <ellipse cx="200" cy="260" rx="110" ry="100" fill="#8B4513" stroke="#222" stroke-width="6"/>
         <path d="M70 220 Q30 200 50 270" fill="#A0522D" stroke="#222" stroke-width="5"/>
         <path d="M330 220 Q370 200 350 270" fill="#A0522D" stroke="#222" stroke-width="5"/>
@@ -570,7 +587,7 @@
       </svg>
 
       <!-- WINK (Tan, Chill) -->
-      <svg class="chickenSVG wink" viewBox="0 0 400 400" preserveAspectRatio="xMidYMax meet">
+      <svg class="chickenSVG wink" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
         <ellipse cx="200" cy="260" rx="95" ry="100" fill="#DEB887" stroke="#222" stroke-width="6"/>
         <path d="M115 250 Q95 270 125 285" fill="none" stroke="#CD853F" stroke-width="6" stroke-linecap="round"/>
         <path d="M170 350 L170 380 M230 350 L230 380" stroke="#f39c12" stroke-width="10" stroke-linecap="round"/>
