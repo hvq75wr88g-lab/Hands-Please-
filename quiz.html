@@ -1241,28 +1241,41 @@ async function sbSaveQuestions(questionsArr){
     });
 
     // === INIT ===
-    function init(){
+    async function init(){
+  // Load shared questions from Supabase first, then fallback to local cache/defaults
+  try{
+    const remote = await sbLoadQuestions();
+    if(Array.isArray(remote) && remote.length){
+      questions = remote;
+    } else {
       const stored = localStorage.getItem('handsPlease_quiz_v5');
       questions = stored ? JSON.parse(stored) : [...DEFAULT_BANK];
-      
-      questions.forEach((q, i) => {
-        if(!q.id) q.id = 'q' + Date.now() + i;
-      });
-      
-      questions.sort(() => Math.random() - 0.5);
-      
-      currentIdx = 0;
-      score = 0;
-      strikes = 0;
-      gameOver = false;
-      
-      setChickenMood('wink');
-      document.getElementById('gameOverPopup').style.display = 'none';
-      document.getElementById('victoryPopup').style.display = 'none';
-      document.querySelectorAll('.egg').forEach(e => e.className = 'egg');
-      
-      renderQuestion();
     }
+  } catch(err){
+    console.warn("Supabase load questions failed, using localStorage:", err);
+    const stored = localStorage.getItem('handsPlease_quiz_v5');
+    questions = stored ? JSON.parse(stored) : [...DEFAULT_BANK];
+  }
+
+  questions.forEach((q, i) => {
+    if(!q.id) q.id = 'q' + Date.now() + i;
+  });
+
+  questions.sort(() => Math.random() - 0.5);
+
+  currentIdx = 0;
+  score = 0;
+  strikes = 0;
+  gameOver = false;
+
+  setChickenMood('wink');
+  document.getElementById('gameOverPopup').style.display = 'none';
+  document.getElementById('victoryPopup').style.display = 'none';
+  document.querySelectorAll('.egg').forEach(e => e.className = 'egg');
+
+  renderQuestion();
+}
+
 
     function renderQuestion(){
       if(currentIdx >= questions.length){
