@@ -918,6 +918,7 @@
     }
 
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body class="wink">
@@ -1074,6 +1075,70 @@
 
   <script>
     const ADMIN_PASSWORD = 'Iworkfortips'; // Change this to your desired password
+    // === SUPABASE (cross-device sync) ===
+const SUPABASE_URL = "https://beyeqxromrqoiruejddp.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJleWVxeHJvbXJxb2lydWVqZGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MjcwMDEsImV4cCI6MjA4NTUwMzAwMX0.LIt8CG0DYeQDXE1RhvGPNyjVdK8SarSGuXJJJd2Ku7o";
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Tables in your Supabase project
+const SB_LB_TABLE = "hp_quiz_leaderboard";
+const SB_Q_TABLE  = "hp_quiz_questions";
+const SB_Q_ID = "main"; // single shared question-bank row
+
+async function sbFetchLeaderboard(limit = 200){
+  const { data, error } = await sb
+    .from(SB_LB_TABLE)
+    .select("id,name,score,total,created_at")
+    .order("score", { ascending: false })
+    .order("created_at", { ascending: true })
+    .limit(limit);
+  if(error) throw error;
+
+  return (data || []).map(r => ({
+    id: r.id,
+    name: r.name,
+    score: r.score,
+    total: r.total,
+    date: r.created_at
+  }));
+}
+
+async function sbInsertScore(name, score, total){
+  const { error } = await sb.from(SB_LB_TABLE).insert([{ name, score, total }]);
+  if(error) throw error;
+}
+
+async function sbDeleteScoreById(id){
+  const { error } = await sb.from(SB_LB_TABLE).delete().eq("id", id);
+  if(error) throw error;
+}
+
+async function sbClearAllScores(){
+  const { error } = await sb
+    .from(SB_LB_TABLE)
+    .delete()
+    .neq("id", "00000000-0000-0000-0000-000000000000");
+  if(error) throw error;
+}
+
+async function sbLoadQuestions(){
+  const { data, error } = await sb
+    .from(SB_Q_TABLE)
+    .select("questions")
+    .eq("id", SB_Q_ID)
+    .maybeSingle();
+  if(error) throw error;
+  return data?.questions || null;
+}
+
+async function sbSaveQuestions(questionsArr){
+  const { error } = await sb
+    .from(SB_Q_TABLE)
+    .upsert({ id: SB_Q_ID, questions: questionsArr }, { onConflict: "id" });
+  if(error) throw error;
+}
 
     const CHICKEN_IMAGES = {
       happy: [
