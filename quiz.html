@@ -1,1640 +1,615 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Breakfast Quiz - Hands Please</title>
-  <style>
-    :root{
-      --eggshell: #f3efe6;
-      --ink: #1f2328;
-      --accent: #d35400;
-      --danger: #c0392b;
-      --ok: #27ae60;
-      --gold: #f39c12;
-    }
-
-    *{ box-sizing: border-box; margin: 0; padding: 0; }
-    
-    html, body{ height: 100%; overflow: hidden; }
-
-    body{
-      background: var(--eggshell);
-      background-image: radial-gradient(circle, #ccc 1px, transparent 1px);
-      background-size: 20px 20px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      color: var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .mainContainer{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 40px;
-      max-width: 1400px;
-      width: 100%;
-      height: 100%;
-    }
-
-    .eggsHUD{
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      align-items: center;
-    }
-
-    .egg{
-      width: 80px;
-      height: 100px;
-      background: linear-gradient(145deg, #fff, #f0f0f0);
-      border: 3px solid #ddd;
-      border-radius: 50% 50% 45% 45%;
-      box-shadow: 0 6px 0 #ccc, inset 0 2px 0 rgba(255,255,255,0.8);
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .egg::after{
-      content: '';
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 16px;
-      height: 20px;
-      background: rgba(255,255,255,0.6);
-      border-radius: 50%;
-      transform: rotate(-30deg);
-    }
-
-    .egg.cracked{
-      background: #e8e8e8;
-      border-color: #999;
-      transform: rotate(8deg);
-      animation: crackShake 0.3s ease-out;
-    }
-
-    @keyframes crackShake{
-      0%, 100%{ transform: rotate(8deg); }
-      25%{ transform: rotate(12deg); }
-      50%{ transform: rotate(4deg); }
-      75%{ transform: rotate(10deg); }
-    }
-
-    .egg.cracked::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background-image:
-        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><path d="M40 8 L41 14 L38 19 L42 26 L39 33 L43 41 L38 49 L41 57 L44 65 L39 73 L42 82 L40 92" stroke="%23999" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M40 12 L34 17 M40 20 L46 26 M39 30 L32 36 M43 38 L49 44 M38 52 L31 58 M41 60 L48 66 M44 70 L50 75 M39 78 L33 83" stroke="%23aaa" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M25 25 Q30 28 35 26 M55 25 Q50 28 45 26 M20 40 Q25 43 30 41 M60 40 Q55 43 50 41 M22 55 Q27 58 32 56 M58 55 Q53 58 48 56 M24 70 Q29 73 34 71 M56 70 Q51 73 46 71 M28 85 Q33 88 38 86 M52 85 Q47 88 42 86" stroke="%23bbb" stroke-width="0.9" fill="none"/><path d="M15 30 L25 35 L20 40 M65 30 L55 35 L60 40 M18 50 L28 55 L23 60 M62 50 L52 55 L57 60 M16 68 L26 73 L21 78 M64 68 L54 73 L59 78" stroke="%23ccc" stroke-width="0.7" fill="none" stroke-linecap="round"/><path d="M30 15 Q35 18 40 16 Q45 18 50 15 M28 35 Q33 38 38 36 Q43 38 48 35 M26 55 Q31 58 36 56 Q41 58 46 55 M29 75 Q34 78 39 76 Q44 78 49 75" stroke="%23aaa" stroke-width="0.8" fill="none"/><path d="M35 22 L38 28 L34 32 M46 22 L43 28 L47 32 M33 44 L36 50 L32 54 M48 44 L45 50 L49 54 M31 64 L34 70 L30 74 M50 64 L47 70 L51 74" stroke="%23bbb" stroke-width="0.6" fill="none" stroke-linecap="round"/></svg>');
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 1;
-    }
-
-    .quizCard{
-      width: 100%;
-      max-width: 600px;
-      background: white;
-      border: 2px solid rgba(0,0,0,0.1);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .quizHeader{
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #7f8c8d;
-    }
-
-    .quizTitle{
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--accent);
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .playerName{
-      text-align: center;
-      font-size: 16px;
-      color: var(--gold);
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-
-    .questionText{
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    .choices{
-      display: grid;
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-
-    .choice{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px;
-      border: 2px solid #ecf0f1;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 16px;
-      background: white;
-    }
-
-    .choice:hover{
-      border-color: var(--accent);
-      background: #fff9f0;
-      transform: translateX(5px);
-    }
-
-    .choice input{
-      width: 20px;
-      height: 20px;
-      accent-color: var(--accent);
-    }
-
-    .submitBtn{
-      width: 100%;
-      padding: 16px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .submitBtn:hover{ background: #e67e22; }
-    .submitBtn:disabled{ opacity: 0.5; cursor: not-allowed; }
-
-    .feedback{
-      text-align: center;
-      margin-top: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      min-height: 24px;
-    }
-
-    .chickenStage{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 300px;
-      height: 300px;
-      position: relative;
-    }
-
-    .chickenImage{
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: none;
-    }
-
-    .chickenImage.active{
-      display: block;
-    }
-
-    body.happy .chickenImage.happy{ 
-      display: block;
-      animation: bounceChicken 0.6s ease-in-out infinite alternate;
-    }
-
-    body.angry .chickenImage.angry{ 
-      display: block;
-      animation: shakeChicken 0.12s linear infinite;
-    }
-
-    body.wink .chickenImage.wink{ 
-      display: block;
-      animation: breatheChicken 3s ease-in-out infinite;
-    }
-
-    body.peck .chickenImage.angry{ 
-      display: block;
-      animation: peckChicken 0.5s ease-in-out infinite;
-    }
-
-    @keyframes bounceChicken{
-      from{ transform: translateY(0); }
-      to{ transform: translateY(-30px); }
-    }
-
-    @keyframes shakeChicken{
-      0%{ transform: translate(2px, 1px) rotate(0deg); }
-      25%{ transform: translate(-2px, -2px) rotate(-1deg); }
-      50%{ transform: translate(2px, 2px) rotate(1deg); }
-      75%{ transform: translate(-2px, 1px) rotate(-1deg); }
-      100%{ transform: translate(2px, -1px) rotate(0deg); }
-    }
-
-    @keyframes breatheChicken{
-      0%, 100%{ transform: scale(1); }
-      50%{ transform: scale(1.03); }
-    }
-
-    @keyframes peckChicken{
-      0%{ transform: scale(1) translateY(0); }
-      50%{ transform: scale(1.5) translateY(30px); }
-      100%{ transform: scale(1) translateY(0); }
-    }
-
-    /* NAME ENTRY SCREEN */
-    .nameEntryScreen{
-      position: fixed;
-      inset: 0;
-      background: var(--eggshell);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 500;
-      padding: 20px;
-    }
-
-    .nameEntryCard{
-      background: white;
-      border: 2px solid rgba(0,0,0,0.1);
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 500px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    .nameEntryCard h2{
-      font-size: 28px;
-      color: var(--accent);
-      margin-bottom: 10px;
-    }
-
-    .nameEntryCard p{
-      font-size: 16px;
-      color: #7f8c8d;
-      margin-bottom: 30px;
-    }
-
-    .nameEntryCard input{
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      border: 2px solid #ecf0f1;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-family: inherit;
-    }
-
-    .nameEntryCard input:focus{
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    /* GAME OVER POPUP */
-    .gameOverPopup{
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 450px;
-      background: white;
-      border: 5px solid var(--danger);
-      border-radius: 24px;
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-      z-index: 100;
-      display: none;
-    }
-
-    .gameOverPopup h2{
-      font-size: 32px;
-      color: var(--danger);
-      margin-bottom: 15px;
-    }
-
-    .gameOverPopup p{
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #555;
-    }
-
-    .gameOverPopup button{
-      margin-top: 20px;
-      padding: 16px 40px;
-      background: var(--ink);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* VICTORY POPUP */
-    .victoryPopup{
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 500px;
-      background: white;
-      border: 5px solid var(--ok);
-      border-radius: 24px;
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-      z-index: 100;
-      display: none;
-    }
-
-    .victoryPopup h2{
-      font-size: 32px;
-      color: var(--ok);
-      margin-bottom: 15px;
-    }
-
-    .victoryPopup .finalScore{
-      font-size: 48px;
-      font-weight: bold;
-      color: var(--gold);
-      margin: 20px 0;
-    }
-
-    .victoryPopup p{
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #555;
-    }
-
-    .victoryPopup button{
-      margin-top: 20px;
-      padding: 16px 40px;
-      background: var(--ok);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-right: 10px;
-    }
-
-    /* LEADERBOARD */
-    .leaderboardBtn{
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      padding: 10px 20px;
-      background: var(--gold);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 200;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .leaderboardBtn:hover{
-      background: #e67e22;
-    }
-
-    .leaderboardModal{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 300;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .leaderboardPanel{
-      background: white;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .leaderboardHeader{
-      padding: 20px;
-      border-bottom: 2px solid #ecf0f1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(135deg, var(--gold), var(--accent));
-      color: white;
-      border-radius: 16px 16px 0 0;
-    }
-
-    .leaderboardHeader h2{
-      font-size: 24px;
-    }
-
-    .leaderboardBody{
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .leaderboardList{
-      display: grid;
-      gap: 12px;
-    }
-
-    .leaderboardItem{
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px;
-      background: #fafafa;
-      border-radius: 12px;
-      border: 2px solid #ecf0f1;
-      transition: 0.2s;
-    }
-
-    .leaderboardItem.champion{
-      background: linear-gradient(135deg, #fff9e6, #ffe6cc);
-      border-color: var(--gold);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .leaderboardItem.champion::before{
-      content: '👑';
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 32px;
-      opacity: 0.3;
-    }
-
-    .leaderboardRank{
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--gold);
-      min-width: 40px;
-      text-align: center;
-    }
-
-    .leaderboardItem.champion .leaderboardRank{
-      color: var(--gold);
-      font-size: 28px;
-    }
-
-    .leaderboardInfo{
-      flex: 1;
-    }
-
-    .leaderboardName{
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--ink);
-      margin-bottom: 5px;
-    }
-
-    .leaderboardItem.champion .leaderboardName{
-      color: var(--gold);
-      font-size: 20px;
-    }
-
-    .leaderboardItem.champion .leaderboardName::after{
-      content: ' 🏆 Superduper Breakfast Champion!';
-      font-size: 14px;
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .leaderboardDate{
-      font-size: 12px;
-      color: #95a5a6;
-    }
-
-    .leaderboardScore{
-      font-size: 28px;
-      font-weight: bold;
-      color: var(--ok);
-    }
-
-    .emptyLeaderboard{
-      text-align: center;
-      padding: 40px 20px;
-      color: #95a5a6;
-    }
-
-    .emptyLeaderboard p{
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-
-    /* ADMIN */
-    .adminLink{
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      font-size: 11px;
-      color: #95a5a6;
-      text-decoration: none;
-      background: rgba(255,255,255,0.8);
-      padding: 5px 10px;
-      border-radius: 6px;
-      z-index: 200;
-    }
-
-    .adminLink:hover{ color: var(--accent); }
-
-    .adminModal{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 400;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .adminPanel{
-      background: white;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 700px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .adminHeader{
-      padding: 20px;
-      border-bottom: 2px solid #ecf0f1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .adminHeader h2{
-      color: var(--accent);
-      font-size: 24px;
-    }
-
-    .adminTabs{
-      display: flex;
-      gap: 10px;
-      padding: 15px 20px;
-      border-bottom: 2px solid #ecf0f1;
-      background: #fafafa;
-    }
-
-    .adminTab{
-      padding: 10px 20px;
-      background: white;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-
-    .adminTab.active{
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-
-    .adminBody{
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .adminSection{
-      display: none;
-    }
-
-    .adminSection.active{
-      display: block;
-    }
-
-    .adminControls{
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .btnAdmin{
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .btnPrimary{ background: var(--accent); color: white; }
-    .btnPrimary:hover{ background: #e67e22; }
-    .btnSecondary{ background: #ecf0f1; color: var(--ink); }
-    .btnSecondary:hover{ background: #d5dbdb; }
-    .btnDanger{ background: var(--danger); color: white; }
-    .btnDanger:hover{ background: #a93226; }
-
-    .questionsList{
-      display: grid;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .qCard{
-      border: 2px solid #ecf0f1;
-      border-radius: 12px;
-      padding: 15px;
-      background: #fafafa;
-    }
-
-    .qCard .qText{
-      font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 16px;
-      color: var(--ink);
-    }
-
-    .qCard .qChoices{
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 10px;
-      padding-left: 10px;
-    }
-
-    .qCard .qChoices div{
-      margin: 5px 0;
-    }
-
-    .qCard .qChoices .correct{
-      color: var(--ok);
-      font-weight: bold;
-    }
-
-    .qCard .qActions{
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .editorForm{
-      display: none;
-      background: white;
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .editorForm.active{ display: block; }
-
-    .formField{
-      margin-bottom: 15px;
-    }
-
-    .formField label{
-      display: block;
-      font-weight: 600;
-      margin-bottom: 5px;
-      font-size: 14px;
-      color: var(--ink);
-    }
-
-    .formField input[type="text"],
-    .formField textarea,
-    .formField input[type="password"]{
-      width: 100%;
-      padding: 10px;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    .formField input:focus,
-    .formField textarea:focus{
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .formField textarea{ min-height: 80px; resize: vertical; }
-
-    .choiceEditor{
-      display: grid;
-      gap: 10px;
-    }
-
-    .choiceRow{
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .choiceRow input[type="text"]{
-      flex: 1;
-      padding: 10px;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    .choiceRow input[type="radio"]{
-      width: 20px;
-      height: 20px;
-      accent-color: var(--ok);
-    }
-
-    .choiceRow button{
-      padding: 8px 12px;
-      background: var(--danger);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
-    .formActions{
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .leaderboardAdminList{
-      display: grid;
-      gap: 10px;
-    }
-
-    .leaderboardAdminItem{
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 12px;
-      background: #fafafa;
-      border: 2px solid #ecf0f1;
-      border-radius: 10px;
-    }
-
-    .leaderboardAdminItem.champion{
-      background: #fff9e6;
-      border-color: var(--gold);
-    }
-
-    .leaderboardAdminInfo{
-      flex: 1;
-    }
-
-    .leaderboardAdminName{
-      font-weight: bold;
-      font-size: 16px;
-      color: var(--ink);
-    }
-
-    .leaderboardAdminDate{
-      font-size: 12px;
-      color: #95a5a6;
-    }
-
-    .leaderboardAdminScore{
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--ok);
-      margin-right: 10px;
-    }
-
-    /* MOBILE RESPONSIVE */
-    @media (max-width: 1200px) {
-      .mainContainer{ gap: 20px; }
-      .chickenStage{ width: 250px; height: 250px; }
-      .eggsHUD{ gap: 20px; }
-      .egg{ width: 70px; height: 87px; }
-    }
-
-    @media (max-width: 900px) {
-      .mainContainer{
-        flex-direction: column;
-        gap: 20px;
-        padding: 10px;
-      }
-      .eggsHUD{
-        flex-direction: row;
-        gap: 20px;
-      }
-      .egg{
-        width: 60px;
-        height: 75px;
-      }
-      .chickenStage{
-        width: 180px;
-        height: 180px;
-      }
-      .quizCard{
-        padding: 20px;
-        max-height: none;
-      }
-      .questionText{
-        font-size: 18px;
-      }
-      .choice{
-        font-size: 14px;
-        padding: 12px;
-      }
-      .leaderboardBtn{
-        padding: 8px 16px;
-        font-size: 12px;
-      }
-      body{
-        padding: 10px;
-      }
-    }
-
-    @media (max-width: 500px) {
-      .quizTitle{
-        font-size: 18px;
-      }
-      .questionText{
-        font-size: 16px;
-      }
-      .choice{
-        font-size: 13px;
-      }
-      .submitBtn{
-        font-size: 16px;
-        padding: 14px;
-      }
-      .nameEntryCard{
-        padding: 30px 20px;
-      }
-      .nameEntryCard h2{
-        font-size: 24px;
-      }
-      .gameOverPopup, .victoryPopup{
-        padding: 30px 20px;
-      }
-      .leaderboardRank{
-        font-size: 20px;
-        min-width: 35px;
-      }
-      .leaderboardScore{
-        font-size: 24px;
-      }
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hands Please Breakfast Quiz</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --brand: #d35400;
+            --brand-dark: #a04000;
+            --egg: #f39c12;
+            --bg: #fdfbf7;
+            --text: #2c3e50;
+            --white: #ffffff;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .screen.active { display: flex; z-index: 20; }
+
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        h1 { font-size: 26px; color: var(--brand); margin-bottom: 10px; line-height: 1.3; }
+        h2 { font-size: 22px; margin-bottom: 15px; color: var(--text); }
+        p { color: #666; margin-bottom: 20px; line-height: 1.5; font-size: 15px; }
+
+        .btn {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            margin-top: 10px;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn:hover { background: var(--brand-dark); }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 17px;
+            text-align: center;
+            margin-bottom: 15px;
+            outline: none;
+            font-family: inherit;
+        }
+        input:focus { border-color: var(--brand); }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .question-text {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .option-btn {
+            background: var(--white);
+            border: 2px solid #eee;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .option-btn.selected { border-color: var(--brand); background: #fff5eb; }
+        .option-btn.correct { border-color: var(--success); background: #e8f8f5; color: var(--success); font-weight: 700; }
+        .option-btn.wrong { border-color: var(--danger); background: #fdedec; color: var(--danger); }
+
+        .leaderboard-container {
+            width: 100%;
+            max-width: 450px;
+            max-height: 55vh;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            background: #fafafa;
+            padding: 10px;
+        }
+
+        .leaderboard-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+
+        .leaderboard-row:last-child { border-bottom: none; }
+
+        .leaderboard-row.champion {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6b3 100%);
+            border-radius: 12px;
+            border: 2px solid #ffd700;
+            margin-bottom: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(241, 196, 15, 0.3);
+        }
+        
+        .rank-1-badge { font-size: 24px; margin-right: 8px; }
+
+        .champion-title {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--brand);
+            font-weight: 800;
+            margin-top: 3px;
+        }
+
+        .chicken-stage {
+            height: 100px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chicken-emoji { font-size: 70px; transition: all 0.3s; }
+        .chicken-emoji.bounce { animation: bounce 0.5s infinite alternate; }
+        .chicken-emoji.shake { animation: shake 0.3s; }
+        @keyframes bounce { to { transform: translateY(-10px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .admin-toggle {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.3;
+            font-size: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 100;
+            color: #999;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .admin-list {
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .admin-item {
+            border-bottom: 1px solid #eee;
+            padding: 12px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: var(--brand);
+            text-decoration: underline;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 400px) {
+            .card { padding: 25px 15px; }
+            h1 { font-size: 24px; }
+            .question-text { font-size: 17px; }
+            .option-btn { font-size: 14px; padding: 12px; }
+        }
+    </style>
 </head>
+<body>
 
-<body class="wink">
-
-  <!-- NAME ENTRY SCREEN -->
-  <div class="nameEntryScreen" id="nameEntryScreen">
-    <div class="nameEntryCard">
-      <h2>🐔 Hands Please! Quiz</h2>
-      <p>Enter your name to join the competition!</p>
-      <input type="text" id="playerNameInput" placeholder="Your name..." maxlength="30" />
-      <button class="submitBtn" onclick="startQuiz()">Start Quiz</button>
-    </div>
-  </div>
-
-  <!-- MAIN QUIZ -->
-  <div class="mainContainer" id="mainContainer" style="display: none;">
-    
-    <div class="eggsHUD">
-      <div class="egg" id="egg1"></div>
-      <div class="egg" id="egg2"></div>
-      <div class="egg" id="egg3"></div>
-    </div>
-
-    <div class="quizCard">
-      <div class="quizHeader">
-        <span id="qNum">Q 1/9</span>
-        <span id="scoreDisplay">Score: 0</span>
-      </div>
-      
-      <div class="quizTitle">Hands Please!</div>
-      <div class="playerName" id="playerNameDisplay"></div>
-      
-      <div class="questionText" id="questionText">Loading...</div>
-      
-      <div class="choices" id="choicesContainer"></div>
-      
-      <button class="submitBtn" id="submitBtn">Submit Answer</button>
-      
-      <div class="feedback" id="feedbackText"></div>
-    </div>
-
-    <div class="chickenStage">
-      <img class="chickenImage happy" id="happyImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png" alt="Happy Chicken">
-      <img class="chickenImage angry" id="angryImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2036a4c0-36eb-4538-bfd4-94ccb3f03b24.png" alt="Angry Chicken">
-      <img class="chickenImage wink" id="winkImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png" alt="Wink Chicken">
-    </div>
-  </div>
-
-  <!-- GAME OVER POPUP -->
-  <div class="gameOverPopup" id="gameOverPopup">
-    <h2>Strike 3!</h2>
-    <p>Oh oh! The chicken is NOT happy.</p>
-    <p id="gameOverScore"></p>
-    <p>Study hard and try again!</p>
-    <button onclick="location.reload()">Try Again</button>
-  </div>
-
-  <!-- VICTORY POPUP -->
-  <div class="victoryPopup" id="victoryPopup">
-    <h2>🎉 Quiz Complete!</h2>
-    <div class="finalScore" id="finalScore">9/9</div>
-    <p id="victoryMessage">Amazing! Perfect score!</p>
-    <button onclick="location.reload()">Play Again</button>
-    <button onclick="openLeaderboard()" style="background: var(--gold);">View Leaderboard</button>
-  </div>
-
-  <!-- LEADERBOARD BUTTON -->
-  <button class="leaderboardBtn" onclick="openLeaderboard()">🏆 Leaderboard</button>
-
-  <!-- LEADERBOARD MODAL -->
-  <div class="leaderboardModal" id="leaderboardModal">
-    <div class="leaderboardPanel">
-      
-      <div class="leaderboardHeader">
-        <h2>🏆 Leaderboard</h2>
-        <button class="btnSecondary" style="background: rgba(255,255,255,0.2); color: white;" onclick="closeLeaderboard()">Close</button>
-      </div>
-
-      <div class="leaderboardBody">
-        <div class="leaderboardList" id="leaderboardList">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ADMIN LINK -->
-  <a href="#" class="adminLink" onclick="event.preventDefault(); openAdmin();">Admin</a>
-
-  <!-- ADMIN MODAL -->
-  <div class="adminModal" id="adminModal">
-    <div class="adminPanel">
-      
-      <div class="adminHeader">
-        <h2>Admin Panel</h2>
-        <button class="btnSecondary" onclick="closeAdmin()">Close</button>
-      </div>
-
-      <div class="adminTabs">
-        <div class="adminTab active" onclick="switchAdminTab('questions')">Questions</div>
-        <div class="adminTab" onclick="switchAdminTab('leaderboard')">Manage Leaderboard</div>
-      </div>
-
-      <div class="adminBody">
-        
-        <!-- QUESTIONS TAB -->
-        <div class="adminSection active" id="adminQuestionsTab">
-          <div class="adminControls">
-            <button class="btnPrimary" onclick="showAddForm()">➕ Add New Question</button>
-            <button class="btnSecondary" onclick="resetToDefaults()">Reset to Defaults</button>
-            <button class="btnSecondary" onclick="exportQuestions()">Export JSON</button>
-            <button class="btnSecondary" onclick="importQuestions()">Import JSON</button>
-          </div>
-
-          <div class="editorForm" id="editorForm">
-            <h3 style="margin-bottom:15px; color:var(--accent);">Edit Question</h3>
+    <!-- SCREEN 1: WELCOME & NAME ENTRY -->
+    <div id="startScreen" class="screen active">
+        <div class="card">
+            <div class="chicken-stage"><div class="chicken-emoji">🐔</div></div>
+            <h1>Hands Please<br>Breakfast Quiz</h1>
+            <p>Prove your menu knowledge and become the Superduper Breakfast Champion!</p>
             
-            <div class="formField">
-              <label>Question Text:</label>
-              <textarea id="editQuestionText" placeholder="Enter your question..."></textarea>
-            </div>
-
-            <div class="formField">
-              <label>Answer Choices (check the correct one):</label>
-              <div class="choiceEditor" id="choiceEditor"></div>
-              <button class="btnSecondary" onclick="addChoiceRow()" style="margin-top:10px; padding:8px 12px; font-size:13px;">+ Add Choice</button>
-            </div>
-
-            <div class="formActions">
-              <button class="btnPrimary" onclick="saveQuestion()">Save Question</button>
-              <button class="btnSecondary" onclick="cancelEdit()">Cancel</button>
-              <button class="btnDanger" onclick="deleteCurrentQuestion()" id="deleteBtn" style="display:none;">Delete Question</button>
-            </div>
-          </div>
-
-          <div class="questionsList" id="questionsList"></div>
+            <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
+            
+            <button class="btn" onclick="startGame()">Start Quiz</button>
+            <button class="link-btn" onclick="showLeaderboard()">View Leaderboard</button>
         </div>
-
-        <!-- LEADERBOARD TAB -->
-        <div class="adminSection" id="adminLeaderboardTab">
-          <div class="adminControls">
-            <button class="btnDanger" onclick="clearAllScores()">Clear All Scores</button>
-          </div>
-
-          <div class="leaderboardAdminList" id="leaderboardAdminList">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-      </div>
     </div>
-  </div>
 
-  <script>
-    const ADMIN_PASSWORD = 'breakfast2026'; // Change this to your desired password
+    <!-- SCREEN 2: QUIZ -->
+    <div id="quizScreen" class="screen">
+        <div class="hud">
+            <span id="playerDisplay">Player</span>
+            <span id="scoreDisplay">0 / 0</span>
+        </div>
+        <div class="card">
+            <div class="chicken-stage"><div id="quizChicken" class="chicken-emoji">🥚</div></div>
+            <div id="questionContainer">
+                <div class="question-text" id="questionText">Loading...</div>
+                <div class="options-grid" id="optionsGrid"></div>
+            </div>
+            <button id="nextBtn" class="btn" style="display:none;" onclick="nextQuestion()">Next Question</button>
+        </div>
+    </div>
 
-    const CHICKEN_IMAGES = {
-      happy: [
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png',
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5cf3e5fe-edb5-4d16-98b8-d45e90eef68e.png',
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/b498ce6d-decf-4441-8f26-57074747b8f5.png'
-      ],
-      angry: [
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2036a4c0-36eb-4538-bfd4-94ccb3f03b24.png',
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/43f53595-f8e6-49ff-8bdf-7cfa8fb1e359.png',
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/bd76b9ab-3a56-49bf-a5e8-6aa9d74a16dd.png'
-      ],
-      wink: [
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png',
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/37753db4-6856-47fe-9f66-f652f7506e99.png',
-        'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/fa393d61-fd60-4e86-9889-d6e25461711f.png'
-      ]
-    };
+    <!-- SCREEN 3: RESULTS & LEADERBOARD -->
+    <div id="resultScreen" class="screen">
+        <div class="card">
+            <div class="chicken-stage"><div id="resultChicken" class="chicken-emoji">🐣</div></div>
+            <h2 id="resultTitle">Quiz Complete!</h2>
+            <p id="resultMessage"></p>
+            <div class="leaderboard-container" id="leaderboardContent"></div>
+            <button class="btn" onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+    
+    <!-- ADMIN MODAL -->
+    <div id="adminModal" class="screen" style="background:rgba(0,0,0,0.9);">
+        <div class="card">
+            <h2>Admin Access</h2>
+            <input type="password" id="adminPass" placeholder="Password">
+            <button class="btn" onclick="verifyAdmin()">Login</button>
+            <button class="btn" style="background:#7f8c8d; margin-top:10px;" onclick="closeAdmin()">Cancel</button>
+        </div>
+    </div>
+    
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" class="screen">
+         <div class="card" style="max-width:600px;">
+            <h2>Admin Control Panel</h2>
+            <p style="font-size:14px; color:#999;">Manage Leaderboard Scores</p>
+            <div id="adminLeaderboardList" class="admin-list"></div>
+            <button class="btn" style="margin-top:20px;" onclick="location.reload()">Exit Admin</button>
+         </div>
+    </div>
 
-    let currentFrame = 0;
-    let animationInterval = null;
+    <button class="admin-toggle" onclick="openAdmin()">Admin</button>
 
-    function startChickenAnimation(mood) {
-      stopChickenAnimation();
-      
-      const images = CHICKEN_IMAGES[mood];
-      if (!images || images.length === 0) return;
-      
-      currentFrame = 0;
-      updateChickenFrame(mood);
-      
-      animationInterval = setInterval(() => {
-        currentFrame = (currentFrame + 1) % images.length;
-        updateChickenFrame(mood);
-      }, 200);
-    }
-
-    function updateChickenFrame(mood) {
-      const img = document.querySelector(`.chickenImage.${mood}`);
-      if (img) {
-        img.src = CHICKEN_IMAGES[mood][currentFrame];
-      }
-    }
-
-    function stopChickenAnimation() {
-      if (animationInterval) {
-        clearInterval(animationInterval);
-        animationInterval = null;
-      }
-    }
-
-    function setChickenMood(mood) {
-      document.body.className = mood;
-      startChickenAnimation(mood);
-    }
-
-    const DEFAULT_BANK = [
-      { id: '1', q: "Describe Loop juices to a guest:", c: ["Imperfect produce, cold pressed, circular economy", "Fresh squeezed daily in-house", "Concentrate from cartons"], a: 0 },
-      { id: '2', q: "Is the Farmhouse Breakfast gluten free?", c: ["Yes, it's naturally gluten free", "No - potatoes cooked in shared fryer (cross-contamination)", "Only if you remove the eggs"], a: 1 },
-      { id: '3', q: "What can VEGAN guests eat?", c: ["Farmhouse Breakfast (no eggs)", "Vegan Mexican Scramble or Fruit Plate", "Eggs Benedict (hold hollandaise)"], a: 1 },
-      { id: '4', q: "What's in the Power Bowl?", c: ["Oatmeal with brown sugar", "Greek yogurt, berries, granola, smoothie, fresh fruit", "Acai blend with granola"], a: 1 },
-      { id: '5', q: "Components of Avocado Toast:", c: ["Sourdough, smashed avo, poached eggs, radish, pickled onion, feta", "Rye bread, fried egg, bacon", "Gluten free toast, plain avocado"], a: 0 },
-      { id: '6', q: "Is the Oatmeal gluten free?", c: ["Yes, certified gluten free", "Cooked in water but NOT celiac-safe (trace risk)", "Only if ordered plain"], a: 1 },
-      { id: '7', q: "Belgian Waffle comes with:", c: ["Just butter and syrup", "Fresh berries, maple whipped cream, salted caramel, icing sugar", "Chocolate sauce and banana"], a: 1 },
-      { id: '8', q: "Dairy-free options:", c: ["Pancakes with butter", "Fruit Plate, Vegan Scramble, Oatmeal (water-cooked)", "Yogurt Bowl"], a: 1 },
-      { id: '9', q: "Can Celiac guests have potatoes/fries?", c: ["Yes, totally safe", "No - cooked in shared fryer with gluten items", "Only baked potatoes"], a: 1 }
-    ];
-
-    let questions = [];
-    let currentIdx = 0;
-    let score = 0;
-    let strikes = 0;
-    let gameOver = false;
-    let editingId = null;
-    let playerName = '';
-
-    // === NAME ENTRY ===
-    function startQuiz(){
-      const input = document.getElementById('playerNameInput');
-      const name = input.value.trim();
-      
-      if(!name){
-        alert('Please enter your name!');
-        return;
-      }
-      
-      playerName = name;
-      document.getElementById('playerNameDisplay').innerText = `Player: ${playerName}`;
-      document.getElementById('nameEntryScreen').style.display = 'none';
-      document.getElementById('mainContainer').style.display = 'flex';
-      
-      init();
-    }
-
-    // Allow Enter key to start quiz
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('playerNameInput').addEventListener('keypress', (e) => {
-        if(e.key === 'Enter') startQuiz();
-      });
-    });
-
-    // === INIT ===
-    function init(){
-      const stored = localStorage.getItem('handsPlease_quiz_v5');
-      questions = stored ? JSON.parse(stored) : [...DEFAULT_BANK];
-      
-      questions.forEach((q, i) => {
-        if(!q.id) q.id = 'q' + Date.now() + i;
-      });
-      
-      questions.sort(() => Math.random() - 0.5);
-      
-      currentIdx = 0;
-      score = 0;
-      strikes = 0;
-      gameOver = false;
-      
-      setChickenMood('wink');
-      document.getElementById('gameOverPopup').style.display = 'none';
-      document.getElementById('victoryPopup').style.display = 'none';
-      document.querySelectorAll('.egg').forEach(e => e.className = 'egg');
-      
-      renderQuestion();
-    }
-
-    function renderQuestion(){
-      if(currentIdx >= questions.length){
-        finishQuiz(true);
-        return;
-      }
-
-      const q = questions[currentIdx];
-
-      document.getElementById('qNum').innerText = `Q ${currentIdx + 1}/${questions.length}`;
-      document.getElementById('scoreDisplay').innerText = `Score: ${score}`;
-      document.getElementById('questionText').innerText = q.q;
-      document.getElementById('feedbackText').innerText = '';
-
-      const container = document.getElementById('choicesContainer');
-      container.innerHTML = '';
-
-      q.c.forEach((choice, i) => {
-        const label = document.createElement('label');
-        label.className = 'choice';
-        label.innerHTML = `<input type="radio" name="answer" value="${i}"> ${choice}`;
-        container.appendChild(label);
-      });
-
-      document.getElementById('submitBtn').disabled = false;
-    }
-
-    document.getElementById('submitBtn').addEventListener('click', () => {
-      if(gameOver) return;
-
-      const selected = document.querySelector('input[name="answer"]:checked');
-      if(!selected){
-        document.getElementById('feedbackText').innerText = '⚠️ Please select an answer';
-        return;
-      }
-
-      const answer = parseInt(selected.value);
-      const q = questions[currentIdx];
-      const correct = (answer === q.a);
-
-      if(correct){
-        score++;
-        document.getElementById('feedbackText').innerText = '✅ Correct!';
-        document.getElementById('feedbackText').style.color = 'var(--ok)';
-        setChickenMood('happy');
+    <script>
+        // CONFIGURATION
+        const SUPABASE_URL = 'https://beyeqxromrqoiruejddp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJleWVxeHJvbXJxb2lydWVqZGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MjcwMDEsImV4cCI6MjA4NTUwMzAwMX0.LIt8CG0DYeQDXE1RhvGPNyjVdK8SarSGuXJJJd2Ku7o';
+        const ADMIN_PASSWORD = 'Iworkfortips';
         
-        setTimeout(() => {
-          currentIdx++;
-          renderQuestion();
-          setChickenMood('wink');
-        }, 1500);
-      } else {
-        strikes++;
-        document.getElementById('feedbackText').innerText = `❌ Wrong! Correct: ${q.c[q.a]}`;
-        document.getElementById('feedbackText').style.color = 'var(--danger)';
-        
-        if(strikes <= 3){
-          const egg = document.getElementById('egg' + strikes);
-          egg.classList.add('cracked');
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // QUIZ DATA
+        const questions = [
+            {
+                q: "What meats come with the Farmhouse Breakfast?",
+                options: ["Bacon or Sausage", "Ham or Bacon", "Sausage or Turkey", "Bacon only"],
+                a: 0
+            },
+            {
+                q: "Is the Farmhouse Breakfast suitable for Celiacs?",
+                options: ["Yes, completely", "No, fryer cross-contamination", "Yes, if no toast", "Only if vegan"],
+                a: 1
+            },
+            {
+                q: "What is in the BLVD Power Bowl?",
+                options: ["Oatmeal & berries", "Yoghurt, smoothie, granola, fruit", "Just fruit salad", "Cornflakes & milk"],
+                a: 1
+            },
+            {
+                q: "Is the Power Bowl Vegan?",
+                options: ["Yes", "No (contains yoghurt/honey)", "Only without granola", "Yes if no milk"],
+                a: 1
+            },
+            {
+                q: "What nut is in the Steel-cut Oatmeal crumble?",
+                options: ["Walnuts", "Peanuts", "Almonds & Pumpkin Seeds", "Macadamia"],
+                a: 2
+            },
+            {
+                q: "How are the eggs cooked in 'Over Hard'?",
+                options: ["Runny yolk", "Un-flipped", "Flipped, fully cooked yolk", "Poached"],
+                a: 2
+            },
+            {
+                q: "The Deluxe Continental includes which pastries?",
+                options: ["Muffin & Toast", "Croissant, Danish, Cornbread", "Bagel & Cream Cheese", "Scone & Jam"],
+                a: 1
+            },
+            {
+                q: "Where are the sausages sourced from?",
+                options: ["Costco", "Two Rivers (North Van)", "Sysco", "Homemade"],
+                a: 1
+            }
+        ];
+
+        // STATE
+        let currentPlayer = "";
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAdmin = false;
+
+        // NAVIGATION
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
-        setChickenMood('angry');
-
-        if(strikes >= 3){
-          gameOver = true;
-          setTimeout(() => {
-            finishQuiz(false);
-          }, 1000);
-        } else {
-          setTimeout(() => {
-            currentIdx++;
-            renderQuestion();
-            setChickenMood('wink');
-          }, 2000);
+        async function startGame() {
+            const nameInput = document.getElementById('playerName');
+            if (!nameInput.value.trim()) {
+                alert("Please enter your name!");
+                return;
+            }
+            currentPlayer = nameInput.value.trim();
+            document.getElementById('playerDisplay').textContent = currentPlayer;
+            currentQuestionIndex = 0;
+            score = 0;
+            showScreen('quizScreen');
+            loadQuestion();
         }
-      }
 
-      document.getElementById('submitBtn').disabled = true;
-    });
-
-    function finishQuiz(completed){
-      if(strikes >= 3){
-        // Game Over
-        document.getElementById('gameOverScore').innerText = `Your Score: ${score}/${questions.length}`;
-        document.getElementById('gameOverPopup').style.display = 'block';
-        setChickenMood('peck');
-        saveScore(score, questions.length);
-      } else if(completed){
-        // Victory
-        document.getElementById('finalScore').innerText = `${score}/${questions.length}`;
-        
-        let message = '';
-        const percent = (score / questions.length) * 100;
-        if(percent === 100) message = 'Perfect score! You are a breakfast LEGEND! 🏆';
-        else if(percent >= 80) message = 'Excellent work! Almost there!';
-        else if(percent >= 60) message = 'Good job! Keep studying!';
-        else message = 'Nice try! Review the material and try again!';
-        
-        document.getElementById('victoryMessage').innerText = message;
-        document.getElementById('victoryPopup').style.display = 'block';
-        setChickenMood('happy');
-        saveScore(score, questions.length);
-      }
-    }
-
-    // === LEADERBOARD ===
-    function saveScore(score, total){
-      const leaderboard = getLeaderboard();
-      
-      leaderboard.push({
-        name: playerName,
-        score: score,
-        total: total,
-        date: new Date().toISOString()
-      });
-      
-      // Sort by score descending
-      leaderboard.sort((a, b) => b.score - a.score);
-      
-      localStorage.setItem('handsPlease_leaderboard', JSON.stringify(leaderboard));
-    }
-
-    function getLeaderboard(){
-      const stored = localStorage.getItem('handsPlease_leaderboard');
-      return stored ? JSON.parse(stored) : [];
-    }
-
-    function openLeaderboard(){
-      document.getElementById('leaderboardModal').style.display = 'flex';
-      renderLeaderboard();
-    }
-
-    function closeLeaderboard(){
-      document.getElementById('leaderboardModal').style.display = 'none';
-    }
-
-    function renderLeaderboard(){
-      const list = document.getElementById('leaderboardList');
-      const leaderboard = getLeaderboard();
-      
-      if(leaderboard.length === 0){
-        list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet!</p><p>Be the first to complete the quiz!</p></div>';
-        return;
-      }
-      
-      list.innerHTML = '';
-      
-      leaderboard.forEach((entry, index) => {
-        const item = document.createElement('div');
-        item.className = 'leaderboardItem';
-        if(index === 0) item.classList.add('champion');
-        
-        const date = new Date(entry.date);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        item.innerHTML = `
-          <div class="leaderboardRank">${index + 1}</div>
-          <div class="leaderboardInfo">
-            <div class="leaderboardName">${entry.name}</div>
-            <div class="leaderboardDate">${dateStr}</div>
-          </div>
-          <div class="leaderboardScore">${entry.score}/${entry.total}</div>
-        `;
-        
-        list.appendChild(item);
-      });
-    }
-
-    // === ADMIN ===
-    function openAdmin(){
-      const password = prompt('Enter admin password:');
-      if(password !== ADMIN_PASSWORD){
-        alert('Incorrect password!');
-        return;
-      }
-      
-      document.getElementById('adminModal').style.display = 'flex';
-      switchAdminTab('questions');
-      refreshQuestionsList();
-      renderLeaderboardAdmin();
-    }
-
-    function closeAdmin(){
-      document.getElementById('adminModal').style.display = 'none';
-      cancelEdit();
-    }
-
-    function switchAdminTab(tab){
-      document.querySelectorAll('.adminTab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.adminSection').forEach(s => s.classList.remove('active'));
-      
-      event.target.classList.add('active');
-      
-      if(tab === 'questions'){
-        document.getElementById('adminQuestionsTab').classList.add('active');
-        refreshQuestionsList();
-      } else if(tab === 'leaderboard'){
-        document.getElementById('adminLeaderboardTab').classList.add('active');
-        renderLeaderboardAdmin();
-      }
-    }
-
-    function renderLeaderboardAdmin(){
-      const list = document.getElementById('leaderboardAdminList');
-      const leaderboard = getLeaderboard();
-      
-      if(leaderboard.length === 0){
-        list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet</p></div>';
-        return;
-      }
-      
-      list.innerHTML = '';
-      
-      leaderboard.forEach((entry, index) => {
-        const item = document.createElement('div');
-        item.className = 'leaderboardAdminItem';
-        if(index === 0) item.classList.add('champion');
-        
-        const date = new Date(entry.date);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        item.innerHTML = `
-          <div class="leaderboardAdminInfo">
-            <div class="leaderboardAdminName">${index === 0 ? '👑 ' : ''}${entry.name}</div>
-            <div class="leaderboardAdminDate">${dateStr}</div>
-          </div>
-          <div class="leaderboardAdminScore">${entry.score}/${entry.total}</div>
-          <button class="btnDanger" style="padding: 8px 12px; font-size: 13px;" onclick="deleteScore(${index})">Delete</button>
-        `;
-        
-        list.appendChild(item);
-      });
-    }
-
-    function deleteScore(index){
-      if(!confirm('Delete this score?')) return;
-      
-      const leaderboard = getLeaderboard();
-      leaderboard.splice(index, 1);
-      localStorage.setItem('handsPlease_leaderboard', JSON.stringify(leaderboard));
-      renderLeaderboardAdmin();
-    }
-
-    function clearAllScores(){
-      if(!confirm('Clear ALL scores from the leaderboard? This cannot be undone!')) return;
-      
-      localStorage.removeItem('handsPlease_leaderboard');
-      renderLeaderboardAdmin();
-    }
-
-    function refreshQuestionsList(){
-      const list = document.getElementById('questionsList');
-      list.innerHTML = '';
-      
-      questions.forEach((q, idx) => {
-        const card = document.createElement('div');
-        card.className = 'qCard';
-        
-        const choicesHTML = q.c.map((c, i) => 
-          `<div class="${i === q.a ? 'correct' : ''}">${i === q.a ? '✓' : '○'} ${c}</div>`
-        ).join('');
-        
-        card.innerHTML = `
-          <div class="qText">${idx + 1}. ${q.q}</div>
-          <div class="qChoices">${choicesHTML}</div>
-          <div class="qActions">
-            <button class="btnSecondary" onclick="editQuestion('${q.id}')">Edit</button>
-          </div>
-        `;
-        
-        list.appendChild(card);
-      });
-    }
-
-    function showAddForm(){
-      editingId = null;
-      document.getElementById('editQuestionText').value = '';
-      document.getElementById('choiceEditor').innerHTML = '';
-      
-      for(let i = 0; i < 3; i++){
-        addChoiceRow('', i === 0);
-      }
-      
-      document.getElementById('deleteBtn').style.display = 'none';
-      document.getElementById('editorForm').classList.add('active');
-    }
-
-    function editQuestion(id){
-      const q = questions.find(x => x.id === id);
-      if(!q) return;
-      
-      editingId = id;
-      document.getElementById('editQuestionText').value = q.q;
-      
-      const editor = document.getElementById('choiceEditor');
-      editor.innerHTML = '';
-      
-      q.c.forEach((choice, i) => {
-        addChoiceRow(choice, i === q.a);
-      });
-      
-      document.getElementById('deleteBtn').style.display = 'block';
-      document.getElementById('editorForm').classList.add('active');
-    }
-
-    function addChoiceRow(text = '', isCorrect = false){
-      const editor = document.getElementById('choiceEditor');
-      const row = document.createElement('div');
-      row.className = 'choiceRow';
-      
-      row.innerHTML = `
-        <input type="text" value="${text}" placeholder="Choice text...">
-        <input type="radio" name="correctChoice" ${isCorrect ? 'checked' : ''}>
-        <button onclick="this.parentElement.remove()">✕</button>
-      `;
-      
-      editor.appendChild(row);
-    }
-
-    function saveQuestion(){
-      const qText = document.getElementById('editQuestionText').value.trim();
-      if(!qText){
-        alert('Question text is required');
-        return;
-      }
-      
-      const editor = document.getElementById('choiceEditor');
-      const rows = editor.querySelectorAll('.choiceRow');
-      
-      const choices = [];
-      let correctIdx = -1;
-      
-      rows.forEach((row, i) => {
-        const input = row.querySelector('input[type="text"]');
-        const radio = row.querySelector('input[type="radio"]');
-        
-        const text = input.value.trim();
-        if(text){
-          choices.push(text);
-          if(radio.checked) correctIdx = choices.length - 1;
+        // GAMEPLAY
+        function loadQuestion() {
+            const q = questions[currentQuestionIndex];
+            document.getElementById('questionText').textContent = q.q;
+            document.getElementById('scoreDisplay').textContent = `${score} / ${questions.length}`;
+            
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+            
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('quizChicken').className = 'chicken-emoji';
+            
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.onclick = () => selectAnswer(idx, btn);
+                grid.appendChild(btn);
+            });
         }
-      });
-      
-      if(choices.length < 2){
-        alert('Need at least 2 choices');
-        return;
-      }
-      
-      if(correctIdx === -1){
-        alert('Please mark one answer as correct');
-        return;
-      }
-      
-      if(editingId){
-        const q = questions.find(x => x.id === editingId);
-        q.q = qText;
-        q.c = choices;
-        q.a = correctIdx;
-      } else {
-        questions.push({
-          id: 'q' + Date.now(),
-          q: qText,
-          c: choices,
-          a: correctIdx
-        });
-      }
-      
-      localStorage.setItem('handsPlease_quiz_v5', JSON.stringify(questions));
-      
-      cancelEdit();
-      refreshQuestionsList();
-    }
 
-    function cancelEdit(){
-      document.getElementById('editorForm').classList.remove('active');
-      editingId = null;
-    }
-
-    function deleteCurrentQuestion(){
-      if(!editingId) return;
-      if(!confirm('Delete this question?')) return;
-      
-      questions = questions.filter(q => q.id !== editingId);
-      localStorage.setItem('handsPlease_quiz_v5', JSON.stringify(questions));
-      
-      cancelEdit();
-      refreshQuestionsList();
-    }
-
-    function resetToDefaults(){
-      if(!confirm('Reset to default questions? This will delete all custom questions.')) return;
-      
-      localStorage.removeItem('handsPlease_quiz_v5');
-      location.reload();
-    }
-
-    function exportQuestions(){
-      const json = JSON.stringify(questions, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'quiz-questions.json';
-      a.click();
-    }
-
-    function importQuestions(){
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json';
-      
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if(!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const imported = JSON.parse(event.target.result);
-            if(!Array.isArray(imported)){
-              alert('Invalid format');
-              return;
+        function selectAnswer(selectedIndex, btnElement) {
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            const correctIndex = questions[currentQuestionIndex].a;
+            
+            if (selectedIndex === correctIndex) {
+                btnElement.classList.add('correct');
+                score++;
+                document.getElementById('quizChicken').classList.add('bounce');
+                document.getElementById('quizChicken').textContent = "🐣";
+            } else {
+                btnElement.classList.add('wrong');
+                buttons[correctIndex].classList.add('correct');
+                document.getElementById('quizChicken').classList.add('shake');
+                document.getElementById('quizChicken').textContent = "🍗";
             }
             
-            questions = imported;
-            localStorage.setItem('handsPlease_quiz_v5', JSON.stringify(questions));
-            refreshQuestionsList();
-            alert('Import successful!');
-          } catch(err){
-            alert('Error parsing JSON');
-          }
-        };
-        reader.readAsText(file);
-      };
-      
-      input.click();
-    }
-  </script>
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        async function finishQuiz() {
+            showScreen('resultScreen');
+            document.getElementById('resultMessage').textContent = `You scored ${score} out of ${questions.length}`;
+            
+            const chicken = document.getElementById('resultChicken');
+            if(score === questions.length) {
+                chicken.textContent = "🦅";
+                document.getElementById('resultTitle').textContent = "FLAWLESS VICTORY!";
+            } else if (score > questions.length / 2) {
+                chicken.textContent = "🐔";
+            } else {
+                chicken.textContent = "🍳";
+            }
+
+            await saveScoreToSupabase(currentPlayer, score, questions.length);
+            loadLeaderboard();
+        }
+
+        // SUPABASE INTEGRATION
+        async function saveScoreToSupabase(name, score, total) {
+            try {
+                const { error } = await supabase
+                    .from('leaderboard')
+                    .insert([{ player_name: name, score: score, total_questions: total }]);
+                
+                if (error) throw error;
+            } catch (err) {
+                console.error("Error saving score:", err);
+                alert("Could not save score. Check console for details.");
+            }
+        }
+
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboardContent');
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Loading scores...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('leaderboard')
+                    .select('*')
+                    .order('score', { ascending: false })
+                    .order('created_at', { ascending: true })
+                    .limit(50);
+
+                if (error) throw error;
+
+                renderLeaderboard(data, container);
+
+            } catch (err) {
+                console.error("Error loading leaderboard:", err);
+                container.innerHTML = '<div style="color:red; text-align:center; padding:20px;">Failed to load. Check your internet connection and refresh the page.</div>';
+            }
+        }
+
+        function renderLeaderboard(data, container) {
+            container.innerHTML = '';
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">No scores yet.<br>Be the first champion! 🏆</div>';
+                return;
+            }
+
+            // Find the highest score
+            const topScore = data[0].score;
+
+            data.forEach((entry, index) => {
+                const row = document.createElement('div');
+                row.className = 'leaderboard-row';
+                
+                // Check if this entry has the top score (could be multiple champions!)
+                const isChampion = entry.score === topScore;
+                
+                // Add champion class if this is a top scorer
+                if (isChampion) {
+                    row.classList.add('champion');
+                }
+                
+                let rankHTML = `<span style="font-weight:bold; width:30px; color:#aaa;">${index + 1}</span>`;
+                let contentHTML = `<span style="font-weight:600;">${entry.player_name}</span>`;
+                
+                if (isChampion) {
+                    rankHTML = `<span class="rank-1-badge">👑</span>`;
+                    contentHTML = `
+                        <div>
+                            <span style="font-weight:800; font-size:17px;">${entry.player_name}</span>
+                            <span class="champion-title">🏆 Superduper Breakfast Champion!</span>
+                        </div>
+                    `;
+                }
+
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        ${rankHTML}
+                        ${contentHTML}
+                    </div>
+                    <strong style="color:var(--brand); font-size:16px;">${entry.score}/${entry.total_questions}</strong>
+                `;
+                
+                container.appendChild(row);
+            });
+        }
+        
+        function showLeaderboard() {
+            showScreen('resultScreen');
+            document.getElementById('resultTitle').textContent = "🏆 Leaderboard";
+            document.getElementById('resultMessage').textContent = "Top players across all devices";
+            document.getElementById('resultChicken').style.display = 'none';
+            loadLeaderboard();
+        }
+
+        // ADMIN FUNCTIONS
+        function openAdmin() { showScreen('adminModal'); }
+        function closeAdmin() { showScreen('startScreen'); }
+
+        function verifyAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === ADMIN_PASSWORD) {
+                isAdmin = true;
+                loadAdminPanel();
+            } else {
+                alert("Wrong password!");
+            }
+        }
+
+        async function loadAdminPanel() {
+            showScreen('adminPanel');
+            const list = document.getElementById('adminLeaderboardList');
+            list.innerHTML = '<div style="text-align:center; color:#999;">Loading...</div>';
+
+            const { data, error } = await supabase
+                .from('leaderboard')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (data) {
+                list.innerHTML = '';
+                if (data.length === 0) {
+                    list.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">No scores to manage yet.</div>';
+                    return;
+                }
+                data.forEach(entry => {
+                    const item = document.createElement('div');
+                    item.className = 'admin-item';
+                    item.innerHTML = `
+                        <span><b>${entry.player_name}</b> - ${entry.score}/${entry.total_questions}</span>
+                        <button class="delete-btn" onclick="deleteScore(${entry.id})">Delete</button>
+                    `;
+                    list.appendChild(item);
+                });
+            } else {
+                list.innerHTML = '<div style="color:red; text-align:center;">Error loading data</div>';
+            }
+        }
+
+        async function deleteScore(id) {
+            if(!confirm("Delete this score?")) return;
+            
+            const { error } = await supabase
+                .from('leaderboard')
+                .delete()
+                .eq('id', id);
+                
+            if (!error) {
+                loadAdminPanel();
+            } else {
+                alert("Error deleting score");
+            }
+        }
+    </script>
 </body>
 </html>
