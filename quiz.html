@@ -12,13 +12,11 @@
     :root {
       --brand: #d35400;
       --brand-dark: #a04000;
-      --egg: #f39c12;
       --bg: #fdfbf7;
       --text: #2c3e50;
       --white: #ffffff;
       --success: #27ae60;
       --danger: #c0392b;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
@@ -76,7 +74,7 @@
     .btn:disabled { background: #ccc; cursor: not-allowed; }
     .btn:hover { background: var(--brand-dark); }
 
-    input[type="text"], input[type="password"] {
+    input[type="text"] {
       width: 100%;
       padding: 15px;
       border: 2px solid #ddd;
@@ -129,7 +127,6 @@
       position: relative;
       font-weight: 500;
     }
-    .option-btn.selected { border-color: var(--brand); background: #fff5eb; }
     .option-btn.correct { border-color: var(--success); background: #e8f8f5; color: var(--success); font-weight: 700; }
     .option-btn.wrong { border-color: var(--danger); background: #fdedec; color: var(--danger); }
 
@@ -188,47 +185,6 @@
     @keyframes bounce { to { transform: translateY(-10px); } }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-    .admin-toggle {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      opacity: 0.3;
-      font-size: 10px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 100;
-      color: #999;
-    }
-
-    .delete-btn {
-      background: none;
-      border: 1px solid var(--danger);
-      color: var(--danger);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .admin-list {
-      text-align: left;
-      max-height: 400px;
-      overflow-y: auto;
-      width: 100%;
-      margin-top: 15px;
-    }
-
-    .admin-item {
-      border-bottom: 1px solid #eee;
-      padding: 12px 5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-    }
-
     .link-btn {
       background: none;
       border: none;
@@ -241,18 +197,10 @@
     }
 
     .tiny-note { font-size: 12px; color:#999; margin-top: 10px; }
-
-    @media (max-width: 400px) {
-      .card { padding: 25px 15px; }
-      h1 { font-size: 24px; }
-      .question-text { font-size: 17px; }
-      .option-btn { font-size: 14px; padding: 12px; }
-    }
   </style>
 </head>
 
 <body>
-  <!-- SCREEN 1: WELCOME -->
   <div id="startScreen" class="screen active">
     <div class="card">
       <div class="chicken-stage"><div class="chicken-emoji">🐔</div></div>
@@ -267,7 +215,6 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: QUIZ -->
   <div id="quizScreen" class="screen">
     <div class="hud">
       <span id="playerDisplay">Player</span>
@@ -283,7 +230,6 @@
     </div>
   </div>
 
-  <!-- SCREEN 3: RESULTS -->
   <div id="resultScreen" class="screen">
     <div class="card">
       <div class="chicken-stage"><div id="resultChicken" class="chicken-emoji">🐣</div></div>
@@ -294,42 +240,18 @@
     </div>
   </div>
 
-  <!-- ADMIN MODAL -->
-  <div id="adminModal" class="screen" style="background:rgba(0,0,0,0.9);">
-    <div class="card">
-      <h2>Admin Access</h2>
-      <input type="password" id="adminPass" placeholder="Password" />
-      <button class="btn" id="adminLoginBtn">Login</button>
-      <button class="btn" id="adminCancelBtn" style="background:#7f8c8d; margin-top:10px;">Cancel</button>
-    </div>
-  </div>
-
-  <!-- ADMIN PANEL -->
-  <div id="adminPanel" class="screen">
-    <div class="card" style="max-width:600px;">
-      <h2>Admin Control Panel</h2>
-      <p style="font-size:14px; color:#999;">Manage Leaderboard Scores</p>
-      <div id="adminLeaderboardList" class="admin-list"></div>
-      <button class="btn" style="margin-top:20px;" onclick="location.reload()">Exit Admin</button>
-    </div>
-  </div>
-
-  <button class="admin-toggle" id="adminToggleBtn">Admin</button>
-
   <script>
     // =====================
     // CONFIGURATION
     // =====================
     const SUPABASE_URL = 'https://beyeqxromrqoiruejddp.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJleWVxeHJvbXJxb2lydWVqZGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MjcwMDEsImV4cCI6MjA4NTUwMzAwMX0.LIt8CG0DYeQDXE1RhvGPNyjVdK8SarSGuXJJJd2Ku7o';
-    const ADMIN_PASSWORD = 'Iworkfortips';
 
-    // Local fallback storage key
     const LOCAL_KEY = 'hp_breakfast_leaderboard_v1';
 
-    // Create Supabase client safely
+    // Supabase client (CDN exposes window.supabase; create your own client with a different name) [web:224]
     const supabaseAvailable = !!(window.supabase && window.supabase.createClient);
-    const supabase = supabaseAvailable ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+    const sb = supabaseAvailable ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
     // =====================
     // QUIZ DATA
@@ -345,17 +267,10 @@
       { q: "Where are the sausages sourced from?", options: ["Costco","Two Rivers (North Van)","Sysco","Homemade"], a: 1 }
     ];
 
-    // =====================
-    // STATE
-    // =====================
     let currentPlayer = "";
     let currentQuestionIndex = 0;
     let score = 0;
-    let isAdmin = false;
 
-    // =====================
-    // DOM HELPERS
-    // =====================
     const $ = (id) => document.getElementById(id);
 
     function showScreen(id) {
@@ -369,9 +284,6 @@
       el.textContent = msg || '';
     }
 
-    // =====================
-    // LOCAL FALLBACK STORAGE
-    // =====================
     function readLocalScores() {
       try {
         const raw = localStorage.getItem(LOCAL_KEY);
@@ -396,14 +308,10 @@
         total_questions: total,
         created_at: new Date().toISOString()
       });
-      // Keep best sorting behavior consistent with DB view
       scores.sort((a,b) => (b.score - a.score) || (new Date(a.created_at) - new Date(b.created_at)));
       writeLocalScores(scores);
     }
 
-    // =====================
-    // GAMEPLAY
-    // =====================
     function loadQuestion() {
       const q = questions[currentQuestionIndex];
       $('questionText').textContent = q.q;
@@ -469,24 +377,17 @@
         $('resultTitle').textContent = "Good try!";
       }
 
-      // Save score (Supabase if possible, always local fallback)
       await saveScore(currentPlayer, score, questions.length);
-
-      // Load leaderboard (Supabase if possible, else local)
       await loadLeaderboard();
     }
 
-    // =====================
-    // SUPABASE / LEADERBOARD
-    // =====================
     async function saveScore(name, score, total) {
-      // always store locally so game works offline
       addLocalScore(name, score, total);
 
-      if (!supabaseAvailable) return;
+      if (!supabaseAvailable || !sb) return;
 
       try {
-        const { error } = await supabase
+        const { error } = await sb
           .from('leaderboard')
           .insert([{ player_name: name, score: score, total_questions: total }]);
 
@@ -500,10 +401,9 @@
       const container = $('leaderboardContent');
       container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Loading scores...</div>';
 
-      // Try Supabase first
-      if (supabaseAvailable) {
+      if (supabaseAvailable && sb) {
         try {
-          const { data, error } = await supabase
+          const { data, error } = await sb
             .from('leaderboard')
             .select('*')
             .order('score', { ascending: false })
@@ -519,12 +419,10 @@
         }
       }
 
-      // Fallback to local
       const local = readLocalScores().slice(0, 50);
       renderLeaderboard(local, container, true);
     }
 
-    // Multiple champions, and ranks continue after all champions
     function renderLeaderboard(data, container, isLocal = false) {
       container.innerHTML = '';
 
@@ -533,15 +431,13 @@
         return;
       }
 
-      // Ensure consistent order
       data = [...data].sort((a,b) => (b.score - a.score) || (new Date(a.created_at) - new Date(b.created_at)));
 
       const topScore = data[0].score;
       const championCount = data.filter(r => r.score === topScore).length;
+      let normalRank = championCount + 1;
 
-      let normalRank = championCount + 1; // first non-champion rank
-
-      data.forEach((entry, index) => {
+      data.forEach((entry) => {
         const isChampion = entry.score === topScore;
 
         const row = document.createElement('div');
@@ -591,9 +487,6 @@
       }[m]));
     }
 
-    // =====================
-    // LEADERBOARD VIEW
-    // =====================
     async function showLeaderboard() {
       showScreen('resultScreen');
       $('resultTitle').textContent = "🏆 Leaderboard";
@@ -602,94 +495,16 @@
       await loadLeaderboard();
     }
 
-    // =====================
-    // ADMIN
-    // =====================
-    function openAdmin() { showScreen('adminModal'); }
-    function closeAdmin() { showScreen('startScreen'); }
-
-    function verifyAdmin() {
-      const pass = $('adminPass').value;
-      if (pass === ADMIN_PASSWORD) {
-        isAdmin = true;
-        loadAdminPanel();
-      } else {
-        alert("Wrong password!");
-      }
-    }
-
-    async function loadAdminPanel() {
-      showScreen('adminPanel');
-      const list = $('adminLeaderboardList');
-      list.innerHTML = '<div style="text-align:center; color:#999;">Loading...</div>';
-
-      // Admin panel only works with Supabase (by design)
-      if (!supabaseAvailable) {
-        list.innerHTML = '<div style="color:#c0392b; text-align:center;">Supabase not available, admin disabled.</div>';
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('leaderboard')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error(error);
-        list.innerHTML = '<div style="color:red; text-align:center;">Error loading data</div>';
-        return;
-      }
-
-      list.innerHTML = '';
-      if (!data || data.length === 0) {
-        list.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">No scores to manage yet.</div>';
-        return;
-      }
-
-      data.forEach(entry => {
-        const item = document.createElement('div');
-        item.className = 'admin-item';
-        item.innerHTML = `
-          <span><b>${escapeHtml(entry.player_name)}</b> - ${entry.score}/${entry.total_questions}</span>
-          <button class="delete-btn" data-id="${entry.id}">Delete</button>
-        `;
-        item.querySelector('button').onclick = () => deleteScore(entry.id);
-        list.appendChild(item);
-      });
-    }
-
-    async function deleteScore(id) {
-      if (!confirm("Delete this score?")) return;
-
-      const { error } = await supabase
-        .from('leaderboard')
-        .delete()
-        .eq('id', id);
-
-      if (!error) loadAdminPanel();
-      else alert("Error deleting score");
-    }
-
-    // =====================
-    // INIT (prevents “landing page does nothing”)
-    // =====================
     function init() {
-      // Wire buttons via addEventListener so nothing depends on inline handlers
       $('startBtn').addEventListener('click', () => startGame());
       $('viewLeaderboardBtn').addEventListener('click', () => showLeaderboard());
       $('nextBtn').addEventListener('click', () => nextQuestion());
 
-      $('adminToggleBtn').addEventListener('click', () => openAdmin());
-      $('adminLoginBtn').addEventListener('click', () => verifyAdmin());
-      $('adminCancelBtn').addEventListener('click', () => closeAdmin());
-
-      // Let user press Enter to start
       $('playerName').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') startGame();
       });
 
-      // Status hint
-      if (supabaseAvailable) setStatus("Online mode enabled.");
+      if (supabaseAvailable && sb) setStatus("Online mode enabled.");
       else setStatus("Offline mode (Supabase not loaded).");
     }
 
@@ -709,7 +524,6 @@
       loadQuestion();
     }
 
-    // Run init after DOM ready
     document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
