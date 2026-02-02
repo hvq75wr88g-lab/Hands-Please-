@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hands Please — Menu Quiz (Breakfast)</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111a2e; --muted:#93a4c7; --text:#e9efff;
+      --accent:#ffd24a; --good:#3ddc97; --bad:#ff5c77; --line:#223155;
+      --btn:#1a2644;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:linear-gradient(180deg,#070b14, var(--bg)); color:var(--text);
+    }
+    .wrap{max-width:980px; margin:0 auto; padding:18px}
+    header{display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:14px}
+    .title{display:flex; flex-direction:column; gap:2px}
+    h1{font-size:18px; margin:0}
+    .sub{color:var(--muted); font-size:12px}
+    .pill{border:1px solid var(--line); background:rgba(255,255,255,0.03); padding:8px 10px; border-radius:999px; font-size:12px; color:var(--muted)}
+    .grid{display:grid; grid-template-columns: 1.3fr .7fr; gap:14px}
+    @media (max-width: 860px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btn{
+      background:var(--btn);
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn:hover{filter:brightness(1.08)}
+    .btn.primary{background:linear-gradient(180deg,#2a3a66,#1a2644); border-color:#2c3f73}
+    .btn.warn{background:rgba(255,210,74,0.12); border-color:rgba(255,210,74,0.35)}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .stat{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px; border-radius:12px; border:1px solid var(--line);
+      background:rgba(0,0,0,0.12);
+      margin-top:10px;
+    }
+    .stat b{font-size:13px}
+    .stat span{color:var(--muted); font-size:12px}
+    .qTitle{font-size:14px; margin:0 0 10px}
+    .choices{display:grid; gap:10px}
+    .choice{
+      text-align:left; width:100%;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,0.03);
+      color:var(--text);
+      padding:12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:650;
+    }
+    .choice small{display:block; color:var(--muted); font-weight:600; margin-top:2px}
+    .choice.correct{border-color:rgba(61,220,151,.7); background:rgba(61,220,151,.10)}
+    .choice.wrong{border-color:rgba(255,92,119,.75); background:rgba(255,92,119,.10)}
+    .note{color:var(--muted); font-size:12px; line-height:1.4}
+    .hr{height:1px; background:var(--line); margin:12px 0}
+    table{width:100%; border-collapse:collapse; font-size:13px}
+    th,td{padding:10px 8px; border-bottom:1px solid var(--line); text-align:left}
+    th{color:var(--muted); font-weight:700; font-size:12px; letter-spacing:.02em}
+    .tag{display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:12px}
+    .right{display:flex; gap:10px; align-items:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Hands Please — Menu Quiz (Breakfast)</h1>
+        <div class="sub">Multiple-choice game • Device-only leaderboard</div>
+      </div>
+      <div class="right">
+        <a class="btn warn" href="./index.html">Back to Hands Please</a>
+        <span class="pill" id="modePill">Quick Play</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card" id="gameCard">
+        <div class="row">
+          <button class="btn primary" id="startBtn">Start Quick Play (9 Qs)</button>
+          <button class="btn" id="resetBtn" title="Clears leaderboard on this device">Reset leaderboard</button>
+          <span class="tag" id="statusTag">Ready</span>
+        </div>
+
+        <div class="stat">
+          <div><b>Score</b><br><span id="score">0</span></div>
+          <div><b>Streak</b><br><span id="streak">0</span></div>
+          <div><b>Question</b><br><span id="qNum">–</span></div>
+          <div><b>Time</b><br><span id="time">–</span></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2 class="qTitle" id="question">Press Start to begin.</h2>
+        <div class="choices" id="choices"></div>
+
+        <div class="hr"></div>
+        <div class="note" id="explain"></div>
+      </section>
+
+      <aside class="card">
+        <h2 class="qTitle">Leaderboard (this device)</h2>
+        <div class="note">Tip: staff can type their name before starting; it only saves on the phone/laptop they’re using.</div>
+        <div class="hr"></div>
+
+        <label class="note" for="playerName">Player name (optional)</label>
+        <input id="playerName" placeholder="e.g., K, Sam, Alex"
+               style="width:100%; padding:10px 12px; margin-top:6px; border-radius:12px; border:1px solid var(--line); background:rgba(0,0,0,0.2); color:var(--text);" />
+
+        <div class="hr"></div>
+
+        <table>
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Score</th><th>When</th></tr>
+          </thead>
+          <tbody id="lb"></tbody>
+        </table>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // Questions derived from your Breakfast menu test + syllabus.
+  // Note: buffet price question intentionally removed (9 questions).  [file:28]
+
+  const QUESTIONS = [
+    {
+      id: "loop",
+      q: "How would you describe Loop juices to a guest?",
+      choices: [
+        {t:"A circular economy company that saves imperfect fruits/vegetables and turns them into cold-pressed juices.", c:true},
+        {t:"A kombucha brand that ferments tea in-house and bottles it daily.", c:false},
+        {t:"A juice concentrate made from imported frozen fruit and diluted to order.", c:false},
+        {t:"A smoothie program that uses only tropical fruit purées and added sugar.", c:false}
+      ],
+      explain: "Loop saves imperfect fruits/vegetables (shape/size) and transforms them into cold-pressed juices."
+    },
+    {
+      id: "farmhouse_gluten",
+      q: "Is the Farmhouse Breakfast gluten free?",
+      choices: [
+        {t:"No, because the sausage and bacon contain gluten.", c:false},
+        {t:"Yes, fully gluten free and suitable for celiac as-is.", c:false},
+        {t:"Mostly gluten free, but the potatoes share a fryer, so it’s not suitable for celiac; offer fruit instead.", c:true},
+        {t:"Only gluten free if the eggs are scrambled.", c:false}
+      ],
+      explain: "Sausage and bacon are gluten free, but potatoes share a fryer—NOT suitable for celiac; offer fruit."
+    },
+    {
+      id: "vegan_items",
+      q: "Which item is vegan (as written in the syllabus)?",
+      choices: [
+        {t:"Vegan Mexican Scramble", c:true},
+        {t:"Classic Eggs Benedict", c:false},
+        {t:"Farmhouse Breakfast", c:false},
+        {t:"Liege Waffles", c:false}
+      ],
+      explain: "Vegan Mexican Scramble is vegan; others contain eggs, butter, dairy, or meat."
+    },
+    {
+      id: "power_bowl",
+      q: "What are the core components of the BLVD Power Bowl?",
+      choices: [
+        {t:"Mixed berries, Greek yoghurt, fruit smoothie, superfood granola, fresh cut fruits.", c:true},
+        {t:"Steel-cut oats, apple compote, nut crumble, julienne apples.", c:false},
+        {t:"English muffin, poached eggs, hollandaise, back bacon.", c:false},
+        {t:"Sourdough toast, smashed avocado, poached eggs, feta, potatoes.", c:false}
+      ],
+      explain: "Power Bowl = mixed berries, Greek yoghurt, fruit smoothie, superfood granola, fresh cut fruits."
+    },
+    {
+      id: "avocado_toast_components",
+      q: "Which set best matches the Avocado Toast components?",
+      choices: [
+        {t:"Smashed avocado (garlic + lime) on sourdough, 2 poached eggs, radish, pickled onion, feta, herbs; served with garlic herb potatoes + roasted tomatoes.", c:true},
+        {t:"Waffles with berries, caramel sauce, icing sugar, maple whipped cream.", c:false},
+        {t:"Tofu scramble with corn/beans, corn tortillas, salsa verde, lime.", c:false},
+        {t:"Fruit smoothie + yoghurt with granola and fresh fruit.", c:false}
+      ],
+      explain: "Avocado Toast includes avocado on sourdough with eggs and garnishes; served with potatoes + tomatoes."
+    },
+    {
+      id: "oatmeal_mods",
+      q: "Is the Steel-cut Oatmeal gluten and dairy free (mods allowed)?",
+      choices: [
+        {t:"Yes, always fully gluten and dairy free as served.", c:false},
+        {t:"It can be dairy-free by removing the compote (butter), but it’s not suitable for celiac due to shared facility gluten risk; offer plain oatmeal.", c:true},
+        {t:"No, it can’t be modified at all.", c:false},
+        {t:"Yes, but only if you add granola.", c:false}
+      ],
+      explain: "Compote has butter (remove for dairy-free), but gluten risk from crumble facility means not suitable for celiac; offer plain oatmeal."
+    },
+    {
+      id: "gluten_free_options",
+      q: "Which option is gluten free (as written), without needing bread substitutions?",
+      choices: [
+        {t:"Fruit Plate", c:true},
+        {t:"Classic Eggs Benedict on English muffin", c:false},
+        {t:"Liege Waffles", c:false},
+        {t:"Deluxe Continental (pastries)", c:false}
+      ],
+      explain: "Fruit Plate lists gluten as none; other items contain gluten unless substituted."
+    },
+    {
+      id: "waffle_comes_with",
+      q: "What does the Liege (Belgian) Waffle come with?",
+      choices: [
+        {t:"Fresh berries, maple whipped cream, salted caramel sauce, icing sugar.", c:true},
+        {t:"Back bacon, hollandaise, English muffin, potatoes.", c:false},
+        {t:"Avocado, feta, radish, pickled onion, sourdough.", c:false},
+        {t:"Granola, Greek yoghurt, fruit smoothie, fresh fruits.", c:false}
+      ],
+      explain: "Waffles come with berries, maple whipped cream, salted caramel sauce, and icing sugar."
+    },
+    {
+      id: "lactose_intolerant",
+      q: "Which is the safest choice for a guest with a dairy allergy (as written, no dairy)?",
+      choices: [
+        {t:"Fruit Plate", c:true},
+        {t:"Liege Waffles", c:false},
+        {t:"Classic Eggs Benedict", c:false},
+        {t:"BLVD Power Bowl", c:false}
+      ],
+      explain: "Fruit Plate lists dairy as none; waffles/benny/power bowl contain dairy."
+    }
+  ];
+
+  const MODE = { name: "Quick Play", total: QUESTIONS.length, secondsPerQ: 20 };
+  const LS_KEY = "handsplease_quiz_breakfast_leaderboard_v1";
+
+  const els = {
+    startBtn: document.getElementById("startBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+    statusTag: document.getElementById("statusTag"),
+    modePill: document.getElementById("modePill"),
+    question: document.getElementById("question"),
+    choices: document.getElementById("choices"),
+    explain: document.getElementById("explain"),
+    score: document.getElementById("score"),
+    streak: document.getElementById("streak"),
+    qNum: document.getElementById("qNum"),
+    time: document.getElementById("time"),
+    lb: document.getElementById("lb"),
+    playerName: document.getElementById("playerName")
+  };
+
+  els.modePill.textContent = MODE.name;
+
+  let state = {
+    running:false,
+    idx:0,
+    order:[],
+    score:0,
+    streak:0,
+    locked:false,
+    tLeft:0,
+    timer:null,
+    startedAt:null
+  };
+
+  function nowStamp(){
+    const d = new Date();
+    return d.toLocaleString(undefined, {month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+  }
+
+  function loadLB(){
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+    catch(e){ return []; }
+  }
+  function saveLB(rows){
+    localStorage.setItem(LS_KEY, JSON.stringify(rows.slice(0,10)));
+  }
+  function renderLB(){
+    const rows = loadLB();
+    els.lb.innerHTML = rows.map((r,i)=>(
+      `<tr>
+        <td>${i+1}</td>
+        <td>${escapeHtml(r.name || "—")}</td>
+        <td>${r.score}</td>
+        <td>${escapeHtml(r.when)}</td>
+      </tr>`
+    )).join("") || `<tr><td colspan="4" class="note">No scores yet.</td></tr>`;
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  }
+
+  function setStatus(text, kind=""){
+    els.statusTag.textContent = text;
+    els.statusTag.style.borderColor = kind==="good" ? "rgba(61,220,151,.55)"
+      : kind==="bad" ? "rgba(255,92,119,.55)"
+      : "var(--line)";
+  }
+
+  function updateHUD(){
+    els.score.textContent = state.score;
+    els.streak.textContent = state.streak;
+    els.qNum.textContent = state.running ? `${state.idx+1}/${MODE.total}` : "–";
+    els.time.textContent = state.running ? `${state.tLeft}s` : "–";
+  }
+
+  function stopTimer(){
+    if(state.timer) clearInterval(state.timer);
+    state.timer = null;
+  }
+
+  function startTimer(){
+    stopTimer();
+    state.tLeft = MODE.secondsPerQ;
+    updateHUD();
+    state.timer = setInterval(()=>{
+      if(!state.running) return;
+      if(state.locked) return;
+      state.tLeft -= 1;
+      if(state.tLeft <= 0){
+        state.tLeft = 0;
+        updateHUD();
+        lockAndReveal(null, true);
+        return;
+      }
+      updateHUD();
+    }, 1000);
+  }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function startGame(){
+    state.running = true;
+    state.idx = 0;
+    state.score = 0;
+    state.streak = 0;
+    state.locked = false;
+    state.order = shuffle(QUESTIONS.map((_,i)=>i));
+    state.startedAt = Date.now();
+    setStatus("Playing", "");
+    els.explain.textContent = "";
+    els.startBtn.disabled = true;
+    renderQuestion();
+  }
+
+  function endGame(){
+    state.running = false;
+    stopTimer();
+    els.startBtn.disabled = false;
+
+    const name = (els.playerName.value || "").trim().slice(0,24);
+    const entry = { name, score: state.score, when: nowStamp() };
+    const rows = loadLB();
+    rows.push(entry);
+    rows.sort((a,b)=>b.score - a.score);
+    saveLB(rows);
+
+    renderLB();
+    setStatus("Finished", "good");
+    els.question.textContent = `Run complete. Final score: ${state.score}`;
+    els.choices.innerHTML = `<button class="btn primary" id="playAgain">Play again</button>`;
+    els.explain.textContent = "Scores save only on this device (phone/laptop).";
+    document.getElementById("playAgain").onclick = startGame;
+    updateHUD();
+  }
+
+  function renderQuestion(){
+    const qIndex = state.order[state.idx];
+    const q = QUESTIONS[qIndex];
+
+    state.locked = false;
+    els.explain.textContent = "";
+    els.question.textContent = q.q;
+
+    // Shuffle answer choices each time
+    const choices = shuffle(q.choices);
+    els.choices.innerHTML = "";
+    choices.forEach((ch)=>{
+      const btn = document.createElement("button");
+      btn.className = "choice";
+      btn.innerHTML = escapeHtml(ch.t);
+      btn.onclick = () => lockAndReveal(btn, false, ch.c, q, choices, ch.t);
+      els.choices.appendChild(btn);
+    });
+
+    updateHUD();
+    startTimer();
+  }
+
+  function lockAndReveal(clickedBtn, timedOut=false, clickedCorrect=false, q=null, choices=null, clickedText=""){
+    if(state.locked) return;
+    state.locked = true;
+    stopTimer();
+
+    // Determine correct
+    const qIndex = state.order[state.idx];
+    const question = q || QUESTIONS[qIndex];
+    const correctText = question.choices.find(x=>x.c).t;
+
+    // Mark buttons
+    const btns = Array.from(els.choices.querySelectorAll("button.choice"));
+    btns.forEach(b=>{
+      if(b.textContent === correctText) b.classList.add("correct");
+      if(clickedBtn && b === clickedBtn && b.textContent !== correctText) b.classList.add("wrong");
+      b.disabled = true;
+    });
+
+    // Score rules
+    if(timedOut){
+      state.streak = 0;
+      state.score = Math.max(0, state.score - 25);
+      setStatus("Time's up", "bad");
+      els.explain.textContent = `Time ran out. Correct answer: ${correctText}. ${question.explain || ""}`;
+    } else if(clickedCorrect){
+      state.streak += 1;
+      let add = 100;
+      if(state.streak % 3 === 0) add += 25; // streak bonus
+      // tiny time bonus
+      add += Math.min(20, state.tLeft);
+      state.score += add;
+      setStatus("Correct", "good");
+      els.explain.textContent = question.explain || "";
+    } else {
+      state.streak = 0;
+      state.score = Math.max(0, state.score - 25);
+      setStatus("Incorrect", "bad");
+      els.explain.textContent = `Correct answer: ${correctText}. ${question.explain || ""}`;
+    }
+
+    updateHUD();
+
+    setTimeout(()=>{
+      if(!state.running) return;
+      state.idx += 1;
+      if(state.idx >= MODE.total){
+        endGame();
+      } else {
+        renderQuestion();
+      }
+    }, 950);
+  }
+
+  els.startBtn.onclick = startGame;
+  els.resetBtn.onclick = () => {
+    if(confirm("Reset leaderboard on this device?")){
+      localStorage.removeItem(LS_KEY);
+      renderLB();
+    }
+  };
+
+  renderLB();
+  updateHUD();
+})();
+</script>
+</body>
+</html>
