@@ -1382,67 +1382,76 @@ async function sbSaveQuestions(questionsArr){
     }
 
     // === LEADERBOARD ===
-    function saveScore(score, total){
-      const leaderboard = getLeaderboard();
-      
-      leaderboard.push({
-        name: playerName,
-        score: score,
-        total: total,
-        date: new Date().toISOString()
-      });
-      
-      // Sort by score descending
-      leaderboard.sort((a, b) => b.score - a.score);
-      
-      localStorage.setItem('handsPlease_leaderboard', JSON.stringify(leaderboard));
-    }
+    async function saveScore(score, total){
+  try{
+    await sbInsertScore(playerName, score, total);
+  } catch(err){
+    console.warn("Supabase saveScore failed:", err);
+
+    // Fallback: still record locally if Supabase is down
+    const leaderboard = getLeaderboard();
+    leaderboard.push({
+      name: playerName,
+      score: score,
+      total: total,
+      date: new Date().toISOString()
+    });
+    leaderboard.sort((a, b) => b.score - a.score);
+    localStorage.setItem('handsPlease_leaderboard', JSON.stringify(leaderboard));
+  }
+}
 
     function getLeaderboard(){
       const stored = localStorage.getItem('handsPlease_leaderboard');
       return stored ? JSON.parse(stored) : [];
     }
 
-    function openLeaderboard(){
-      document.getElementById('leaderboardModal').style.display = 'flex';
-      renderLeaderboard();
-    }
+    async function openLeaderboard(){
+  document.getElementById('leaderboardModal').style.display = 'flex';
+  await renderLeaderboard();
+}
 
     function closeLeaderboard(){
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    function renderLeaderboard(){
-      const list = document.getElementById('leaderboardList');
-      const leaderboard = getLeaderboard();
-      
-      if(leaderboard.length === 0){
-        list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet!</p><p>Be the first to complete the quiz!</p></div>';
-        return;
-      }
-      
-      list.innerHTML = '';
-      
-      leaderboard.forEach((entry, index) => {
-        const item = document.createElement('div');
-        item.className = 'leaderboardItem';
-        if(index === 0) item.classList.add('champion');
-        
-        const date = new Date(entry.date);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        item.innerHTML = `
-          <div class="leaderboardRank">${index + 1}</div>
-          <div class="leaderboardInfo">
-            <div class="leaderboardName">${entry.name}</div>
-            <div class="leaderboardDate">${dateStr}</div>
-          </div>
-          <div class="leaderboardScore">${entry.score}/${entry.total}</div>
-        `;
-        
-        list.appendChild(item);
-      });
-    }
+    async function renderLeaderboard(){
+  const list = document.getElementById('leaderboardList');
+  list.innerHTML = '<div class="emptyLeaderboard"><p>Loading...</p></div>';
+
+  let leaderboard = [];
+  try{
+    leaderboard = await sbFetchLeaderboard(50);
+  } catch(err){
+    console.warn("Supabase fetch leaderboard failed, using localStorage:", err);
+    leaderboard = getLeaderboard();
+  }
+
+  if(!leaderboard || leaderboard.length === 0){
+    list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet!</p><p>Be the first to complete the quiz!</p></div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  leaderboard.forEach((entry, index) => {
+    const item = document.createElement('div');
+    item.className = 'leaderboardItem';
+    if(index === 0) item.classList.add('champion');
+
+    const date = new Date(entry.date);
+    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    item.innerHTML = `
+      <div class="leaderboardRank">${index + 1}</div>
+      <div class="leaderboardInfo">
+        <div class="leaderboardName">${entry.name}</div>
+        <div class="leaderboardDate">${dateStr}</div>
+      </div>
+      <div class="leaderboardScore">${entry.score}/${entry.total}</div>
+    `;
+    list.appendChild(item);
+  });
+}
 
     // === ADMIN ===
     function openAdmin(){
@@ -1478,53 +1487,69 @@ async function sbSaveQuestions(questionsArr){
       }
     }
 
-    function renderLeaderboardAdmin(){
-      const list = document.getElementById('leaderboardAdminList');
-      const leaderboard = getLeaderboard();
-      
-      if(leaderboard.length === 0){
-        list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet</p></div>';
-        return;
-      }
-      
-      list.innerHTML = '';
-      
-      leaderboard.forEach((entry, index) => {
-        const item = document.createElement('div');
-        item.className = 'leaderboardAdminItem';
-        if(index === 0) item.classList.add('champion');
-        
-        const date = new Date(entry.date);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        item.innerHTML = `
-          <div class="leaderboardAdminInfo">
-            <div class="leaderboardAdminName">${index === 0 ? '👑 ' : ''}${entry.name}</div>
-            <div class="leaderboardAdminDate">${dateStr}</div>
-          </div>
-          <div class="leaderboardAdminScore">${entry.score}/${entry.total}</div>
-          <button class="btnDanger" style="padding: 8px 12px; font-size: 13px;" onclick="deleteScore(${index})">Delete</button>
-        `;
-        
-        list.appendChild(item);
-      });
-    }
+    async function renderLeaderboardAdmin(){
+  const list = document.getElementById('leaderboardAdminList');
+  list.innerHTML = '<div class="emptyLeaderboard"><p>Loading...</p></div>';
 
-    function deleteScore(index){
-      if(!confirm('Delete this score?')) return;
-      
-      const leaderboard = getLeaderboard();
-      leaderboard.splice(index, 1);
-      localStorage.setItem('handsPlease_leaderboard', JSON.stringify(leaderboard));
-      renderLeaderboardAdmin();
-    }
+  let leaderboard = [];
+  try{
+    leaderboard = await sbFetchLeaderboard(200);
+  } catch(err){
+    console.warn("Supabase admin fetch failed, using localStorage:", err);
+    leaderboard = getLeaderboard();
+  }
 
-    function clearAllScores(){
-      if(!confirm('Clear ALL scores from the leaderboard? This cannot be undone!')) return;
-      
-      localStorage.removeItem('handsPlease_leaderboard');
-      renderLeaderboardAdmin();
-    }
+  if(!leaderboard || leaderboard.length === 0){
+    list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet</p></div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  leaderboard.forEach((entry, index) => {
+    const item = document.createElement('div');
+    item.className = 'leaderboardAdminItem';
+    if(index === 0) item.classList.add('champion');
+
+    const date = new Date(entry.date);
+    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    item.innerHTML = `
+      <div class="leaderboardAdminInfo">
+        <div class="leaderboardAdminName">${index === 0 ? '👑 ' : ''}${entry.name}</div>
+        <div class="leaderboardAdminDate">${dateStr}</div>
+      </div>
+      <div class="leaderboardAdminScore">${entry.score}/${entry.total}</div>
+      <button class="btnDanger" style="padding: 8px 12px; font-size: 13px;" onclick="deleteScoreById('${entry.id}')">Delete</button>
+    `;
+    list.appendChild(item);
+  });
+}
+
+
+    async function deleteScoreById(id){
+  if(!confirm('Delete this score?')) return;
+
+  try{
+    await sbDeleteScoreById(id);
+    await renderLeaderboardAdmin();
+  } catch(err){
+    alert("Delete failed. Check the hp_quiz_leaderboard DELETE policy.");
+    console.error(err);
+  }
+}
+
+    async function clearAllScores(){
+  if(!confirm('Clear ALL scores from the leaderboard? This cannot be undone!')) return;
+
+  try{
+    await sbClearAllScores();
+    await renderLeaderboardAdmin();
+  } catch(err){
+    alert("Clear all failed. Check the hp_quiz_leaderboard DELETE policy.");
+    console.error(err);
+  }
+}
+
 
     function refreshQuestionsList(){
       const list = document.getElementById('questionsList');
