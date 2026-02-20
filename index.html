@@ -325,7 +325,8 @@
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="food" onclick="switchTab('food')">Food</button>
+    <button class="tab-btn active" data-tab="breakfast" onclick="switchTab('breakfast')">Breakfast</button>
+    <button class="tab-btn" data-tab="brunch" onclick="switchTab('brunch')">Brunch</button>
   </div>
 
   <div class="container">
@@ -387,7 +388,7 @@
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let foodItems = [];
-    let currentTab = "food";
+    let currentTab = "breakfast";
     let isAdmin = false;
     let foodFilter = "all";
     let searchTerm = "";
@@ -408,6 +409,7 @@
         id: row.id,
         name: row.name || "",
         image: row.image_url || "",
+        category: row.category || "breakfast",
         dietaries: row.dietaries ? row.dietaries.split(",").map(s => s.trim()).filter(Boolean) : [],
         ingredients: row.ingredients ? row.ingredients.split("\n") : [],
         miseEnPlace: row.mise_en_place ? row.mise_en_place.split("\n") : [],
@@ -449,7 +451,7 @@
 
     function renderGrid() {
       const grid = document.getElementById("contentGrid");
-      let items = [...foodItems];
+      let items = foodItems.filter(d => (d.category || "breakfast") === currentTab);
 
       if (foodFilter !== "all") {
         items = items.filter(d => d.dietaries && d.dietaries.includes(foodFilter));
@@ -606,6 +608,7 @@
       const item = isNew ? createEmptyItem() : structuredClone(foodItems[index]);
       editorState.index = index;
       editorState.id = isNew ? null : item.id;
+      editorState.category = item.category || currentTab;
 
       bodyEl.innerHTML = renderFoodEditor(item);
       initFoodEditor(item);
@@ -624,6 +627,7 @@
     id: null,
     name: "",
     image: "",
+    category: currentTab,
     dietaries: [],
     ingredients: [""],
     miseEnPlace: [""],
@@ -846,6 +850,7 @@
       const row = {
         name,
         image_url: imageUrl || null,
+        category: editorState.category || "breakfast",
         dietaries: dietaries.join(","),
         ingredients: ingredients.join("\n"),
         mise_en_place: miseEnPlace.join("\n"),
