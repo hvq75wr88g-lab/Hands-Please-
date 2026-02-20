@@ -655,6 +655,13 @@
             <input type="text" id="foodName" value="${escapeHtml(item.name || "")}">
           </div>
           <div class="form-group">
+            <label>Category</label>
+            <select id="foodCategory">
+              <option value="breakfast" ${(editorState.category || "breakfast") === "breakfast" ? "selected" : ""}>Breakfast</option>
+              <option value="brunch" ${(editorState.category || "breakfast") === "brunch" ? "selected" : ""}>Brunch</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label>Image</label>
             <input type="text" id="foodImage" value="${escapeHtml(item.image || "")}" placeholder="Existing image URL (will be replaced if you upload)">
             <input type="file" id="foodImageFile" accept="image/*" style="margin-top:0.35rem;">
@@ -850,7 +857,7 @@
       const row = {
         name,
         image_url: imageUrl || null,
-        category: editorState.category || "breakfast",
+        category: (document.getElementById("foodCategory") || {}).value || editorState.category || "breakfast",
         dietaries: dietaries.join(","),
         ingredients: ingredients.join("\n"),
         mise_en_place: miseEnPlace.join("\n"),
