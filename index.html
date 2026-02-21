@@ -1384,10 +1384,10 @@
           .from("menu-images")
           .upload(uniqueName, file, { cacheControl: "3600", upsert: false });
 
-        if (uploadError || !uploadData) {
-          console.error(uploadError);
-          alert("Image upload failed: " + (uploadError?.message || "Unknown error"));
-          return;
+       console.log("Upload result:", uploadData, uploadError);
+if (uploadError || !uploadData) {
+  alert("Image upload failed: " + (uploadError?.message || uploadError?.error || JSON.stringify(uploadError)));
+  return;
         }
 
         imageUrl = `${SUPABASE_URL}/storage/v1/object/public/menu-images/${uploadData.path}`;
