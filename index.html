@@ -881,555 +881,599 @@
   </div>
 
   <script>
-    // Supabase config
-    const SUPABASE_URL = "https://beyeqxromrqoiruejddp.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJleWVxeHJvbXJxb2lydWVqZGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MjcwMDEsImV4cCI6MjA4NTUwMzAwMX0.LIt8CG0DYeQDXE1RhvGPNyjVdK8SarSGuXJJJd2Ku7o";
+  const SUPABASE_URL = "https://beyeqxromrqoiruejddp.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJleWVxeHJvbXJxb2lydWVqZGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MjcwMDEsImV4cCI6MjA4NTUwMzAwMX0.LIt8CG0DYeQDXE1RhvGPNyjVdK8SarSGuXJJJd2Ku7o";
 
-    const { createClient } = window.supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { createClient } = window.supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let foodItems = [];
-    let currentTab = "breakfast";
-    let isAdmin = false;
-    let foodFilter = "all";
-    let searchTerm = "";
-    let editorState = { index: null, id: null }; // for food_items
+  let foodItems = [];
+  let currentTab = "breakfast";
+  let isAdmin = false;
+  let foodFilter = "all";
+  let searchTerm = "";
+  let editorState = { index: null, id: null };
 
-    async function loadFood() {
-      const { data, error } = await supabaseClient
-        .from("food_items")
-        .select("*")
-        .order("created_at", { ascending: true });
+  // ── Drag state ──────────────────────────────────────────────
+  let dragSrcId = null;
 
-      if (error) {
-        console.error("Error loading food_items", error);
-        alert("Error loading dishes from Supabase.");
-        return;
-      }
-      foodItems = (data || []).map(row => ({
-        id: row.id,
-        name: row.name || "",
-        image: row.image_url || "",
-        category: row.category || "breakfast",
-        dietaries: row.dietaries ? row.dietaries.split(",").map(s => s.trim()).filter(Boolean) : [],
-        ingredients: row.ingredients ? row.ingredients.split("\n") : [],
-        miseEnPlace: row.mise_en_place ? row.mise_en_place.split("\n") : [],
-        modifications: row.modifications ? safeParseJSON(row.modifications, []) : [],
-        interestingInfo: row.interesting_info || ""
-      }));
-      renderGrid();
+  async function loadFood() {
+    const { data, error } = await supabaseClient
+      .from("food_items")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("created_at",  { ascending: true });
+
+    if (error) {
+      console.error("Error loading food_items", error);
+      alert("Error loading dishes from Supabase.");
+      return;
     }
+    foodItems = (data || []).map(row => ({
+      id:            row.id,
+      name:          row.name || "",
+      image:         row.image_url || "",
+      category:      row.category || "breakfast",
+      dietaries:     row.dietaries ? row.dietaries.split(",").map(s => s.trim()).filter(Boolean) : [],
+      ingredients:   row.ingredients   ? row.ingredients.split("\n")   : [],
+      miseEnPlace:   row.mise_en_place ? row.mise_en_place.split("\n") : [],
+      modifications: row.modifications ? safeParseJSON(row.modifications, []) : [],
+      interestingInfo: row.interesting_info || "",
+      sortOrder:     row.sort_order ?? 0
+    }));
+    renderGrid();
+  }
 
-    function safeParseJSON(str, fallback) {
-      try {
-        const v = JSON.parse(str);
-        return Array.isArray(v) || typeof v === "object" ? v : fallback;
-      } catch {
-        return fallback;
-      }
-    }
+  function safeParseJSON(str, fallback) {
+    try {
+      const v = JSON.parse(str);
+      return Array.isArray(v) || typeof v === "object" ? v : fallback;
+    } catch { return fallback; }
+  }
 
-    function switchTab(tab) {
-      currentTab = tab;
-      document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.tab === tab);
-      });
-      // Scroll active tab into view on mobile
-      const activeBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
-      if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-      }
-      renderGrid();
-    }
-
-    function setFoodFilter(filter) {
-      foodFilter = filter;
-      document.querySelectorAll("#foodFilters .filter-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.filter === filter);
-      });
-      renderGrid();
-    }
-
-    document.getElementById("searchInput").addEventListener("input", e => {
-      searchTerm = e.target.value.trim().toLowerCase();
-      renderGrid();
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.tab === tab);
     });
+    const activeBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    renderGrid();
+  }
 
-    function renderGrid() {
-      const grid = document.getElementById("contentGrid");
-      let items = foodItems.filter(d => (d.category || "breakfast") === currentTab);
+  function setFoodFilter(filter) {
+    foodFilter = filter;
+    document.querySelectorAll("#foodFilters .filter-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.filter === filter);
+    });
+    renderGrid();
+  }
 
-      if (foodFilter !== "all") {
-        items = items.filter(d => d.dietaries && d.dietaries.includes(foodFilter));
-      }
+  document.getElementById("searchInput").addEventListener("input", e => {
+    searchTerm = e.target.value.trim().toLowerCase();
+    renderGrid();
+  });
 
-      if (searchTerm) {
-        items = items.filter(item => {
-          const haystack = [];
-          haystack.push(item.name || "");
-          (item.ingredients || []).forEach(x => haystack.push(x));
-          (item.miseEnPlace || []).forEach(x => haystack.push(x));
-          haystack.push(item.interestingInfo || "");
-          (item.dietaries || []).forEach(x => haystack.push(x));
-          return haystack.join(" ").toLowerCase().includes(searchTerm);
-        });
-      }
+  // ── FIX: look up by id, not array index ────────────────────
+  function getItemById(id) {
+    return foodItems.find(item => item.id === id) || null;
+  }
 
-      if (!items.length) {
-        grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:3rem 0; font-size:0.9rem; letter-spacing:0.05em;">No dishes found.</p>';
-        document.body.classList.toggle("admin-mode", isAdmin);
-        document.getElementById("adminBanner").style.display = isAdmin ? "block" : "none";
-        return;
-      }
+  function renderGrid() {
+    const grid = document.getElementById("contentGrid");
+    let items = foodItems.filter(d => (d.category || "breakfast") === currentTab);
 
-      grid.innerHTML = items.map((item, idx) => `
-        <div class="card" onclick="handleCardClick(${idx})">
-          <div class="admin-chip">Edit</div>
-          <img src="${item.image || ""}" alt="${item.name || ""}" class="card-image"
-            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect fill=%22%230f1928%22 width=%22800%22 height=%22600%22/%3E%3Ctext fill=%22%234e6070%22 font-family=%22Georgia%2Cserif%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E${encodeURIComponent(item.name || "")}%3C/text%3E%3C/svg%3E'">
-          <div class="card-content">
-            <h3 class="card-title">${item.name || ""}</h3>
-            <div class="dietary-tags">
-              ${(item.dietaries || []).map(d => `<span class="dietary-tag">${formatDietary(d)}</span>`).join("")}
-            </div>
-            <p class="card-preview">${item.interestingInfo || ""}</p>
-          </div>
+    if (foodFilter !== "all") {
+      items = items.filter(d => d.dietaries && d.dietaries.includes(foodFilter));
+    }
+
+    if (searchTerm) {
+      items = items.filter(item => {
+        const haystack = [
+          item.name || "",
+          ...(item.ingredients  || []),
+          ...(item.miseEnPlace  || []),
+          item.interestingInfo  || "",
+          ...(item.dietaries    || [])
+        ];
+        return haystack.join(" ").toLowerCase().includes(searchTerm);
+      });
+    }
+
+    if (!items.length) {
+      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem 0;font-size:0.9rem;letter-spacing:0.05em;">No dishes found.</p>';
+      syncAdminMode();
+      return;
+    }
+
+    // Pass item.id (stable) instead of array index (unstable)
+    grid.innerHTML = items.map(item => `
+      <div class="card"
+           onclick="handleCardClick('${item.id}')"
+           draggable="${isAdmin}"
+           data-id="${item.id}"
+           ondragstart="onDragStart(event)"
+           ondragover="onDragOver(event)"
+           ondrop="onDrop(event)"
+           ondragend="onDragEnd(event)">
+        <div class="admin-chip">
+          <span class="drag-handle" onclick="event.stopPropagation()">&#9776;</span>
+          Edit
         </div>
-      `).join("");
-
-      document.body.classList.toggle("admin-mode", isAdmin);
-      document.getElementById("adminBanner").style.display = isAdmin ? "block" : "none";
-    }
-
-    function formatDietary(d) {
-      if (!d) return "";
-      return d.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-    }
-
-    function handleCardClick(index) {
-      if (isAdmin) {
-        openEditor(index);
-      } else {
-        openDetailModal(index);
-      }
-    }
-
-    function openDetailModal(index) {
-      const item = foodItems[index];
-      if (!item) return;
-      const modal = document.getElementById("detailModal");
-      const inner = document.getElementById("modalInner");
-
-      inner.innerHTML = `
-        <img src="${item.image || ""}" alt="${item.name || ""}" class="modal-image" onerror="this.style.display='none'">
-        <div class="modal-body">
-          <h2 class="modal-title">${item.name || ""}</h2>
-          <div class="dietary-tags" style="margin-bottom:1.25rem;">
+        <img src="${item.image || ""}" alt="${escapeHtml(item.name || "")}" class="card-image"
+          onerror="this.src='image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect fill=%22%230f1928%22 width=%22800%22 height=%22600%22/%3E%3Ctext fill=%22%234e6070%22 font-family=%22Georgia%2Cserif%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E${encodeURIComponent(item.name || "")}%3C/text%3E%3C/svg%3E'">
+        <div class="card-content">
+          <h3 class="card-title">${item.name || ""}</h3>
+          <div class="dietary-tags">
             ${(item.dietaries || []).map(d => `<span class="dietary-tag">${formatDietary(d)}</span>`).join("")}
           </div>
-
-          <div class="section">
-            <h3 class="section-title">Mise en Place</h3>
-            <div class="section-content">
-              <ul>${(item.miseEnPlace || []).map(x => `<li>${x}</li>`).join("")}</ul>
-            </div>
-          </div>
-
-          <div class="section">
-            <h3 class="section-title">Ingredients</h3>
-            <div class="section-content">
-              <ul>${(item.ingredients || []).map(x => `<li>${x}</li>`).join("")}</ul>
-            </div>
-          </div>
-
-          <div class="section">
-            <h3 class="section-title">Dietary Modifications</h3>
-            <div class="section-content">
-              ${(item.modifications || []).map(mod => `
-                <div class="modification-item">
-                  <strong>${mod.dietary || ""}:</strong>
-                  <span class="${mod.available ? "available" : "not-available"}">
-                    ${mod.available ? "Available" : "Not Available"}
-                  </span><br>
-                  <small>${mod.note || ""}</small>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-
-          <div class="section">
-            <h3 class="section-title">Interesting Information</h3>
-            <div class="info-box">${item.interestingInfo || ""}</div>
-          </div>
-        </div>
-      `;
-      modal.classList.add("active");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeDetailModal() {
-      document.getElementById("detailModal").classList.remove("active");
-      document.body.style.overflow = "auto";
-    }
-
-    document.getElementById("detailModal").addEventListener("click", e => {
-      if (e.target.id === "detailModal") closeDetailModal();
-    });
-
-    function handleAdminButtonClick() {
-      if (isAdmin) {
-        logoutAdmin();
-      } else {
-        const pwd = prompt("Enter admin password:");
-        if (pwd === "Iworkfortips") {
-          isAdmin = true;
-          document.body.classList.add("admin-mode");
-          renderGrid();
-        } else if (pwd !== null) {
-          alert("Incorrect password");
-        }
-      }
-    }
-
-    function logoutAdmin() {
-      isAdmin = false;
-      document.body.classList.remove("admin-mode");
-    }
-
-    function openAddItem() {
-      editorState = { index: null, id: null };
-      openEditor(null);
-    }
-
-    function openEditor(index) {
-      const isNew = index === null || index === undefined;
-      const modal = document.getElementById("editorModal");
-      const titleEl = document.getElementById("editorTitle");
-      const hintEl = document.getElementById("editorHint");
-      const bodyEl = document.getElementById("editorBody");
-
-      titleEl.textContent = isNew ? "Add Dish" : "Edit Dish";
-      hintEl.textContent = "Saved to Supabase (cloud) so all devices see the same data.";
-
-      const item = isNew ? createEmptyItem() : structuredClone(foodItems[index]);
-      editorState.index = index;
-      editorState.id = isNew ? null : item.id;
-      editorState.category = item.category || currentTab;
-
-      bodyEl.innerHTML = renderFoodEditor(item);
-      initFoodEditor(item);
-
-      modal.classList.add("active");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeEditor() {
-      document.getElementById("editorModal").classList.remove("active");
-      document.body.style.overflow = "auto";
-    }
-
-   function createEmptyItem() {
-  return {
-    id: null,
-    name: "",
-    image: "",
-    category: currentTab,
-    dietaries: [],
-    ingredients: [""],
-    miseEnPlace: [""],
-    modifications: [
-      { dietary: "Vegan",         available: false, note: "" },
-      { dietary: "Vegetarian",    available: false, note: "" },
-      { dietary: "Gluten-Free",   available: false, note: "" },
-      { dietary: "Dairy-Free",    available: false, note: "" },
-      { dietary: "Nut Allergies", available: true,  note: "No nuts in dish" },
-      { dietary: "Shellfish",     available: false, note: "" },
-      { dietary: "Fin Fish",      available: false, note: "" },
-      { dietary: "Pork",          available: false, note: "" },
-      { dietary: "Alcohol",       available: false, note: "" },
-      { dietary: "Onion/Garlic",  available: false, note: "" }
-    ],
-    interestingInfo: ""
-  };
-}
-    function renderFoodEditor(item) {
-      return `
-      <div class="editor-grid">
-        <div>
-          <div class="form-group">
-            <label>Dish name</label>
-            <input type="text" id="foodName" value="${escapeHtml(item.name || "")}">
-          </div>
-          <div class="form-group">
-            <label>Category</label>
-            <select id="foodCategory">
-              <option value="breakfast" ${(editorState.category || "breakfast") === "breakfast" ? "selected" : ""}>Breakfast</option>
-              <option value="brunch" ${(editorState.category || "breakfast") === "brunch" ? "selected" : ""}>Brunch</option>
-              <option value="lunch" ${(editorState.category || "breakfast") === "lunch" ? "selected" : ""}>Lunch</option>
-              <option value="dinner" ${(editorState.category || "breakfast") === "dinner" ? "selected" : ""}>Dinner</option>
-              <option value="drinks" ${(editorState.category || "breakfast") === "drinks" ? "selected" : ""}>Drinks</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Image</label>
-            <input type="text" id="foodImage" value="${escapeHtml(item.image || "")}" placeholder="Existing image URL (will be replaced if you upload)">
-            <input type="file" id="foodImageFile" accept="image/*" style="margin-top:0.35rem;">
-            <div class="small-hint">If you choose a file, it will upload to Supabase Storage and update the image URL automatically.</div>
-          </div>
-          <div class="form-group">
-            <label>Dietaries / allergens (tags shown on cards &amp; filters)</label>
-            <div class="checkbox-row">
-              ${["vegan","vegetarian","gluten-free","dairy-free","nut-free","shellfish","fin-fish","pork","alcohol","onion-garlic"].map(d => `
-                <label>
-                  <input type="checkbox" class="foodDietary" value="${d}" ${item.dietaries && item.dietaries.includes(d) ? "checked" : ""}>
-                  ${formatDietary(d)}
-                </label>
-              `).join("")}
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Interesting information / talking points</label>
-            <textarea id="foodInfo">${escapeHtml(item.interestingInfo || "")}</textarea>
-          </div>
-        </div>
-        <div>
-          <div class="form-group">
-            <label>Mise en place (one line per bullet)</label>
-            <div class="list-editor" id="foodMepList"></div>
-            <button type="button" class="list-add-btn" onclick="addListRow('foodMepList')">+ Add line</button>
-          </div>
-          <div class="form-group">
-            <label>Ingredients (one line per bullet)</label>
-            <div class="list-editor" id="foodIngList"></div>
-            <button type="button" class="list-add-btn" onclick="addListRow('foodIngList')">+ Add ingredient</button>
-          </div>
+          <p class="card-preview">${item.interestingInfo || ""}</p>
         </div>
       </div>
-      <div class="form-group">
-        <label>Dietary modifications</label>
-        <div class="list-editor" id="foodModList"></div>
-        <button type="button" class="list-add-btn" onclick="addModRow()">+ Add modification</button>
+    `).join("");
+
+    syncAdminMode();
+  }
+
+  function syncAdminMode() {
+    document.body.classList.toggle("admin-mode", isAdmin);
+    document.getElementById("adminBanner").style.display = isAdmin ? "block" : "none";
+  }
+
+  // ── Drag & drop reorder ─────────────────────────────────────
+  function onDragStart(e) {
+    if (!isAdmin) return;
+    dragSrcId = e.currentTarget.dataset.id;
+    e.currentTarget.style.opacity = "0.45";
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  function onDragOver(e) {
+    if (!isAdmin) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    e.currentTarget.style.outline = "2px solid var(--gold)";
+  }
+
+  function onDragEnd(e) {
+    e.currentTarget.style.opacity = "";
+    e.currentTarget.style.outline = "";
+    // Clean up any lingering outlines
+    document.querySelectorAll(".card").forEach(c => c.style.outline = "");
+  }
+
+  async function onDrop(e) {
+    e.preventDefault();
+    const dropTargetId = e.currentTarget.dataset.id;
+    e.currentTarget.style.outline = "";
+    if (!dragSrcId || dragSrcId === dropTargetId) return;
+
+    // Re-order foodItems in memory for the current tab
+    const tabItems = foodItems.filter(d => d.category === currentTab);
+    const others   = foodItems.filter(d => d.category !== currentTab);
+
+    const srcIdx  = tabItems.findIndex(i => i.id === dragSrcId);
+    const destIdx = tabItems.findIndex(i => i.id === dropTargetId);
+    if (srcIdx === -1 || destIdx === -1) return;
+
+    // Splice src into new position
+    const [moved] = tabItems.splice(srcIdx, 1);
+    tabItems.splice(destIdx, 0, moved);
+
+    // Reassign sortOrder values
+    tabItems.forEach((item, i) => { item.sortOrder = i; });
+    foodItems = [...others, ...tabItems];
+
+    renderGrid();
+
+    // Persist new sort_order to Supabase
+    await Promise.all(
+      tabItems.map(item =>
+        supabaseClient
+          .from("food_items")
+          .update({ sort_order: item.sortOrder })
+          .eq("id", item.id)
+      )
+    );
+  }
+
+  function formatDietary(d) {
+    if (!d) return "";
+    return d.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  }
+
+  // ── FIX: accepts id string, not array index ─────────────────
+  function handleCardClick(id) {
+    if (isAdmin) {
+      openEditorById(id);
+    } else {
+      openDetailModalById(id);
+    }
+  }
+
+  function openDetailModalById(id) {
+    const item = getItemById(id);
+    if (!item) return;
+    const modal = document.getElementById("detailModal");
+    const inner = document.getElementById("modalInner");
+
+    inner.innerHTML = `
+      <img src="${item.image || ""}" alt="${escapeHtml(item.name || "")}" class="modal-image" onerror="this.style.display='none'">
+      <div class="modal-body">
+        <h2 class="modal-title">${item.name || ""}</h2>
+        <div class="dietary-tags" style="margin-bottom:1.25rem;">
+          ${(item.dietaries || []).map(d => `<span class="dietary-tag">${formatDietary(d)}</span>`).join("")}
+        </div>
+        <div class="section">
+          <h3 class="section-title">Mise en Place</h3>
+          <div class="section-content">
+            <ul>${(item.miseEnPlace || []).map(x => `<li>${x}</li>`).join("")}</ul>
+          </div>
+        </div>
+        <div class="section">
+          <h3 class="section-title">Ingredients</h3>
+          <div class="section-content">
+            <ul>${(item.ingredients || []).map(x => `<li>${x}</li>`).join("")}</ul>
+          </div>
+        </div>
+        <div class="section">
+          <h3 class="section-title">Dietary Modifications</h3>
+          <div class="section-content">
+            ${(item.modifications || []).map(mod => `
+              <div class="modification-item">
+                <strong>${mod.dietary || ""}:</strong>
+                <span class="${mod.available ? "available" : "not-available"}">
+                  ${mod.available ? "Available" : "Not Available"}
+                </span><br>
+                <small>${mod.note || ""}</small>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div class="section">
+          <h3 class="section-title">Interesting Information</h3>
+          <div class="info-box">${item.interestingInfo || ""}</div>
+        </div>
       </div>
-      <div class="editor-actions">
-        <div>
-          <button class="btn btn-primary" onclick="saveFoodItem()">Save</button>
-          <button class="btn btn-secondary" onclick="closeEditor()">Cancel</button>
-        </div>
-        <div>
-          ${editorState.id ? '<button class="btn btn-danger" onclick="deleteCurrentItem()">Delete dish</button>' : ""}
-        </div>
-      </div>`;
-    }
+    `;
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
 
-    function initFoodEditor(item) {
-      renderListEditor(document.getElementById("foodMepList"), item.miseEnPlace || [""]);
-      renderListEditor(document.getElementById("foodIngList"), item.ingredients || [""]);
-      renderModEditor(document.getElementById("foodModList"), item.modifications || []);
-    }
+  function closeDetailModal() {
+    document.getElementById("detailModal").classList.remove("active");
+    document.body.style.overflow = "auto";
+  }
 
-    function renderListEditor(container, items) {
-      if (!items || !items.length) items = [""];
-      container.innerHTML = items.map((val, idx) => `
-        <div class="list-row">
-          <input type="text" value="${escapeHtml(val)}" data-index="${idx}">
-          <button type="button" onclick="removeListRow('${container.id}', ${idx})">✕</button>
-        </div>
-      `).join("");
-    }
+  document.getElementById("detailModal").addEventListener("click", e => {
+    if (e.target.id === "detailModal") closeDetailModal();
+  });
 
-    function addListRow(containerId) {
-      const container = document.getElementById(containerId);
-      const rowCount = container.querySelectorAll(".list-row").length;
-      const div = document.createElement("div");
-      div.className = "list-row";
-      div.innerHTML = `
-        <input type="text" value="" data-index="${rowCount}">
-        <button type="button" onclick="removeListRow('${containerId}', ${rowCount})">✕</button>
-      `;
-      container.appendChild(div);
-    }
-
-    function removeListRow(containerId, index) {
-      const container = document.getElementById(containerId);
-      const rows = Array.from(container.querySelectorAll(".list-row"));
-      if (rows[index]) rows[index].remove();
-    }
-
-    function collectListValues(containerId) {
-      const container = document.getElementById(containerId);
-      const inputs = Array.from(container.querySelectorAll("input"));
-      const values = inputs.map(i => i.value.trim()).filter(v => v);
-      return values.length ? values : [];
-    }
-
-    function renderModEditor(container, mods) {
-      if (!mods || !mods.length) {
-        mods = [
-          { dietary: "Vegan", available: false, note: "" },
-          { dietary: "Vegetarian", available: false, note: "" },
-          { dietary: "Gluten-Free", available: false, note: "" },
-          { dietary: "Dairy-Free", available: false, note: "" },
-          { dietary: "Nut Allergies", available: true, note: "" }
-        ];
+  function handleAdminButtonClick() {
+    if (isAdmin) {
+      logoutAdmin();
+    } else {
+      const pwd = prompt("Enter admin password:");
+      if (pwd === "Iworkfortips") {
+        isAdmin = true;
+        document.body.classList.add("admin-mode");
+        renderGrid();
+      } else if (pwd !== null) {
+        alert("Incorrect password");
       }
-      container.innerHTML = mods.map((mod, idx) => `
-        <div class="mod-row">
-          <input type="text" value="${escapeHtml(mod.dietary || "")}" placeholder="Dietary" data-mod-field="dietary" data-index="${idx}">
-          <select data-mod-field="available" data-index="${idx}">
-            <option value="true" ${mod.available ? "selected" : ""}>Available</option>
-            <option value="false" ${!mod.available ? "selected" : ""}>Not available</option>
+    }
+  }
+
+  function logoutAdmin() {
+    isAdmin = false;
+    document.body.classList.remove("admin-mode");
+    renderGrid();
+  }
+
+  function openAddItem() {
+    editorState = { index: null, id: null };
+    openEditorById(null);
+  }
+
+  // ── FIX: renamed to openEditorById, accepts id not index ────
+  function openEditorById(id) {
+    const isNew = id === null || id === undefined;
+    const modal   = document.getElementById("editorModal");
+    const titleEl = document.getElementById("editorTitle");
+    const hintEl  = document.getElementById("editorHint");
+    const bodyEl  = document.getElementById("editorBody");
+
+    titleEl.textContent = isNew ? "Add Dish" : "Edit Dish";
+    hintEl.textContent  = "Saved to Supabase (cloud) so all devices see the same data.";
+
+    const item = isNew ? createEmptyItem() : structuredClone(getItemById(id));
+    editorState.index = null;  // no longer used
+    editorState.id    = isNew ? null : item.id;
+    editorState.category = item.category || currentTab;
+
+    bodyEl.innerHTML = renderFoodEditor(item);
+    initFoodEditor(item);
+
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeEditor() {
+    document.getElementById("editorModal").classList.remove("active");
+    document.body.style.overflow = "auto";
+  }
+
+  function createEmptyItem() {
+    return {
+      id: null,
+      name: "",
+      image: "",
+      category: currentTab,
+      dietaries: [],
+      ingredients: [""],
+      miseEnPlace: [""],
+      modifications: [
+        { dietary: "Vegan",         available: false, note: "" },
+        { dietary: "Vegetarian",    available: false, note: "" },
+        { dietary: "Gluten-Free",   available: false, note: "" },
+        { dietary: "Dairy-Free",    available: false, note: "" },
+        { dietary: "Nut Allergies", available: true,  note: "No nuts in dish" },
+        { dietary: "Shellfish",     available: false, note: "" },
+        { dietary: "Fin Fish",      available: false, note: "" },
+        { dietary: "Pork",          available: false, note: "" },
+        { dietary: "Alcohol",       available: false, note: "" },
+        { dietary: "Onion/Garlic",  available: false, note: "" }
+      ],
+      interestingInfo: "",
+      sortOrder: 0
+    };
+  }
+
+  function renderFoodEditor(item) {
+    return `
+    <div class="editor-grid">
+      <div>
+        <div class="form-group">
+          <label>Dish name</label>
+          <input type="text" id="foodName" value="${escapeHtml(item.name || "")}">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="foodCategory">
+            <option value="breakfast" ${(editorState.category||"breakfast")==="breakfast"?"selected":""}>Breakfast</option>
+            <option value="brunch"    ${(editorState.category||"breakfast")==="brunch"   ?"selected":""}>Brunch</option>
+            <option value="lunch"     ${(editorState.category||"breakfast")==="lunch"    ?"selected":""}>Lunch</option>
+            <option value="dinner"    ${(editorState.category||"breakfast")==="dinner"   ?"selected":""}>Dinner</option>
+            <option value="drinks"    ${(editorState.category||"breakfast")==="drinks"   ?"selected":""}>Drinks</option>
           </select>
-          <input type="text" value="${escapeHtml(mod.note || "")}" placeholder="Note" data-mod-field="note" data-index="${idx}">
-          <button type="button" onclick="removeModRow(${idx})">✕</button>
         </div>
-      `).join("");
-    }
+        <div class="form-group">
+          <label>Image</label>
+          <input type="text" id="foodImage" value="${escapeHtml(item.image || "")}" placeholder="Existing image URL (will be replaced if you upload)">
+          <input type="file" id="foodImageFile" accept="image/*" style="margin-top:0.35rem;">
+          <div class="small-hint">If you choose a file, it will upload to Supabase Storage and update the image URL automatically.</div>
+        </div>
+        <div class="form-group">
+          <label>Dietaries / allergens</label>
+          <div class="checkbox-row">
+            ${["vegan","vegetarian","gluten-free","dairy-free","nut-free","shellfish","fin-fish","pork","alcohol","onion-garlic"].map(d => `
+              <label>
+                <input type="checkbox" class="foodDietary" value="${d}" ${item.dietaries && item.dietaries.includes(d) ? "checked" : ""}>
+                ${formatDietary(d)}
+              </label>
+            `).join("")}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Interesting information / talking points</label>
+          <textarea id="foodInfo">${escapeHtml(item.interestingInfo || "")}</textarea>
+        </div>
+      </div>
+      <div>
+        <div class="form-group">
+          <label>Mise en place (one line per bullet)</label>
+          <div class="list-editor" id="foodMepList"></div>
+          <button type="button" class="list-add-btn" onclick="addListRow('foodMepList')">+ Add line</button>
+        </div>
+        <div class="form-group">
+          <label>Ingredients (one line per bullet)</label>
+          <div class="list-editor" id="foodIngList"></div>
+          <button type="button" class="list-add-btn" onclick="addListRow('foodIngList')">+ Add ingredient</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Dietary modifications</label>
+      <div class="list-editor" id="foodModList"></div>
+      <button type="button" class="list-add-btn" onclick="addModRow()">+ Add modification</button>
+    </div>
+    <div class="editor-actions">
+      <div>
+        <button class="btn btn-primary" onclick="saveFoodItem()">Save</button>
+        <button class="btn btn-secondary" onclick="closeEditor()">Cancel</button>
+      </div>
+      <div>
+        ${editorState.id ? '<button class="btn btn-danger" onclick="deleteCurrentItem()">Delete dish</button>' : ""}
+      </div>
+    </div>`;
+  }
 
-    function addModRow() {
-      const container = document.getElementById("foodModList");
-      const idx = container.querySelectorAll(".mod-row").length;
-      const div = document.createElement("div");
-      div.className = "mod-row";
-      div.innerHTML = `
-        <input type="text" placeholder="Dietary" data-mod-field="dietary" data-index="${idx}">
-        <select data-mod-field="available" data-index="${idx}">
-          <option value="true" selected>Available</option>
-          <option value="false">Not available</option>
+  function initFoodEditor(item) {
+    renderListEditor(document.getElementById("foodMepList"), item.miseEnPlace || [""]);
+    renderListEditor(document.getElementById("foodIngList"), item.ingredients  || [""]);
+    renderModEditor(document.getElementById("foodModList"),  item.modifications || []);
+  }
+
+  function renderListEditor(container, items) {
+    if (!items || !items.length) items = [""];
+    container.innerHTML = items.map((val, idx) => `
+      <div class="list-row">
+        <input type="text" value="${escapeHtml(val)}" data-index="${idx}">
+        <button type="button" onclick="removeListRow('${container.id}', ${idx})">✕</button>
+      </div>
+    `).join("");
+  }
+
+  function addListRow(containerId) {
+    const container = document.getElementById(containerId);
+    const rowCount = container.querySelectorAll(".list-row").length;
+    const div = document.createElement("div");
+    div.className = "list-row";
+    div.innerHTML = `
+      <input type="text" value="" data-index="${rowCount}">
+      <button type="button" onclick="removeListRow('${containerId}', ${rowCount})">✕</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function removeListRow(containerId, index) {
+    const container = document.getElementById(containerId);
+    const rows = Array.from(container.querySelectorAll(".list-row"));
+    if (rows[index]) rows[index].remove();
+  }
+
+  function collectListValues(containerId) {
+    const container = document.getElementById(containerId);
+    return Array.from(container.querySelectorAll(".list-row input"))
+      .map(i => i.value.trim())
+      .filter(Boolean);
+  }
+
+  function renderModEditor(container, mods) {
+    if (!mods || !mods.length) mods = [];
+    container.innerHTML = mods.map((mod, idx) => `
+      <div class="mod-row">
+        <input type="text" data-mod-field="dietary" value="${escapeHtml(mod.dietary || "")}" placeholder="Dietary">
+        <select data-mod-field="available">
+          <option value="true"  ${mod.available ? "selected" : ""}>Available</option>
+          <option value="false" ${!mod.available ? "selected" : ""}>Not Available</option>
         </select>
-        <input type="text" placeholder="Note" data-mod-field="note" data-index="${idx}">
+        <input type="text" data-mod-field="note" value="${escapeHtml(mod.note || "")}" placeholder="Note">
         <button type="button" onclick="removeModRow(${idx})">✕</button>
-      `;
-      container.appendChild(div);
-    }
+      </div>
+    `).join("");
+  }
 
-    function removeModRow(index) {
-      const container = document.getElementById("foodModList");
-      const rows = Array.from(container.querySelectorAll(".mod-row"));
-      if (rows[index]) rows[index].remove();
-    }
+  function addModRow() {
+    const container = document.getElementById("foodModList");
+    const idx = container.querySelectorAll(".mod-row").length;
+    const div = document.createElement("div");
+    div.className = "mod-row";
+    div.innerHTML = `
+      <input type="text" data-mod-field="dietary" value="" placeholder="Dietary">
+      <select data-mod-field="available">
+        <option value="true">Available</option>
+        <option value="false" selected>Not Available</option>
+      </select>
+      <input type="text" data-mod-field="note" value="" placeholder="Note">
+      <button type="button" onclick="removeModRow(${idx})">✕</button>
+    `;
+    container.appendChild(div);
+  }
 
-    function collectModValues() {
-      const container = document.getElementById("foodModList");
-      const rows = Array.from(container.querySelectorAll(".mod-row"));
-      const mods = [];
-      rows.forEach(row => {
-        const inputs = row.querySelectorAll("[data-mod-field]");
-        const mod = {};
-        inputs.forEach(el => {
-          const field = el.dataset.modField;
-          if (field === "available") {
-            mod[field] = el.value === "true";
-          } else {
-            mod[field] = el.value.trim();
-          }
-        });
-        if (mod.dietary) mods.push(mod);
+  function removeModRow(index) {
+    const container = document.getElementById("foodModList");
+    const rows = Array.from(container.querySelectorAll(".mod-row"));
+    if (rows[index]) rows[index].remove();
+  }
+
+  function collectModValues() {
+    const container = document.getElementById("foodModList");
+    const rows = Array.from(container.querySelectorAll(".mod-row"));
+    const mods = [];
+    rows.forEach(row => {
+      const inputs = row.querySelectorAll("[data-mod-field]");
+      const mod = {};
+      inputs.forEach(el => {
+        const field = el.dataset.modField;
+        mod[field] = field === "available" ? el.value === "true" : el.value.trim();
       });
-      return mods;
+      if (mod.dietary) mods.push(mod);
+    });
+    return mods;
+  }
+
+  async function saveFoodItem() {
+    const name = document.getElementById("foodName").value.trim();
+    if (!name) { alert("Dish name is required"); return; }
+
+    const imageField = document.getElementById("foodImage");
+    const fileInput  = document.getElementById("foodImageFile");
+    const info       = document.getElementById("foodInfo").value.trim();
+
+    const dietaries   = Array.from(document.querySelectorAll(".foodDietary:checked")).map(cb => cb.value);
+    const miseEnPlace = collectListValues("foodMepList");
+    const ingredients = collectListValues("foodIngList");
+    const modifications = collectModValues();
+
+    let imageUrl = imageField.value.trim();
+    const file = fileInput.files && fileInput.files[0];
+    if (file) {
+      const fileExt    = file.name.split(".").pop();
+      const uniqueName = `${crypto.randomUUID()}.${fileExt}`;
+      const {  uploadData, error: uploadError } = await supabaseClient.storage
+        .from("menu-images")
+        .upload(uniqueName, file, { cacheControl: "3600", upsert: false });
+      if (uploadError) { console.error(uploadError); alert("Image upload failed."); return; }
+      const {  publicData } = supabaseClient.storage.from("menu-images").getPublicUrl(uploadData.path);
+      imageUrl = publicData.publicUrl;
     }
 
-    async function saveFoodItem() {
-      const name = document.getElementById("foodName").value.trim();
-      if (!name) {
-        alert("Dish name is required");
-        return;
-      }
-      const imageField = document.getElementById("foodImage");
-      const fileInput = document.getElementById("foodImageFile");
-      const info = document.getElementById("foodInfo").value.trim();
+    const category = document.getElementById("foodCategory").value || editorState.category || "breakfast";
 
-      const dietaries = Array.from(document.querySelectorAll(".foodDietary:checked")).map(cb => cb.value);
-      const miseEnPlace = collectListValues("foodMepList");
-      const ingredients = collectListValues("foodIngList");
-      const modifications = collectModValues();
-
-      let imageUrl = imageField.value.trim();
-
-      const file = fileInput.files && fileInput.files[0];
-      if (file) {
-        const fileExt = file.name.split(".").pop();
-        const uniqueName = `${crypto.randomUUID()}.${fileExt}`;
-        const { data: uploadData, error: uploadError } = await supabaseClient.storage
-          .from("menu-images")
-          .upload(uniqueName, file, { cacheControl: "3600", upsert: false });
-
-        if (uploadError) {
-          console.error(uploadError);
-          alert("Image upload failed.");
-          return;
-        }
-
-        const { data: publicData } = supabaseClient.storage.from("menu-images").getPublicUrl(uploadData.path);
-        imageUrl = publicData.publicUrl;
-      }
-
-      const row = {
-        name,
-        image_url: imageUrl || null,
-        category: (document.getElementById("foodCategory") || {}).value || editorState.category || "breakfast",
-        dietaries: dietaries.join(","),
-        ingredients: ingredients.join("\n"),
-        mise_en_place: miseEnPlace.join("\n"),
-        modifications: JSON.stringify(modifications),
-        interesting_info: info
-      };
-
-      let error;
-      if (editorState.id) {
-        const { error: upError } = await supabaseClient
-          .from("food_items")
-          .update(row)
-          .eq("id", editorState.id);
-        error = upError;
-      } else {
-        const { data: insertData, error: inError } = await supabaseClient
-          .from("food_items")
-          .insert(row)
-          .select("id")
-          .single();
-        error = inError;
-        if (!error && insertData) editorState.id = insertData.id;
-      }
-
-      if (error) {
-        console.error(error);
-        alert("Error saving dish.");
-        return;
-      }
-
-      closeEditor();
-      await loadFood();
+    // For new items, assign sort_order after existing items in same category
+    let sortOrder = 0;
+    if (!editorState.id) {
+      const catItems = foodItems.filter(i => i.category === category);
+      sortOrder = catItems.length > 0 ? Math.max(...catItems.map(i => i.sortOrder)) + 1 : 0;
     }
 
-    async function deleteCurrentItem() {
-      if (!editorState.id) return;
-      if (!confirm("Delete this dish?")) return;
+    const row = {
+      name,
+      image_url:      imageUrl || null,
+      category,
+      dietaries:      dietaries.join(","),
+      ingredients:    ingredients.join("\n"),
+      mise_en_place:  miseEnPlace.join("\n"),
+      modifications:  JSON.stringify(modifications),
+      interesting_info: info,
+      ...(editorState.id ? {} : { sort_order: sortOrder })
+    };
 
-      const { error } = await supabaseClient
-        .from("food_items")
-        .delete()
-        .eq("id", editorState.id);
-
-      if (error) {
-        console.error(error);
-        alert("Error deleting dish.");
-        return;
-      }
-      closeEditor();
-      await loadFood();
+    let error;
+    if (editorState.id) {
+      const { error: upError } = await supabaseClient
+        .from("food_items").update(row).eq("id", editorState.id);
+      error = upError;
+    } else {
+      const {  insertData, error: inError } = await supabaseClient
+        .from("food_items").insert(row).select("id").single();
+      error = inError;
+      if (!error && insertData) editorState.id = insertData.id;
     }
 
-    function escapeHtml(str) {
-      return String(str || "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;");
-    }
+    if (error) { console.error(error); alert("Error saving dish."); return; }
+    closeEditor();
+    await loadFood();
+  }
 
-    (async function init() {
-      await loadFood();
-    })();
-  </script>
+  async function deleteCurrentItem() {
+    if (!editorState.id) return;
+    if (!confirm("Delete this dish?")) return;
+    const { error } = await supabaseClient
+      .from("food_items").delete().eq("id", editorState.id);
+    if (error) { console.error(error); alert("Error deleting dish."); return; }
+    closeEditor();
+    await loadFood();
+  }
+
+  function escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  (async function init() { await loadFood(); })();
+</script>
 </body>
 </html>
