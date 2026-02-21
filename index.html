@@ -1384,8 +1384,8 @@
           .from("menu-images")
           .upload(uniqueName, file, { cacheControl: "3600", upsert: false });
 
-       console.log("Upload result:", uploadData, uploadError);
-if (uploadError || !uploadData) {
+       
+if (uploadError) {
   alert("Image upload failed: " + (uploadError?.message || uploadError?.error || JSON.stringify(uploadError)));
   return;
         }
