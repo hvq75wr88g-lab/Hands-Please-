@@ -1,1315 +1,1714 @@
 <!doctype html>
+
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Breakfast Quiz - Hands Please</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --eggshell: #f3efe6;
-      --ink: #1f2328;
-      --accent: #d35400;
-      --danger: #c0392b;
-      --ok: #27ae60;
-      --gold: #f39c12;
-    }
-
-    *{ box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body{ height: 100%; overflow: hidden; }
-
-    body{
-      background: var(--eggshell);
-      background-image: radial-gradient(circle, #ccc 1px, transparent 1px);
-      background-size: 20px 20px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      color: var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .mainContainer{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 40px;
-      max-width: 1400px;
-      width: 100%;
-      height: 100%;
-    }
-
-    .eggsHUD{
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      align-items: center;
-    }
-
-    .egg{
-      width: 80px;
-      height: 100px;
-      background: linear-gradient(145deg, #fff, #f0f0f0);
-      border: 3px solid #ddd;
-      border-radius: 50% 50% 45% 45%;
-      box-shadow: 0 6px 0 #ccc, inset 0 2px 0 rgba(255,255,255,0.8);
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .egg::after{
-      content: '';
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 16px;
-      height: 20px;
-      background: rgba(255,255,255,0.6);
-      border-radius: 50%;
-      transform: rotate(-30deg);
-    }
-
-    .egg.cracked{
-      background: #e8e8e8;
-      border-color: #999;
-      transform: rotate(8deg);
-      animation: crackShake 0.3s ease-out;
-    }
-
-    @keyframes crackShake{
-      0%, 100%{ transform: rotate(8deg); }
-      25%{ transform: rotate(12deg); }
-      50%{ transform: rotate(4deg); }
-      75%{ transform: rotate(10deg); }
-    }
-
-    .egg.cracked::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background-image:
-        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><path d="M40 8 L41 14 L38 19 L42 26 L39 33 L43 41 L38 49 L41 57 L44 65 L39 73 L42 82 L40 92" stroke="%23999" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M40 12 L34 17 M40 20 L46 26 M39 30 L32 36 M43 38 L49 44 M38 52 L31 58 M41 60 L48 66 M44 70 L50 75 M39 78 L33 83" stroke="%23aaa" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M25 25 Q30 28 35 26 M55 25 Q50 28 45 26 M20 40 Q25 43 30 41 M60 40 Q55 43 50 41 M22 55 Q27 58 32 56 M58 55 Q53 58 48 56 M24 70 Q29 73 34 71 M56 70 Q51 73 46 71 M28 85 Q33 88 38 86 M52 85 Q47 88 42 86" stroke="%23bbb" stroke-width="0.9" fill="none"/><path d="M15 30 L25 35 L20 40 M65 30 L55 35 L60 40 M18 50 L28 55 L23 60 M62 50 L52 55 L57 60 M16 68 L26 73 L21 78 M64 68 L54 73 L59 78" stroke="%23ccc" stroke-width="0.7" fill="none" stroke-linecap="round"/><path d="M30 15 Q35 18 40 16 Q45 18 50 15 M28 35 Q33 38 38 36 Q43 38 48 35 M26 55 Q31 58 36 56 Q41 58 46 55 M29 75 Q34 78 39 76 Q44 78 49 75" stroke="%23aaa" stroke-width="0.8" fill="none"/><path d="M35 22 L38 28 L34 32 M46 22 L43 28 L47 32 M33 44 L36 50 L32 54 M48 44 L45 50 L49 54 M31 64 L34 70 L30 74 M50 64 L47 70 L51 74" stroke="%23bbb" stroke-width="0.6" fill="none" stroke-linecap="round"/></svg>');
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 1;
-    }
-
-    .quizCard{
-      width: 100%;
-      max-width: 600px;
-      background: white;
-      border: 2px solid rgba(0,0,0,0.1);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-    }
-
-    .quizHeader{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #7f8c8d;
-    }
-
-    /* TIMER */
-    .timerWrap{
-      position: relative;
-      height: 8px;
-      background: #ecf0f1;
-      border-radius: 4px;
-      margin-bottom: 18px;
-      overflow: visible;
-    }
-
-    .timerBar{
-      height: 100%;
-      border-radius: 4px;
-      width: 100%;
-      transition: width 0.1s linear, background-color 0.5s;
-      background: var(--ok);
-    }
-
-    .timerCount{
-      position: absolute;
-      right: 0;
-      top: -22px;
-      font-size: 13px;
-      font-weight: bold;
-      color: #7f8c8d;
-      font-variant-numeric: tabular-nums;
-      transition: color 0.3s;
-    }
-
-    /* STREAK BADGE */
-    .streakBadge{
-      display: none;
-      background: linear-gradient(135deg, #ff6b35, #f7931e);
-      color: white;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: bold;
-      animation: streakPulse 0.8s ease-in-out infinite alternate;
-    }
-
-    .streakBadge.hot{
-      background: linear-gradient(135deg, #e53935, #ff6b35);
-    }
-
-    @keyframes streakPulse{
-      from{ transform: scale(1); }
-      to{ transform: scale(1.06); }
-    }
-
-    /* SCORE POPUP */
-    .scorePopup{
-      position: absolute;
-      right: 30px;
-      top: 55px;
-      background: linear-gradient(135deg, var(--ok), #2ecc71);
-      color: white;
-      padding: 10px 16px;
-      border-radius: 16px;
-      font-size: 17px;
-      font-weight: bold;
-      text-align: center;
-      pointer-events: none;
-      animation: floatUp 1.3s ease-out forwards;
-      z-index: 50;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      line-height: 1.5;
-      white-space: nowrap;
-    }
-
-    @keyframes floatUp{
-      0%  { opacity: 1; transform: translateY(0) scale(1); }
-      20% { opacity: 1; transform: translateY(-12px) scale(1.05); }
-      100%{ opacity: 0; transform: translateY(-70px) scale(0.9); }
-    }
-
-    /* ANSWER HIGHLIGHTS */
-    .choice.correct-highlight{
-      border-color: var(--ok) !important;
-      background: #e8f8ef !important;
-      transform: none !important;
-    }
-
-    .choice.wrong-highlight{
-      border-color: var(--danger) !important;
-      background: #fde8e8 !important;
-      transform: none !important;
-    }
-
-    .quizTitle{
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--accent);
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .playerName{
-      text-align: center;
-      font-size: 16px;
-      color: var(--gold);
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-
-    .questionText{
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    .choices{
-      display: grid;
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-
-    .choice{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px;
-      border: 2px solid #ecf0f1;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 16px;
-      background: white;
-    }
-
-    .choice:hover{
-      border-color: var(--accent);
-      background: #fff9f0;
-      transform: translateX(5px);
-    }
-
-    .choice input{
-      width: 20px;
-      height: 20px;
-      accent-color: var(--accent);
-    }
-
-    .submitBtn{
-      width: 100%;
-      padding: 16px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .submitBtn:hover{ background: #e67e22; }
-    .submitBtn:disabled{ opacity: 0.5; cursor: not-allowed; }
-
-    .feedback{
-      text-align: center;
-      margin-top: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      min-height: 24px;
-    }
-
-    .chickenStage{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 300px;
-      height: 300px;
-      position: relative;
-    }
-
-    .chickenImage{
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: none;
-    }
-
-    .chickenImage.active{
-      display: block;
-    }
-
-    body.happy .chickenImage.happy{
-      display: block;
-      animation: bounceChicken 0.6s ease-in-out infinite alternate;
-    }
-
-    body.angry .chickenImage.angry{
-      display: block;
-      animation: shakeChicken 0.12s linear infinite;
-    }
-
-    body.wink .chickenImage.wink{
-      display: block;
-      animation: breatheChicken 3s ease-in-out infinite;
-    }
-
-    body.peck .chickenImage.angry{
-      display: block;
-      animation: peckChicken 0.5s ease-in-out infinite;
-    }
-
-    @keyframes bounceChicken{
-      from{ transform: translateY(0); }
-      to{ transform: translateY(-30px); }
-    }
-
-    @keyframes shakeChicken{
-      0%{ transform: translate(2px, 1px) rotate(0deg); }
-      25%{ transform: translate(-2px, -2px) rotate(-1deg); }
-      50%{ transform: translate(2px, 2px) rotate(1deg); }
-      75%{ transform: translate(-2px, 1px) rotate(-1deg); }
-      100%{ transform: translate(2px, -1px) rotate(0deg); }
-    }
-
-    @keyframes breatheChicken{
-      0%, 100%{ transform: scale(1); }
-      50%{ transform: scale(1.03); }
-    }
-
-    @keyframes peckChicken{
-      0%{ transform: scale(1) translateY(0); }
-      50%{ transform: scale(1.5) translateY(30px); }
-      100%{ transform: scale(1) translateY(0); }
-    }
-
-    /* NAME ENTRY SCREEN */
-    .nameEntryScreen{
-      position: fixed;
-      inset: 0;
-      background: var(--eggshell);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 500;
-      padding: 20px;
-    }
-
-    .nameEntryCard{
-      background: white;
-      border: 2px solid rgba(0,0,0,0.1);
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 500px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    .nameEntryCard h2{
-      font-size: 28px;
-      color: var(--accent);
-      margin-bottom: 10px;
-    }
-
-    .nameEntryCard p{
-      font-size: 16px;
-      color: #7f8c8d;
-      margin-bottom: 30px;
-    }
-
-    .nameEntryCard input{
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      border: 2px solid #ecf0f1;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-family: inherit;
-    }
-
-    .nameEntryCard input:focus{
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    /* GAME OVER POPUP */
-    .gameOverPopup{
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 450px;
-      background: white;
-      border: 5px solid var(--danger);
-      border-radius: 24px;
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-      z-index: 100;
-      display: none;
-    }
-
-    .gameOverPopup h2{
-      font-size: 32px;
-      color: var(--danger);
-      margin-bottom: 15px;
-    }
-
-    .gameOverPopup p{
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #555;
-    }
-
-    .gameOverPopup button{
-      margin-top: 20px;
-      padding: 16px 40px;
-      background: var(--ink);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* VICTORY POPUP */
-    .victoryPopup{
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 500px;
-      background: white;
-      border: 5px solid var(--ok);
-      border-radius: 24px;
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-      z-index: 100;
-      display: none;
-    }
-
-    .victoryPopup h2{
-      font-size: 32px;
-      color: var(--ok);
-      margin-bottom: 15px;
-    }
-
-    .victoryPopup .finalScore{
-      font-size: 48px;
-      font-weight: bold;
-      color: var(--gold);
-      margin: 20px 0;
-    }
-
-    .victoryPopup p{
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #555;
-    }
-
-    .victoryPopup button{
-      margin-top: 20px;
-      padding: 16px 40px;
-      background: var(--ok);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-right: 10px;
-    }
-
-    /* LEADERBOARD */
-    .leaderboardBtn{
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      padding: 10px 20px;
-      background: var(--gold);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 200;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .leaderboardBtn:hover{
-      background: #e67e22;
-    }
-
-    .leaderboardModal{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 300;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .leaderboardPanel{
-      background: white;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .leaderboardHeader{
-      padding: 20px;
-      border-bottom: 2px solid #ecf0f1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(135deg, var(--gold), var(--accent));
-      color: white;
-      border-radius: 16px 16px 0 0;
-    }
-
-    .leaderboardHeader h2{
-      font-size: 24px;
-    }
-
-    .leaderboardBody{
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .leaderboardList{
-      display: grid;
-      gap: 12px;
-    }
-
-    .leaderboardItem{
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px;
-      background: #fafafa;
-      border-radius: 12px;
-      border: 2px solid #ecf0f1;
-      transition: 0.2s;
-    }
-
-    .leaderboardItem.champion{
-      background: linear-gradient(135deg, #fff9e6, #ffe6cc);
-      border-color: var(--gold);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .leaderboardItem.champion::before{
-      content: '👑';
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 32px;
-      opacity: 0.3;
-    }
-
-    .leaderboardRank{
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--gold);
-      min-width: 40px;
-      text-align: center;
-    }
-
-    .leaderboardItem.champion .leaderboardRank{
-      color: var(--gold);
-      font-size: 28px;
-    }
-
-    .leaderboardInfo{
-      flex: 1;
-    }
-
-    .leaderboardName{
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--ink);
-      margin-bottom: 5px;
-    }
-
-    .leaderboardItem.champion .leaderboardName{
-      color: var(--gold);
-      font-size: 20px;
-    }
-
-    .leaderboardItem.champion .leaderboardName::after{
-      content: ' 🏆 Superduper Breakfast Champion!';
-      font-size: 14px;
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .leaderboardDate{
-      font-size: 12px;
-      color: #95a5a6;
-    }
-
-    .leaderboardScore{
-      font-size: 28px;
-      font-weight: bold;
-      color: var(--ok);
-    }
-
-    .emptyLeaderboard{
-      text-align: center;
-      padding: 40px 20px;
-      color: #95a5a6;
-    }
-
-    .emptyLeaderboard p{
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-
-    /* ADMIN */
-    .adminLink{
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      font-size: 11px;
-      color: #95a5a6;
-      text-decoration: none;
-      background: rgba(255,255,255,0.8);
-      padding: 5px 10px;
-      border-radius: 6px;
-      z-index: 200;
-    }
-
-    .adminLink:hover{ color: var(--accent); }
-
-    .adminModal{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 400;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .adminPanel{
-      background: white;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 700px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .adminHeader{
-      padding: 20px;
-      border-bottom: 2px solid #ecf0f1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .adminHeader h2{
-      color: var(--accent);
-      font-size: 24px;
-    }
-
-    .adminTabs{
-      display: flex;
-      gap: 10px;
-      padding: 15px 20px;
-      border-bottom: 2px solid #ecf0f1;
-      background: #fafafa;
-    }
-
-    .adminTab{
-      padding: 10px 20px;
-      background: white;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-
-    .adminTab.active{
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-
-    .adminBody{
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .adminSection{
-      display: none;
-    }
-
-    .adminSection.active{
-      display: block;
-    }
-
-    .adminControls{
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .btnAdmin{
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .btnPrimary{ background: var(--accent); color: white; }
-    .btnPrimary:hover{ background: #e67e22; }
-    .btnSecondary{ background: #ecf0f1; color: var(--ink); }
-    .btnSecondary:hover{ background: #d5dbdb; }
-    .btnDanger{ background: var(--danger); color: white; }
-    .btnDanger:hover{ background: #a93226; }
-
-    .questionsList{
-      display: grid;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .qCard{
-      border: 2px solid #ecf0f1;
-      border-radius: 12px;
-      padding: 15px;
-      background: #fafafa;
-    }
-
-    .qCard .qText{
-      font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 16px;
-      color: var(--ink);
-    }
-
-    .qCard .qChoices{
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 10px;
-      padding-left: 10px;
-    }
-
-    .qCard .qChoices div{
-      margin: 5px 0;
-    }
-
-    .qCard .qChoices .correct{
-      color: var(--ok);
-      font-weight: bold;
-    }
-
-    .qCard .qActions{
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .editorForm{
-      display: none;
-      background: white;
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .editorForm.active{ display: block; }
-
-    .formField{
-      margin-bottom: 15px;
-    }
-
-    .formField label{
-      display: block;
-      font-weight: 600;
-      margin-bottom: 5px;
-      font-size: 14px;
-      color: var(--ink);
-    }
-
-    .formField input[type="text"],
-    .formField textarea,
-    .formField input[type="password"]{
-      width: 100%;
-      padding: 10px;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    .formField input:focus,
-    .formField textarea:focus{
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .formField textarea{ min-height: 80px; resize: vertical; }
-
-    .choiceEditor{
-      display: grid;
-      gap: 10px;
-    }
-
-    .choiceRow{
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .choiceRow input[type="text"]{
-      flex: 1;
-      padding: 10px;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    .choiceRow input[type="radio"]{
-      width: 20px;
-      height: 20px;
-      accent-color: var(--ok);
-    }
-
-    .choiceRow button{
-      padding: 8px 12px;
-      background: var(--danger);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
-    .formActions{
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .leaderboardAdminList{
-      display: grid;
-      gap: 10px;
-    }
-
-    .leaderboardAdminItem{
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 12px;
-      background: #fafafa;
-      border: 2px solid #ecf0f1;
-      border-radius: 10px;
-    }
-
-    .leaderboardAdminItem.champion{
-      background: #fff9e6;
-      border-color: var(--gold);
-    }
-
-    .leaderboardAdminInfo{
-      flex: 1;
-    }
-
-    .leaderboardAdminName{
-      font-weight: bold;
-      font-size: 16px;
-      color: var(--ink);
-    }
-
-    .leaderboardAdminDate{
-      font-size: 12px;
-      color: #95a5a6;
-    }
-
-    .leaderboardAdminScore{
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--ok);
-      margin-right: 10px;
-    }
-
-    /* MOBILE RESPONSIVE */
-    @media (max-width: 1200px) {
-      .mainContainer{ gap: 20px; }
-      .chickenStage{ width: 250px; height: 250px; }
-      .eggsHUD{ gap: 20px; }
-      .egg{ width: 70px; height: 87px; }
-    }
-
-    @media (max-width: 900px) {
-      .mainContainer{
-        flex-direction: column;
-        gap: 20px;
-        padding: 10px;
-      }
-      .eggsHUD{
-        flex-direction: row;
-        gap: 20px;
-      }
-      .egg{
-        width: 60px;
-        height: 75px;
-      }
-      .chickenStage{
-        width: 180px;
-        height: 180px;
-      }
-      .quizCard{
-        padding: 20px;
-        max-height: none;
-      }
-      .questionText{
-        font-size: 18px;
-      }
-      .choice{
-        font-size: 14px;
-        padding: 12px;
-      }
-      .leaderboardBtn{
-        padding: 8px 16px;
-        font-size: 12px;
-      }
-      body{
-        padding: 10px;
-      }
-    }
-
-    @media (max-width: 500px) {
-      .quizTitle{
-        font-size: 18px;
-      }
-      .questionText{
-        font-size: 16px;
-      }
-      .choice{
-        font-size: 13px;
-      }
-      .submitBtn{
-        font-size: 16px;
-        padding: 14px;
-      }
-      .nameEntryCard{
-        padding: 30px 20px;
-      }
-      .nameEntryCard h2{
-        font-size: 24px;
-      }
-      .gameOverPopup, .victoryPopup{
-        padding: 30px 20px;
-      }
-      .leaderboardRank{
-        font-size: 20px;
-        min-width: 35px;
-      }
-      .leaderboardScore{
-        font-size: 24px;
-      }
-    }
-
-    /* =====================================================
-       NEW ANIMATIONS A–H
-       ===================================================== */
-
-    /* A. EGG SHATTER */
-    .egg.shattering{
-      animation: eggShatterBurst 0.65s ease-out forwards;
-      z-index: 10;
-    }
-
-    @keyframes eggShatterBurst{
-      0%  { transform: scale(1) rotate(0deg); filter: brightness(1); }
-      12% { transform: scale(1.45) rotate(-8deg); filter: brightness(2.2);
-            box-shadow: 0 0 0 #ccc, 0 0 30px rgba(255,220,50,0.9); }
-      28% { transform: scale(1.2) rotate(12deg); filter: brightness(1.4); }
-      45% { transform: scale(0.88) rotate(-5deg); filter: brightness(1); }
-      60% { transform: scale(1.04) rotate(9deg); }
-      78% { transform: scale(1) rotate(7deg); }
-      100%{ transform: rotate(8deg); }
-    }
-
-    .yolkDrip{
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 24px;
-      height: 0;
-      background: radial-gradient(ellipse at top, #f1c40f 30%, #e67e22 100%);
-      border-radius: 0 0 60% 60%;
-      animation: yolkDripAnim 1.1s ease-out 0.25s both;
-      pointer-events: none;
-      z-index: 20;
-    }
-
-    @keyframes yolkDripAnim{
-      0%  { height: 0; opacity: 1; }
-      40% { height: 24px; opacity: 1; }
-      70% { height: 32px; opacity: 1; }
-      100%{ height: 26px; opacity: 0.55; }
-    }
-
-    /* B. TIMER HEARTBEAT */
-    .timerBar.heartbeat{
-      animation: timerHeartbeat 0.55s ease-in-out infinite;
-    }
-
-    @keyframes timerHeartbeat{
-      0%,100%{ opacity: 1; }
-      15%    { opacity: 0.3; }
-      30%    { opacity: 1; }
-      48%    { opacity: 0.55; }
-      64%    { opacity: 1; }
-    }
-
-    .quizCard.urgency{
-      animation: cardUrgencyPulse 0.55s ease-in-out infinite;
-    }
-
-    @keyframes cardUrgencyPulse{
-      0%,100%{ box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-      50%    { box-shadow: 0 10px 40px rgba(231,76,60,0.4),
-                           0 0 0 3px rgba(231,76,60,0.3); }
-    }
-
-    /* D. CHOICE STAGGER IN */
-    @keyframes choiceSlideIn{
-      from{ opacity: 0; transform: translateX(-28px); }
-      to  { opacity: 1; transform: translateX(0); }
-    }
-
-    .choice.stagger-in{
-      opacity: 0;
-      animation: choiceSlideIn 0.3s ease-out both;
-    }
-
-    /* E. CORRECT GLOW PULSE */
-    @keyframes correctGlowPulse{
-      0%,100%{ box-shadow: 0 0 0 0 rgba(39,174,96,0); }
-      50%    { box-shadow: 0 0 22px 8px rgba(39,174,96,0.45); }
-    }
-
-    .choice.correct-highlight.glow-pulse{
-      animation: correctGlowPulse 0.5s ease-in-out 3;
-    }
-
-    /* F. SUBMIT RIPPLE */
-    .submitBtn{ position: relative; overflow: hidden; }
-
-    .ripple{
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.45);
-      transform: scale(0);
-      animation: rippleExpand 0.65s linear forwards;
-      pointer-events: none;
-    }
-
-    @keyframes rippleExpand{
-      to{ transform: scale(50); opacity: 0; }
-    }
-
-    /* G. VICTORY ENTRANCE & CONFETTI */
-    @keyframes victoryEntrance{
-      0%  { opacity: 0; transform: translate(-50%,-50%) scale(0.4) rotate(-4deg); }
-      55% { transform: translate(-50%,-50%) scale(1.07) rotate(1deg); }
-      75% { transform: translate(-50%,-50%) scale(0.97) rotate(-0.5deg); }
-      100%{ opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
-    }
-
-    .victoryPopup.celebrating{
-      animation: victoryEntrance 0.75s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-
-    .confettiPiece{
-      position: fixed;
-      top: -20px;
-      border-radius: 3px;
-      pointer-events: none;
-      z-index: 9999;
-      animation: confettiFall linear both;
-    }
-
-    @keyframes confettiFall{
-      0%  { transform: translateY(0) rotate(0deg); opacity: 1; }
-      25% { transform: translateY(25vh) rotate(180deg) scaleX(-1); }
-      50% { transform: translateY(55vh) rotate(360deg) scaleX(1); }
-      75% { transform: translateY(80vh) rotate(540deg) scaleX(-1); }
-      100%{ transform: translateY(115vh) rotate(720deg); opacity: 0; }
-    }
-
-    /* H. CHICKEN ENTRANCE */
-    @keyframes chickenEntrance{
-      0%  { transform: translateX(220px) scale(0.6); opacity: 0; }
-      55% { transform: translateX(-18px) scale(1.08); opacity: 1; }
-      75% { transform: translateX(10px) scale(0.97); }
-      100%{ transform: translateX(0) scale(1); opacity: 1; }
-    }
-
-    .chickenStage.entering{
-      animation: chickenEntrance 0.75s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-
-    /* NAME ENTRY CARD BOUNCE IN */
-    @keyframes nameCardDrop{
-      0%  { opacity: 0; transform: translateY(-60px) scale(0.9); }
-      60% { transform: translateY(10px) scale(1.02); }
-      80% { transform: translateY(-5px) scale(0.99); }
-      100%{ opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .nameEntryCard{
-      animation: nameCardDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-
-    /* GAME OVER DRAMATIC ENTRANCE */
-    @keyframes gameOverShakeIn{
-      0%  { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
-      40% { transform: translate(-50%,-50%) scale(1.06) rotate(2deg); }
-      60% { transform: translate(-50%,-50%) scale(0.97) rotate(-1.5deg); }
-      75% { transform: translate(-50%,-50%) scale(1.02) rotate(1deg); }
-      88% { transform: translate(-50%,-50%) scale(0.99) rotate(-0.5deg); }
-      100%{ opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
-    }
-
-    .gameOverPopup.entering{
-      animation: gameOverShakeIn 0.65s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-
-    /* REMAINING EGGS PULSE */
-    @keyframes eggAlive{
-      0%,100%{ transform: scale(1); }
-      50%    { transform: scale(1.04); }
-    }
-
-    .egg:not(.cracked).alive-pulse{
-      animation: eggAlive 2s ease-in-out infinite;
-    }
-
-    /* =====================================================
-       QUIZ POLISH — 10 IMPROVEMENTS
-       ===================================================== */
-
-    /* 1. SELECTED CHOICE HIGHLIGHT (before submitting) */
-    .choice:has(input:checked){
-      border-color: var(--accent) !important;
-      background: #fff4eb !important;
-      transform: translateX(5px);
-    }
-
-    /* 2. PROGRESS DOTS */
-    .progressDots{
-      display: flex;
-      justify-content: center;
-      gap: 7px;
-      margin: 8px 0 14px;
-    }
-
-    .progressDot{
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #e0e0e0;
-      transition: background 0.3s, transform 0.3s;
-      flex-shrink: 0;
-    }
-
-    .progressDot.done{
-      background: var(--ok);
-    }
-
-    .progressDot.current{
-      background: var(--accent);
-      transform: scale(1.35);
-    }
-
-    .progressDot.wrong{
-      background: var(--danger);
-    }
-
-    /* 3. QUESTION FADE-IN */
-    @keyframes questionFadeIn{
-      from{ opacity: 0; transform: translateY(10px); }
-      to  { opacity: 1; transform: translateY(0); }
-    }
-
-    .questionText.fade-in{
-      animation: questionFadeIn 0.28s ease-out both;
-    }
-
-    .choices.fade-in{
-      animation: questionFadeIn 0.28s ease-out 0.05s both;
-    }
-
-    /* 4. TIMER GLOW */
-    .timerBar.danger-glow{
-      filter: drop-shadow(0 0 5px rgba(231,76,60,0.7));
-    }
-
-    /* 5. DIMMED choices after answer */
-    .choice.dimmed{
-      opacity: 0.38;
-      filter: grayscale(0.4);
-    }
-
-    /* 6. STREAK MILESTONE FLASH */
-    @keyframes streakCardFlash{
-      0%,100%{ background: white; }
-      50%    { background: rgba(243,156,18,0.12); }
-    }
-
-    .quizCard.streak-flash{
-      animation: streakCardFlash 0.55s ease-in-out;
-    }
-
-    /* 7. FEEDBACK FADE-IN */
-    @keyframes feedbackFadeIn{
-      from{ opacity: 0; transform: translateY(5px); }
-      to  { opacity: 1; transform: translateY(0); }
-    }
-
-    .feedback.reveal{
-      animation: feedbackFadeIn 0.25s ease-out both;
-    }
-
-    /* 8. SUBMIT BUTTON ACTIVE PRESS */
-    .submitBtn:active:not(:disabled){
-      transform: scale(0.97);
-      transition: transform 0.08s;
-    }
-
-    /* 9. SCORE DISPLAY TREATMENT */
-    #scoreDisplay{
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--accent);
-      transition: color 0.4s;
-    }
-
-    @keyframes scorePop{
-      0%  { transform: scale(1); }
-      40% { transform: scale(1.25); color: var(--gold); }
-      100%{ transform: scale(1); }
-    }
-
-    #scoreDisplay.pop{
-      animation: scorePop 0.45s ease-out;
-    }
-
-    /* 10. Q COUNTER — BOLDER CURRENT NUMBER */
-    #qNum{
-      font-size: 13px;
-      color: #95a5a6;
-    }
-
-    #qNum .qCurrent{
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--accent);
-    }
+      --bg-deep: #0b1120;
+      --bg-card: rgba(15, 23, 50, 0.75);
+      --bg-card-solid: #111d3a;
+      --bg-surface: rgba(20, 30, 60, 0.6);
+      --glass-border: rgba(212, 175, 55, 0.18);
+      --glass-glow: rgba(212, 175, 55, 0.06);
+      --ink: #e8e4df;
+      --ink-muted: #8a93a8;
+      --accent: #d4af37;
+      --accent-bright: #f5d76e;
+      --danger: #ef4444;
+      --danger-glow: rgba(239,68,68,0.35);
+      --ok: #22c55e;
+      --ok-glow: rgba(34,197,94,0.3);
+      --gold: #f5d76e;
+      --streak-warm: linear-gradient(135deg, #f97316, #f59e0b);
+      --streak-hot: linear-gradient(135deg, #ef4444, #f97316);
+    }
+
+```
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body{
+  height: 100%;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body{
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(212,175,55,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(100,120,200,0.05) 0%, transparent 50%),
+    radial-gradient(circle, rgba(212,175,55,0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+/* =====================================================
+   LAYOUT
+   ===================================================== */
+.mainContainer{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  max-width: 1400px;
+  width: 100%;
+  height: 100%;
+}
+
+/* =====================================================
+   EGGS HUD
+   ===================================================== */
+.eggsHUD{
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  align-items: center;
+}
+
+.egg{
+  width: 74px;
+  height: 92px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  border: 2px solid rgba(212,175,55,0.25);
+  border-radius: 50% 50% 45% 45%;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.1);
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: visible;
+}
+
+.egg::after{
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 14px;
+  height: 18px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+
+/* Cracked state: hide the original egg, show halves via JS children */
+.egg.cracked{
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.egg.cracked::after{ display: none; }
+
+/* Egg half shells */
+.eggHalf{
+  position: absolute;
+  width: 100%;
+  height: 55%;
+  background: linear-gradient(145deg, rgba(240,230,210,0.25), rgba(200,190,170,0.12));
+  border: 2px solid rgba(212,175,55,0.3);
+  overflow: hidden;
+}
+
+.eggHalf::after{
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 10px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+
+.eggHalf.top{
+  top: 0;
+  left: 0;
+  border-radius: 50% 50% 10% 30%;
+  transform-origin: bottom left;
+  animation: eggHalfFallLeft 0.7s cubic-bezier(0.4,0,0.8,0.6) forwards;
+}
+
+.eggHalf.top::after{ top: 10px; left: 12px; }
+
+.eggHalf.bottom{
+  bottom: 0;
+  right: 0;
+  border-radius: 30% 10% 45% 45%;
+  transform-origin: bottom right;
+  animation: eggHalfFallRight 0.7s cubic-bezier(0.4,0,0.8,0.6) forwards;
+}
+
+.eggHalf.bottom::after{ top: 6px; right: 10px; left: auto; }
+
+/* Jagged edge on the crack line */
+.eggHalf.top::before{
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: -2px;
+  right: -2px;
+  height: 8px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 74 8"><path d="M0 4 L8 1 L15 6 L22 2 L30 7 L37 0 L44 5 L52 2 L60 6 L67 1 L74 4" stroke="rgba(212,175,55,0.3)" stroke-width="1.5" fill="none"/></svg>') no-repeat;
+  background-size: 100% 100%;
+}
+
+.eggHalf.bottom::before{
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -2px;
+  right: -2px;
+  height: 8px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 74 8"><path d="M0 4 L8 7 L15 2 L22 6 L30 1 L37 8 L44 3 L52 6 L60 2 L67 7 L74 4" stroke="rgba(212,175,55,0.3)" stroke-width="1.5" fill="none"/></svg>') no-repeat;
+  background-size: 100% 100%;
+}
+
+@keyframes eggHalfFallLeft{
+  0%  { transform: rotate(0deg) translateY(0); opacity: 1; }
+  30% { transform: rotate(-15deg) translateY(2px); }
+  60% { transform: rotate(-35deg) translateX(-12px) translateY(14px); opacity: 1; }
+  100%{ transform: rotate(-55deg) translateX(-18px) translateY(24px); opacity: 0.6; }
+}
+
+@keyframes eggHalfFallRight{
+  0%  { transform: rotate(0deg) translateY(0); opacity: 1; }
+  30% { transform: rotate(12deg) translateY(2px); }
+  60% { transform: rotate(30deg) translateX(10px) translateY(12px); opacity: 1; }
+  100%{ transform: rotate(50deg) translateX(16px) translateY(22px); opacity: 0.6; }
+}
+
+/* Yolk blob */
+.eggYolk{
+  position: absolute;
+  width: 30px;
+  height: 28px;
+  background: radial-gradient(ellipse at 40% 35%, #f5d76e 0%, #e6a817 50%, #d4950c 100%);
+  border-radius: 50% 50% 50% 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 5;
+  animation: yolkAppear 0.8s 0.15s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  box-shadow: 0 3px 10px rgba(212,175,55,0.4);
+}
+
+.eggYolk::after{
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 8px;
+  width: 8px;
+  height: 6px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  transform: rotate(-20deg);
+}
+
+@keyframes yolkAppear{
+  0%  { transform: translate(-50%, -50%) scale(0); }
+  50% { transform: translate(-50%, -40%) scale(1.15); }
+  70% { transform: translate(-50%, -30%) scale(0.95); }
+  100%{ transform: translate(-50%, -20%) scale(1); }
+}
+
+/* Egg white puddle */
+.eggWhite{
+  position: absolute;
+  width: 50px;
+  height: 22px;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.2) 0%, rgba(220,230,240,0.12) 60%, transparent 100%);
+  border-radius: 50%;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  z-index: 3;
+  animation: whiteSpread 1s 0.25s ease-out forwards;
+}
+
+.eggWhite::before{
+  content: '';
+  position: absolute;
+  width: 35px;
+  height: 16px;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  top: -6px;
+  left: -8px;
+  transform: rotate(-15deg);
+}
+
+.eggWhite::after{
+  content: '';
+  position: absolute;
+  width: 28px;
+  height: 14px;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  top: -4px;
+  right: -6px;
+  transform: rotate(10deg);
+}
+
+@keyframes whiteSpread{
+  0%  { transform: translateX(-50%) scaleX(0) scaleY(0.3); opacity: 0; }
+  40% { transform: translateX(-50%) scaleX(1.15) scaleY(0.9); opacity: 1; }
+  70% { transform: translateX(-50%) scaleX(1.3) scaleY(1.05); }
+  100%{ transform: translateX(-50%) scaleX(1.2) scaleY(1); opacity: 0.8; }
+}
+
+/* Drip from shell */
+.eggDrip{
+  position: absolute;
+  width: 6px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(245,215,110,0.3));
+  border-radius: 0 0 50% 50%;
+  z-index: 4;
+  animation: dripFall 1.2s 0.3s ease-in forwards;
+  opacity: 0;
+}
+
+.eggDrip.left{
+  left: 8px;
+  top: 55%;
+  height: 0;
+}
+
+.eggDrip.right{
+  right: 10px;
+  top: 50%;
+  height: 0;
+}
+
+@keyframes dripFall{
+  0%  { height: 0; opacity: 0; }
+  15% { height: 4px; opacity: 0.7; }
+  50% { height: 18px; opacity: 0.6; }
+  80% { height: 26px; opacity: 0.4; }
+  100%{ height: 30px; opacity: 0; }
+}
+
+/* =====================================================
+   QUIZ CARD — GLASSMORPHISM
+   ===================================================== */
+.quizCard{
+  width: 100%;
+  max-width: 600px;
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 22px 24px 18px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(212,175,55,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.quizCard::before{
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.3;
+}
+
+/* =====================================================
+   1. XP PROGRESS BAR (replaces Q counter)
+   ===================================================== */
+.xpBarWrap{
+  position: relative;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.xpBarFill{
+  height: 100%;
+  border-radius: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 8px rgba(212,175,55,0.4);
+}
+
+.xpLabel{
+  position: absolute;
+  right: 0;
+  top: -18px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  letter-spacing: 0.5px;
+}
+
+/* =====================================================
+   QUIZ HEADER
+   ===================================================== */
+.quizHeader{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+/* =====================================================
+   TIMER — CLEAN LAYOUT
+   ===================================================== */
+.timerWrap{
+  position: relative;
+  height: 5px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  margin-bottom: 12px;
+  overflow: visible;
+}
+
+.timerBar{
+  height: 100%;
+  border-radius: 3px;
+  width: 100%;
+  transition: width 0.1s linear, background-color 0.5s;
+  background: var(--ok);
+}
+
+.timerCount{
+  position: absolute;
+  right: 0;
+  top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  color: var(--ink-muted);
+  transition: color 0.3s;
+}
+
+/* =====================================================
+   STREAK BADGE
+   ===================================================== */
+.streakBadge{
+  display: none;
+  background: var(--streak-warm);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  animation: streakPulse 0.8s ease-in-out infinite alternate;
+}
+
+.streakBadge.hot{
+  background: var(--streak-hot);
+}
+
+@keyframes streakPulse{
+  from{ transform: scale(1); }
+  to{ transform: scale(1.06); }
+}
+
+/* =====================================================
+   SCORE POPUP
+   ===================================================== */
+.scorePopup{
+  position: absolute;
+  right: 24px;
+  top: 50px;
+  background: linear-gradient(135deg, var(--ok), #34d399);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+  animation: floatUp 1.3s ease-out forwards;
+  z-index: 50;
+  box-shadow: 0 4px 20px var(--ok-glow);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+@keyframes floatUp{
+  0%  { opacity: 1; transform: translateY(0) scale(1); }
+  20% { opacity: 1; transform: translateY(-12px) scale(1.05); }
+  100%{ opacity: 0; transform: translateY(-70px) scale(0.9); }
+}
+
+/* =====================================================
+   ANSWER HIGHLIGHTS
+   ===================================================== */
+.choice.correct-highlight{
+  border-color: var(--ok) !important;
+  background: rgba(34,197,94,0.12) !important;
+  transform: none !important;
+}
+
+.choice.wrong-highlight{
+  border-color: var(--danger) !important;
+  background: rgba(239,68,68,0.12) !important;
+  transform: none !important;
+}
+
+.quizTitle{
+  text-align: center;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.playerName{
+  text-align: center;
+  font-size: 13px;
+  color: var(--accent-bright);
+  margin-bottom: 10px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.questionText{
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.choices{
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.choice{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  background: rgba(255,255,255,0.03);
+  color: var(--ink);
+}
+
+.choice:hover{
+  border-color: var(--accent);
+  background: rgba(212,175,55,0.06);
+  transform: translateX(4px);
+}
+
+.choice:has(input:checked){
+  border-color: var(--accent) !important;
+  background: rgba(212,175,55,0.1) !important;
+  transform: translateX(4px);
+}
+
+.choice input{
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ELIMINATED CHOICE (Spotlight power-up) */
+.choice.eliminated{
+  opacity: 0.2;
+  pointer-events: none;
+  text-decoration: line-through;
+  filter: grayscale(1);
+}
+
+.submitBtn{
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--accent), #c9a030);
+  color: var(--bg-deep);
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.submitBtn:hover{ background: linear-gradient(135deg, var(--accent-bright), var(--accent)); }
+.submitBtn:disabled{ opacity: 0.35; cursor: not-allowed; }
+.submitBtn:active:not(:disabled){ transform: scale(0.97); }
+
+.feedback{
+  text-align: center;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 20px;
+}
+
+/* =====================================================
+   4. POWER-UPS
+   ===================================================== */
+.powerUpsRow{
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+
+.powerUpBtn{
+  padding: 7px 14px;
+  border: 1.5px solid rgba(212,175,55,0.25);
+  border-radius: 8px;
+  background: rgba(212,175,55,0.06);
+  color: var(--accent-bright);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.powerUpBtn:hover:not(:disabled){
+  background: rgba(212,175,55,0.15);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.powerUpBtn:disabled{
+  opacity: 0.25;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.powerUpBtn.used{
+  opacity: 0.2;
+  text-decoration: line-through;
+}
+
+/* =====================================================
+   9. STREAK MILESTONE BANNER
+   ===================================================== */
+.streakBanner{
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 60;
+  text-align: center;
+  padding: 14px;
+  font-size: 20px;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
+  pointer-events: none;
+  animation: bannerFlash 1.8s ease-out forwards;
+}
+
+.streakBanner.fire3{
+  background: linear-gradient(135deg, rgba(249,115,22,0.92), rgba(245,158,11,0.92));
+  box-shadow: 0 0 40px rgba(249,115,22,0.5);
+}
+
+.streakBanner.fire5{
+  background: linear-gradient(135deg, rgba(239,68,68,0.92), rgba(249,115,22,0.92));
+  box-shadow: 0 0 40px rgba(239,68,68,0.5);
+}
+
+@keyframes bannerFlash{
+  0%  { opacity: 0; transform: translateY(-50%) scaleX(0.3); }
+  15% { opacity: 1; transform: translateY(-50%) scaleX(1.05); }
+  25% { transform: translateY(-50%) scaleX(1); }
+  70% { opacity: 1; }
+  100%{ opacity: 0; transform: translateY(-50%) scaleX(1); }
+}
+
+/* =====================================================
+   3. SCREEN SHAKE ON WRONG/TIMEOUT
+   ===================================================== */
+.quizCard.screen-shake{
+  animation: screenShake 0.4s ease-out;
+}
+
+@keyframes screenShake{
+  0%  { transform: translateX(0); }
+  10% { transform: translateX(-8px) rotate(-0.5deg); }
+  20% { transform: translateX(7px) rotate(0.5deg); }
+  30% { transform: translateX(-6px) rotate(-0.3deg); }
+  40% { transform: translateX(5px) rotate(0.3deg); }
+  50% { transform: translateX(-3px); }
+  60% { transform: translateX(2px); }
+  70% { transform: translateX(-1px); }
+  100%{ transform: translateX(0); }
+}
+
+/* =====================================================
+   10. SMOOTH QUESTION TRANSITIONS
+   ===================================================== */
+.questionArea{
+  position: relative;
+}
+
+@keyframes slideOutLeft{
+  from{ opacity: 1; transform: translateX(0); }
+  to  { opacity: 0; transform: translateX(-40px); }
+}
+
+@keyframes slideInRight{
+  from{ opacity: 0; transform: translateX(40px); }
+  to  { opacity: 1; transform: translateX(0); }
+}
+
+.questionArea.slide-out{
+  animation: slideOutLeft 0.25s ease-in forwards;
+}
+
+.questionArea.slide-in{
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* =====================================================
+   2. CONFETTI BURST (on correct / streaks)
+   ===================================================== */
+.confettiPiece{
+  position: fixed;
+  top: -20px;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 9999;
+  animation: confettiFall linear both;
+}
+
+@keyframes confettiFall{
+  0%  { transform: translateY(0) rotate(0deg); opacity: 1; }
+  25% { transform: translateY(25vh) rotate(180deg) scaleX(-1); }
+  50% { transform: translateY(55vh) rotate(360deg) scaleX(1); }
+  75% { transform: translateY(80vh) rotate(540deg) scaleX(-1); }
+  100%{ transform: translateY(115vh) rotate(720deg); opacity: 0; }
+}
+
+/* Mini confetti burst from score popup area */
+.miniConfetti{
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 55;
+  animation: miniPop 0.8s ease-out forwards;
+}
+
+@keyframes miniPop{
+  0%  { opacity: 1; transform: translate(0,0) scale(1); }
+  100%{ opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.3); }
+}
+
+/* =====================================================
+   CHICKEN STAGE
+   ===================================================== */
+.chickenStage{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 280px;
+  height: 280px;
+  position: relative;
+}
+
+.chickenImage{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none;
+}
+
+.chickenImage.active{ display: block; }
+
+body.happy .chickenImage.happy{
+  display: block;
+  animation: bounceChicken 0.6s ease-in-out infinite alternate;
+}
+
+body.angry .chickenImage.angry{
+  display: block;
+  animation: shakeChicken 0.12s linear infinite;
+}
+
+body.wink .chickenImage.wink{
+  display: block;
+  animation: breatheChicken 3s ease-in-out infinite;
+}
+
+body.peck .chickenImage.angry{
+  display: block;
+  animation: peckChicken 0.5s ease-in-out infinite;
+}
+
+@keyframes bounceChicken{
+  from{ transform: translateY(0); }
+  to{ transform: translateY(-30px); }
+}
+
+@keyframes shakeChicken{
+  0%{ transform: translate(2px, 1px) rotate(0deg); }
+  25%{ transform: translate(-2px, -2px) rotate(-1deg); }
+  50%{ transform: translate(2px, 2px) rotate(1deg); }
+  75%{ transform: translate(-2px, 1px) rotate(-1deg); }
+  100%{ transform: translate(2px, -1px) rotate(0deg); }
+}
+
+@keyframes breatheChicken{
+  0%, 100%{ transform: scale(1); }
+  50%{ transform: scale(1.03); }
+}
+
+@keyframes peckChicken{
+  0%{ transform: scale(1) translateY(0); }
+  50%{ transform: scale(1.5) translateY(30px); }
+  100%{ transform: scale(1) translateY(0); }
+}
+
+/* =====================================================
+   NAME ENTRY SCREEN — DARK THEME
+   ===================================================== */
+.nameEntryScreen{
+  position: fixed;
+  inset: 0;
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 50% 40%, rgba(212,175,55,0.06) 0%, transparent 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+}
+
+.nameEntryCard{
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: nameCardDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes nameCardDrop{
+  0%  { opacity: 0; transform: translateY(-60px) scale(0.9); }
+  60% { transform: translateY(10px) scale(1.02); }
+  80% { transform: translateY(-5px) scale(0.99); }
+  100%{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.nameEntryCard h2{
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.nameEntryCard p{
+  font-size: 15px;
+  color: var(--ink-muted);
+  margin-bottom: 28px;
+}
+
+.nameEntryCard input{
+  width: 100%;
+  padding: 14px;
+  font-size: 17px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-family: inherit;
+  background: rgba(255,255,255,0.04);
+  color: var(--ink);
+}
+
+.nameEntryCard input:focus{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
+}
+
+.nameEntryCard input::placeholder{
+  color: var(--ink-muted);
+}
+
+/* =====================================================
+   GAME OVER POPUP — DARK
+   ===================================================== */
+.gameOverPopup{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 450px;
+  background: var(--bg-card-solid);
+  border: 2px solid var(--danger);
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 60px var(--danger-glow);
+  z-index: 100;
+  display: none;
+}
+
+.gameOverPopup h2{
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--danger);
+  margin-bottom: 12px;
+}
+
+.gameOverPopup p{
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: var(--ink-muted);
+}
+
+.gameOverPopup .endRank{
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+  margin: 12px 0;
+}
+
+.gameOverPopup .statsGrid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.statBox{
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 10px 8px;
+}
+
+.statBox .statVal{
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent-bright);
+}
+
+.statBox .statLabel{
+  font-size: 11px;
+  color: var(--ink-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.gameOverPopup button{
+  margin-top: 16px;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, var(--accent), #c9a030);
+  color: var(--bg-deep);
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* =====================================================
+   VICTORY POPUP — DARK
+   ===================================================== */
+.victoryPopup{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 480px;
+  background: var(--bg-card-solid);
+  border: 2px solid var(--ok);
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 60px var(--ok-glow);
+  z-index: 100;
+  display: none;
+}
+
+.victoryPopup h2{
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--ok);
+  margin-bottom: 10px;
+}
+
+.victoryPopup .finalScore{
+  font-size: 44px;
+  font-weight: 900;
+  color: var(--gold);
+  margin: 14px 0 6px;
+  font-family: 'Space Mono', monospace;
+}
+
+.victoryPopup .endRank{
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent-bright);
+  margin: 8px 0 14px;
+}
+
+.victoryPopup p{
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: var(--ink-muted);
+}
+
+.victoryPopup .statsGrid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.victoryPopup button{
+  margin-top: 14px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--ok), #16a34a);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-right: 8px;
+  font-family: inherit;
+}
+
+/* =====================================================
+   LEADERBOARD — DARK
+   ===================================================== */
+.leaderboardBtn{
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, var(--accent), #c9a030);
+  color: var(--bg-deep);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  z-index: 200;
+  box-shadow: 0 4px 16px rgba(212,175,55,0.3);
+  font-family: inherit;
+}
+
+.leaderboardBtn:hover{ background: linear-gradient(135deg, var(--accent-bright), var(--accent)); }
+
+.musicToggleBtn{
+  position: fixed;
+  top: 10px;
+  left: 145px;
+  padding: 9px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 200;
+  transition: 0.2s;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.musicToggleBtn:hover{ background: rgba(255,255,255,0.1); }
+
+.leaderboardModal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.leaderboardPanel{
+  background: var(--bg-card-solid);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboardHeader{
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(212,175,55,0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(200,160,48,0.08));
+  border-radius: 16px 16px 0 0;
+}
+
+.leaderboardHeader h2{
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--accent);
+}
+
+.leaderboardBody{
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.leaderboardList{
+  display: grid;
+  gap: 8px;
+}
+
+.leaderboardItem{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: 0.2s;
+}
+
+/* 8. LEADERBOARD MEDALS */
+.leaderboardItem.medal-gold{
+  background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(245,215,110,0.06));
+  border-color: rgba(212,175,55,0.3);
+}
+
+.leaderboardItem.medal-silver{
+  background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(220,220,220,0.04));
+  border-color: rgba(192,192,192,0.25);
+}
+
+.leaderboardItem.medal-bronze{
+  background: linear-gradient(135deg, rgba(205,127,50,0.1), rgba(205,127,50,0.04));
+  border-color: rgba(205,127,50,0.25);
+}
+
+.leaderboardItem.champion{
+  position: relative;
+  overflow: hidden;
+}
+
+.leaderboardItem.champion::before{
+  content: '👑';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  opacity: 0.15;
+}
+
+.leaderboardRank{
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+  min-width: 40px;
+  text-align: center;
+}
+
+.leaderboardInfo{
+  flex: 1;
+}
+
+.leaderboardName{
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+
+.leaderboardItem.champion .leaderboardName{
+  color: var(--gold);
+  font-size: 17px;
+}
+
+.leaderboardItem.champion .leaderboardName::after{
+  content: ' 🏆 Breakfast Champion!';
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.leaderboardDate{
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+.leaderboardScore{
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ok);
+  font-family: 'Space Mono', monospace;
+}
+
+.emptyLeaderboard{
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ink-muted);
+}
+
+.emptyLeaderboard p{
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+/* =====================================================
+   ADMIN — DARK
+   ===================================================== */
+.adminLink{
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-size: 11px;
+  color: var(--ink-muted);
+  text-decoration: none;
+  background: rgba(255,255,255,0.04);
+  padding: 5px 10px;
+  border-radius: 6px;
+  z-index: 200;
+}
+
+.adminLink:hover{ color: var(--accent); }
+
+.adminModal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 400;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.adminPanel{
+  background: var(--bg-card-solid);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.adminHeader{
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.adminHeader h2{
+  color: var(--accent);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.adminTabs{
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+}
+
+.adminTab{
+  padding: 8px 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s;
+  color: var(--ink-muted);
+  font-family: inherit;
+}
+
+.adminTab.active{
+  background: linear-gradient(135deg, var(--accent), #c9a030);
+  color: var(--bg-deep);
+  border-color: var(--accent);
+}
+
+.adminBody{
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.adminSection{ display: none; }
+.adminSection.active{ display: block; }
+
+.adminControls{
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.btnAdmin{
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: inherit;
+}
+
+.btnPrimary{ background: linear-gradient(135deg, var(--accent), #c9a030); color: var(--bg-deep); }
+.btnPrimary:hover{ filter: brightness(1.1); }
+.btnSecondary{ background: rgba(255,255,255,0.06); color: var(--ink); border: 1px solid rgba(255,255,255,0.08); }
+.btnSecondary:hover{ background: rgba(255,255,255,0.1); }
+.btnDanger{ background: var(--danger); color: white; }
+.btnDanger:hover{ background: #dc2626; }
+
+.questionsList{
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.qCard{
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 14px;
+  background: rgba(255,255,255,0.03);
+}
+
+.qCard .qText{
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.qCard .qChoices{
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+  padding-left: 10px;
+}
+
+.qCard .qChoices div{ margin: 4px 0; }
+.qCard .qChoices .correct{ color: var(--ok); font-weight: 700; }
+
+.qCard .qActions{
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.editorForm{
+  display: none;
+  background: rgba(212,175,55,0.05);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.editorForm.active{ display: block; }
+
+.formField{ margin-bottom: 14px; }
+
+.formField label{
+  display: block;
+  font-weight: 700;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.formField input[type="text"],
+.formField textarea,
+.formField input[type="password"]{
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: rgba(255,255,255,0.04);
+  color: var(--ink);
+}
+
+.formField input:focus,
+.formField textarea:focus{
+  outline: none;
+  border-color: var(--accent);
+}
+
+.formField textarea{ min-height: 70px; resize: vertical; }
+
+.choiceEditor{ display: grid; gap: 8px; }
+
+.choiceRow{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.choiceRow input[type="text"]{
+  flex: 1;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  font-size: 13px;
+  background: rgba(255,255,255,0.04);
+  color: var(--ink);
+}
+
+.choiceRow input[type="radio"]{
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ok);
+}
+
+.choiceRow button{
+  padding: 6px 10px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.formActions{
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.leaderboardAdminList{ display: grid; gap: 8px; }
+
+.leaderboardAdminItem{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+
+.leaderboardAdminItem.champion{
+  background: rgba(212,175,55,0.08);
+  border-color: rgba(212,175,55,0.2);
+}
+
+.leaderboardAdminInfo{ flex: 1; }
+.leaderboardAdminName{ font-weight: 700; font-size: 15px; color: var(--ink); }
+.leaderboardAdminDate{ font-size: 11px; color: var(--ink-muted); }
+.leaderboardAdminScore{ font-size: 18px; font-weight: 800; color: var(--ok); margin-right: 8px; }
+
+/* =====================================================
+   EGG SHATTER
+   ===================================================== */
+/* Egg initial shake before crack */
+.egg.shattering{
+  animation: eggPreCrackShake 0.5s ease-out;
+}
+
+@keyframes eggPreCrackShake{
+  0%  { transform: rotate(0deg); }
+  15% { transform: rotate(-6deg) scale(1.05); }
+  30% { transform: rotate(5deg) scale(1.08); }
+  45% { transform: rotate(-4deg) scale(1.03); }
+  60% { transform: rotate(3deg); }
+  75% { transform: rotate(-2deg); }
+  90% { transform: rotate(1deg); }
+  100%{ transform: rotate(0deg); }
+}
+
+/* TIMER HEARTBEAT */
+.timerBar.heartbeat{
+  animation: timerHeartbeat 0.55s ease-in-out infinite;
+}
+
+@keyframes timerHeartbeat{
+  0%,100%{ opacity: 1; }
+  15%    { opacity: 0.3; }
+  30%    { opacity: 1; }
+  48%    { opacity: 0.55; }
+  64%    { opacity: 1; }
+}
+
+.quizCard.urgency{
+  animation: cardUrgencyPulse 0.55s ease-in-out infinite;
+}
+
+@keyframes cardUrgencyPulse{
+  0%,100%{ box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  50%    { box-shadow: 0 8px 32px rgba(0,0,0,0.4),
+                       0 0 0 2px rgba(239,68,68,0.3),
+                       0 0 30px var(--danger-glow); }
+}
+
+/* CHOICE STAGGER IN */
+@keyframes choiceSlideIn{
+  from{ opacity: 0; transform: translateX(-24px); }
+  to  { opacity: 1; transform: translateX(0); }
+}
+
+.choice.stagger-in{
+  opacity: 0;
+  animation: choiceSlideIn 0.3s ease-out both;
+}
+
+/* CORRECT GLOW PULSE */
+@keyframes correctGlowPulse{
+  0%,100%{ box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+  50%    { box-shadow: 0 0 18px 6px var(--ok-glow); }
+}
+
+.choice.correct-highlight.glow-pulse{
+  animation: correctGlowPulse 0.5s ease-in-out 3;
+}
+
+/* SUBMIT RIPPLE */
+.ripple{
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  transform: scale(0);
+  animation: rippleExpand 0.65s linear forwards;
+  pointer-events: none;
+}
+
+@keyframes rippleExpand{
+  to{ transform: scale(50); opacity: 0; }
+}
+
+/* VICTORY ENTRANCE */
+@keyframes victoryEntrance{
+  0%  { opacity: 0; transform: translate(-50%,-50%) scale(0.4) rotate(-4deg); }
+  55% { transform: translate(-50%,-50%) scale(1.07) rotate(1deg); }
+  75% { transform: translate(-50%,-50%) scale(0.97) rotate(-0.5deg); }
+  100%{ opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+}
+
+.victoryPopup.celebrating{
+  animation: victoryEntrance 0.75s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+/* GAME OVER ENTRANCE */
+@keyframes gameOverShakeIn{
+  0%  { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+  40% { transform: translate(-50%,-50%) scale(1.06) rotate(2deg); }
+  60% { transform: translate(-50%,-50%) scale(0.97) rotate(-1.5deg); }
+  75% { transform: translate(-50%,-50%) scale(1.02) rotate(1deg); }
+  88% { transform: translate(-50%,-50%) scale(0.99) rotate(-0.5deg); }
+  100%{ opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+}
+
+.gameOverPopup.entering{
+  animation: gameOverShakeIn 0.65s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+/* CHICKEN ENTRANCE */
+@keyframes chickenEntrance{
+  0%  { transform: translateX(220px) scale(0.6); opacity: 0; }
+  55% { transform: translateX(-18px) scale(1.08); opacity: 1; }
+  75% { transform: translateX(10px) scale(0.97); }
+  100%{ transform: translateX(0) scale(1); opacity: 1; }
+}
+
+.chickenStage.entering{
+  animation: chickenEntrance 0.75s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+/* REMAINING EGGS PULSE */
+@keyframes eggAlive{
+  0%,100%{ transform: scale(1); }
+  50%    { transform: scale(1.04); }
+}
+
+.egg:not(.cracked).alive-pulse{
+  animation: eggAlive 2s ease-in-out infinite;
+}
+
+/* DIMMED choices */
+.choice.dimmed{
+  opacity: 0.25;
+  filter: grayscale(0.4);
+}
+
+/* FEEDBACK FADE-IN */
+@keyframes feedbackFadeIn{
+  from{ opacity: 0; transform: translateY(5px); }
+  to  { opacity: 1; transform: translateY(0); }
+}
+
+.feedback.reveal{
+  animation: feedbackFadeIn 0.25s ease-out both;
+}
+
+/* SCORE DISPLAY */
+#scoreDisplay{
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent);
+  font-family: 'Space Mono', monospace;
+  transition: color 0.4s;
+}
+
+@keyframes scorePop{
+  0%  { transform: scale(1); }
+  40% { transform: scale(1.25); color: var(--gold); }
+  100%{ transform: scale(1); }
+}
+
+#scoreDisplay.pop{
+  animation: scorePop 0.45s ease-out;
+}
+
+.timerBar.danger-glow{
+  filter: drop-shadow(0 0 5px var(--danger-glow));
+}
+
+/* =====================================================
+   MOBILE RESPONSIVE — COMPACT FOR IPHONE
+   ===================================================== */
+@media (max-width: 1200px) {
+  .mainContainer{ gap: 20px; }
+  .chickenStage{ width: 230px; height: 230px; }
+  .eggsHUD{ gap: 18px; }
+  .egg{ width: 64px; height: 80px; }
+}
+
+@media (max-width: 900px) {
+  html, body{ overflow-y: auto; }
+  .mainContainer{
+    flex-direction: column;
+    gap: 12px;
+    padding: 6px;
+    height: auto;
+    min-height: 100%;
+  }
+  .eggsHUD{
+    flex-direction: row;
+    gap: 16px;
+    order: -1;
+  }
+  .egg{
+    width: 50px;
+    height: 62px;
+  }
+  .chickenStage{
+    width: 140px;
+    height: 140px;
+    order: -2;
+  }
+  .quizCard{
+    padding: 16px 16px 14px;
+    max-height: none;
+    border-radius: 16px;
+  }
+  .quizTitle{ font-size: 14px; margin-bottom: 2px; }
+  .playerName{ font-size: 11px; margin-bottom: 6px; }
+  .questionText{ font-size: 15px; margin-bottom: 10px; }
+  .choice{ font-size: 13px; padding: 10px 11px; gap: 8px; }
+  .choice input{ width: 16px; height: 16px; }
+  .choices{ gap: 6px; margin-bottom: 8px; }
+  .submitBtn{ font-size: 15px; padding: 12px; }
+  .feedback{ font-size: 13px; margin-top: 6px; }
+  .leaderboardBtn{ padding: 7px 14px; font-size: 11px; }
+  .musicToggleBtn{ left: 110px; padding: 7px 10px; font-size: 14px; }
+  .powerUpsRow{ margin-bottom: 8px; }
+  .powerUpBtn{ padding: 5px 10px; font-size: 12px; }
+  .xpBarWrap{ margin-bottom: 10px; }
+  .timerCount{ font-size: 11px; top: 6px; }
+  body{ padding: 8px; }
+}
+
+@media (max-width: 500px) {
+  .quizTitle{ font-size: 13px; }
+  .questionText{ font-size: 14px; }
+  .choice{ font-size: 12px; padding: 9px 10px; }
+  .submitBtn{ font-size: 14px; padding: 11px; }
+  .nameEntryCard{ padding: 28px 18px; }
+  .nameEntryCard h2{ font-size: 22px; }
+  .gameOverPopup, .victoryPopup{ padding: 24px 18px; }
+  .victoryPopup .finalScore{ font-size: 36px; }
+  .statBox .statVal{ font-size: 18px; }
+  .statBox .statLabel{ font-size: 10px; }
+  .leaderboardRank{ font-size: 18px; min-width: 34px; }
+  .leaderboardScore{ font-size: 20px; }
+  .chickenStage{ width: 110px; height: 110px; }
+  .egg{ width: 42px; height: 52px; }
+  .streakBanner{ font-size: 16px; padding: 10px; }
+}
+
+/* Extra small phones */
+@media (max-height: 700px) and (max-width: 500px) {
+  .chickenStage{ width: 90px; height: 90px; }
+  .eggsHUD{ gap: 10px; }
+  .egg{ width: 36px; height: 44px; }
+  .quizCard{ padding: 12px 14px 10px; }
+  .questionText{ font-size: 13px; margin-bottom: 8px; }
+  .choice{ padding: 8px 9px; font-size: 11px; }
+  .choices{ gap: 5px; }
+  .submitBtn{ padding: 10px; font-size: 13px; }
+}
+```
 
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1318,6 +1717,7 @@
 <body class="wink">
 
   <!-- NAME ENTRY SCREEN -->
+
   <div class="nameEntryScreen" id="nameEntryScreen">
     <div class="nameEntryCard">
       <h2>🐔 Hands Please! Quiz</h2>
@@ -1328,107 +1728,126 @@
   </div>
 
   <!-- MAIN QUIZ -->
+
   <div class="mainContainer" id="mainContainer" style="display: none;">
 
-    <div class="eggsHUD">
-      <div class="egg" id="egg1"></div>
-      <div class="egg" id="egg2"></div>
-      <div class="egg" id="egg3"></div>
-    </div>
+```
+<div class="eggsHUD">
+  <div class="egg" id="egg1"></div>
+  <div class="egg" id="egg2"></div>
+  <div class="egg" id="egg3"></div>
+</div>
 
-    <div class="quizCard">
-      <div class="quizHeader">
-        <span id="qNum">Q 1/9</span>
-        <span id="streakBadge" class="streakBadge"></span>
-        <span id="scoreDisplay">0 pts</span>
-      </div>
+<div class="quizCard" id="quizCard">
 
-      <div class="timerWrap">
-        <div class="timerBar" id="timerBar"></div>
-        <span class="timerCount" id="timerCount">15s</span>
-      </div>
+  <!-- XP Progress Bar -->
+  <div class="xpBarWrap">
+    <span class="xpLabel" id="xpLabel">Q 1 / 9</span>
+    <div class="xpBarFill" id="xpBarFill"></div>
+  </div>
 
-      <!-- 2. Progress dots -->
-      <div class="progressDots" id="progressDots"></div>
+  <div class="quizHeader">
+    <span id="streakBadge" class="streakBadge"></span>
+    <span id="scoreDisplay">0 pts</span>
+  </div>
 
-      <div class="quizTitle">Hands Please!</div>
-      <div class="playerName" id="playerNameDisplay"></div>
+  <!-- Timer -->
+  <div class="timerWrap">
+    <div class="timerBar" id="timerBar"></div>
+    <span class="timerCount" id="timerCount">15s</span>
+  </div>
 
-      <div class="questionText" id="questionText">Loading...</div>
+  <div class="quizTitle">Hands Please!</div>
+  <div class="playerName" id="playerNameDisplay"></div>
 
-      <div class="choices" id="choicesContainer"></div>
+  <!-- Power-Ups -->
+  <div class="powerUpsRow" id="powerUpsRow">
+    <button class="powerUpBtn" id="shieldBtn" onclick="useShield()">🛡️ Shield</button>
+    <button class="powerUpBtn" id="spotlightBtn" onclick="useSpotlight()">⚡ Spotlight</button>
+  </div>
 
-      <button class="submitBtn" id="submitBtn">Submit Answer</button>
+  <!-- Question Area (for slide transitions) -->
+  <div class="questionArea" id="questionArea">
+    <div class="questionText" id="questionText">Loading...</div>
+    <div class="choices" id="choicesContainer"></div>
+  </div>
 
-      <div class="feedback" id="feedbackText"></div>
-    </div>
+  <button class="submitBtn" id="submitBtn">Submit Answer</button>
 
-    <div class="chickenStage">
-      <img class="chickenImage happy" id="happyImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png" alt="Happy Chicken">
-      <img class="chickenImage angry" id="angryImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2036a4c0-36eb-4538-bfd4-94ccb3f03b24.png" alt="Angry Chicken">
-      <img class="chickenImage wink" id="winkImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png" alt="Wink Chicken">
-    </div>
+  <div class="feedback" id="feedbackText"></div>
+</div>
+
+<div class="chickenStage">
+  <img class="chickenImage happy" id="happyImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png" alt="Happy Chicken">
+  <img class="chickenImage angry" id="angryImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2036a4c0-36eb-4538-bfd4-94ccb3f03b24.png" alt="Angry Chicken">
+  <img class="chickenImage wink" id="winkImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png" alt="Wink Chicken">
+</div>
+```
+
   </div>
 
   <!-- GAME OVER POPUP -->
+
   <div class="gameOverPopup" id="gameOverPopup">
     <h2>Strike 3!</h2>
     <p>Oh oh! The chicken is NOT happy.</p>
-    <p id="gameOverScore"></p>
+    <div class="endRank" id="gameOverRank"></div>
+    <div class="statsGrid" id="gameOverStats"></div>
     <p>Study hard and try again!</p>
     <button onclick="location.reload()">Try Again</button>
   </div>
 
   <!-- VICTORY POPUP -->
+
   <div class="victoryPopup" id="victoryPopup">
     <h2>🎉 Quiz Complete!</h2>
     <div class="finalScore" id="finalScore">0 pts</div>
-    <p id="victoryMessage">Amazing! Perfect score!</p>
+    <div class="endRank" id="victoryRank"></div>
+    <div class="statsGrid" id="victoryStats"></div>
+    <p id="victoryMessage"></p>
     <button onclick="location.reload()">Play Again</button>
-    <button onclick="openLeaderboard()" style="background: var(--gold);">View Leaderboard</button>
+    <button onclick="openLeaderboard()" style="background: linear-gradient(135deg, var(--accent), #c9a030); color: var(--bg-deep);">View Leaderboard</button>
   </div>
 
   <!-- LEADERBOARD BUTTON -->
-  <button class="leaderboardBtn" onclick="openLeaderboard()">🏆 Leaderboard</button>
+
+<button class="leaderboardBtn" onclick="openLeaderboard()">🏆 Leaderboard</button>
+
+  <!-- MUSIC TOGGLE -->
+
+<button class="musicToggleBtn" id="musicToggle" onclick="toggleMusic()">🔊</button>
 
   <!-- LEADERBOARD MODAL -->
+
   <div class="leaderboardModal" id="leaderboardModal">
     <div class="leaderboardPanel">
-
       <div class="leaderboardHeader">
         <h2>🏆 Leaderboard</h2>
-        <button class="btnSecondary" style="background: rgba(255,255,255,0.2); color: white;" onclick="closeLeaderboard()">Close</button>
+        <button class="btnSecondary" style="background: rgba(255,255,255,0.15); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 700;" onclick="closeLeaderboard()">Close</button>
       </div>
-
       <div class="leaderboardBody">
-        <div class="leaderboardList" id="leaderboardList">
-          <!-- Populated by JS -->
-        </div>
+        <div class="leaderboardList" id="leaderboardList"></div>
       </div>
-
     </div>
   </div>
 
   <!-- ADMIN LINK -->
-  <a href="#" class="adminLink" onclick="event.preventDefault(); openAdmin();">Admin</a>
+
+<a href="#" class="adminLink" onclick="event.preventDefault(); openAdmin();">Admin</a>
 
   <!-- ADMIN MODAL -->
+
   <div class="adminModal" id="adminModal">
     <div class="adminPanel">
-
       <div class="adminHeader">
         <h2>Admin Panel</h2>
         <button class="btnSecondary" onclick="closeAdmin()">Close</button>
       </div>
-
       <div class="adminTabs">
         <div class="adminTab active" onclick="switchAdminTab('questions')">Questions</div>
         <div class="adminTab" onclick="switchAdminTab('leaderboard')">Manage Leaderboard</div>
       </div>
-
       <div class="adminBody">
-
-        <!-- QUESTIONS TAB -->
         <div class="adminSection active" id="adminQuestionsTab">
           <div class="adminControls">
             <button class="btnPrimary" onclick="showAddForm()">➕ Add New Question</button>
@@ -1436,42 +1855,31 @@
             <button class="btnSecondary" onclick="exportQuestions()">Export JSON</button>
             <button class="btnSecondary" onclick="importQuestions()">Import JSON</button>
           </div>
-
           <div class="editorForm" id="editorForm">
-            <h3 style="margin-bottom:15px; color:var(--accent);">Edit Question</h3>
-
+            <h3 style="margin-bottom:14px; color:var(--accent); font-weight:800;">Edit Question</h3>
             <div class="formField">
               <label>Question Text:</label>
               <textarea id="editQuestionText" placeholder="Enter your question..."></textarea>
             </div>
-
             <div class="formField">
               <label>Answer Choices (check the correct one):</label>
               <div class="choiceEditor" id="choiceEditor"></div>
-              <button class="btnSecondary" onclick="addChoiceRow()" style="margin-top:10px; padding:8px 12px; font-size:13px;">+ Add Choice</button>
+              <button class="btnSecondary" onclick="addChoiceRow()" style="margin-top:8px; padding:6px 10px; font-size:12px;">+ Add Choice</button>
             </div>
-
             <div class="formActions">
               <button class="btnPrimary" onclick="saveQuestion()">Save Question</button>
               <button class="btnSecondary" onclick="cancelEdit()">Cancel</button>
               <button class="btnDanger" onclick="deleteCurrentQuestion()" id="deleteBtn" style="display:none;">Delete Question</button>
             </div>
           </div>
-
           <div class="questionsList" id="questionsList"></div>
         </div>
-
-        <!-- LEADERBOARD TAB -->
         <div class="adminSection" id="adminLeaderboardTab">
           <div class="adminControls">
             <button class="btnDanger" onclick="clearAllScores()">Clear All Scores</button>
           </div>
-
-          <div class="leaderboardAdminList" id="leaderboardAdminList">
-            <!-- Populated by JS -->
-          </div>
+          <div class="leaderboardAdminList" id="leaderboardAdminList"></div>
         </div>
-
       </div>
     </div>
   </div>
@@ -1499,11 +1907,7 @@
         .limit(limit);
       if(error) throw error;
       return (data || []).map(r => ({
-        id: r.id,
-        name: r.name,
-        score: r.score,
-        total: r.total,
-        date: r.created_at
+        id: r.id, name: r.name, score: r.score, total: r.total, date: r.created_at
       }));
     }
 
@@ -1582,15 +1986,11 @@
     }
 
     function stopChickenAnimation() {
-      if (animationInterval) {
-        clearInterval(animationInterval);
-        animationInterval = null;
-      }
+      if (animationInterval) { clearInterval(animationInterval); animationInterval = null; }
     }
 
     function setChickenMood(mood) {
       document.body.className = mood;
-      // H. Chicken entrance on first appearance
       if (chickenFirstEntry) {
         chickenFirstEntry = false;
         const stage = document.querySelector('.chickenStage');
@@ -1602,59 +2002,222 @@
       startChickenAnimation(mood);
     }
 
-    // === AUDIO ===
+    // === AUDIO — CHIPTUNE BGM ENGINE ===
     let audioCtx = null;
+    let masterGain = null;
+    let bgmPlaying = false;
+    let bgmMode = 'normal'; // 'normal' | 'powerup'
+    let bgmTimers = [];
+    let bgmLoopId = null;
 
     function ensureAudio() {
       if (!audioCtx) {
         try {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        } catch(e) {
-          console.warn('Web Audio not supported:', e);
-        }
+          masterGain = audioCtx.createGain();
+          masterGain.gain.value = 0.18;
+          masterGain.connect(audioCtx.destination);
+        } catch(e) {}
       }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     }
 
+    // Low-level tone player for SFX (bypasses master for punch)
     function playTone(freq, duration, delay, type = 'sine', volume = 0.25) {
       if (!audioCtx) return;
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        osc.connect(gain); gain.connect(audioCtx.destination);
         osc.type = type;
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
         gain.gain.setValueAtTime(volume, audioCtx.currentTime + delay);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
         osc.start(audioCtx.currentTime + delay);
         osc.stop(audioCtx.currentTime + delay + duration + 0.01);
-      } catch(e) {
-        console.warn('Audio playback error:', e);
+      } catch(e) {}
+    }
+
+    // BGM note player — routes through master gain for volume control
+    function bgmNote(freq, duration, startTime, type = 'square', vol = 0.12) {
+      if (!audioCtx || !masterGain) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.connect(g); g.connect(masterGain);
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, startTime);
+        g.gain.setValueAtTime(vol, startTime);
+        g.gain.setValueAtTime(vol * 0.8, startTime + duration * 0.7);
+        g.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        osc.start(startTime);
+        osc.stop(startTime + duration + 0.01);
+      } catch(e) {}
+    }
+
+    // ---- Normal BGM: Bouncy chiptune loop (retro platformer feel) ----
+    function playNormalBGM() {
+      if (!audioCtx) return;
+      const t = audioCtx.currentTime + 0.05;
+      const bpm = 140;
+      const eighth = 60 / bpm / 2;
+
+      // Melody — bright bouncy 8-bit tune
+      const melody = [
+        523, 523, 0, 659, 0, 784, 659, 0,  // C5 C5 . E5 . G5 E5 .
+        698, 659, 587, 523, 0, 587, 659, 0,  // F5 E5 D5 C5 . D5 E5 .
+        784, 784, 0, 880, 0, 784, 659, 0,   // G5 G5 . A5 . G5 E5 .
+        587, 523, 494, 523, 0, 0, 0, 0,     // D5 C5 B4 C5 . . . .
+      ];
+
+      // Bass line — simple bouncy root notes
+      const bass = [
+        131, 0, 131, 0, 175, 0, 175, 0,   // C3 . C3 . F3 . F3 .
+        131, 0, 131, 0, 196, 0, 196, 0,   // C3 . C3 . G3 . G3 .
+        175, 0, 175, 0, 165, 0, 165, 0,   // F3 . F3 . E3 . E3 .
+        196, 0, 131, 0, 131, 0, 0, 0,     // G3 . C3 . C3 . . .
+      ];
+
+      melody.forEach((freq, i) => {
+        if (freq > 0) bgmNote(freq, eighth * 0.8, t + i * eighth, 'square', 0.09);
+      });
+
+      bass.forEach((freq, i) => {
+        if (freq > 0) bgmNote(freq, eighth * 0.75, t + i * eighth, 'triangle', 0.14);
+      });
+
+      // Hi-hat rhythm
+      for (let i = 0; i < 32; i++) {
+        if (i % 2 === 0) {
+          bgmNote(12000 + Math.random() * 2000, 0.03, t + i * eighth, 'square', 0.015);
+        }
+      }
+
+      const loopLen = 32 * eighth * 1000;
+      return loopLen;
+    }
+
+    // ---- Power-up BGM: Faster, higher energy, triumphant feel ----
+    function playPowerUpBGM() {
+      if (!audioCtx) return;
+      const t = audioCtx.currentTime + 0.05;
+      const bpm = 170;
+      const eighth = 60 / bpm / 2;
+
+      // Melody — triumphant ascending runs
+      const melody = [
+        784, 880, 988, 1047, 0, 1175, 1047, 988,  // G5 A5 B5 C6 . D6 C6 B5
+        880, 988, 1047, 1175, 0, 1319, 1175, 0,    // A5 B5 C6 D6 . E6 D6 .
+        1047, 988, 880, 784, 880, 988, 1047, 0,     // C6 B5 A5 G5 A5 B5 C6 .
+        1175, 1319, 1175, 1047, 988, 880, 784, 0,   // D6 E6 D6 C6 B5 A5 G5 .
+      ];
+
+      // Bass — driving energy
+      const bass = [
+        196, 0, 262, 0, 220, 0, 262, 0,   // G3 . C4 . A3 . C4 .
+        220, 0, 262, 0, 247, 0, 294, 0,   // A3 . C4 . B3 . D4 .
+        262, 0, 220, 0, 196, 0, 220, 0,   // C4 . A3 . G3 . A3 .
+        247, 0, 294, 0, 262, 0, 196, 0,   // B3 . D4 . C4 . G3 .
+      ];
+
+      // Harmony layer — adds thickness
+      const harmony = [
+        659, 0, 0, 784, 0, 0, 784, 0,
+        698, 0, 0, 784, 0, 0, 880, 0,
+        784, 0, 0, 659, 0, 0, 784, 0,
+        880, 0, 0, 784, 0, 0, 659, 0,
+      ];
+
+      melody.forEach((freq, i) => {
+        if (freq > 0) bgmNote(freq, eighth * 0.7, t + i * eighth, 'square', 0.08);
+      });
+
+      bass.forEach((freq, i) => {
+        if (freq > 0) bgmNote(freq, eighth * 0.7, t + i * eighth, 'triangle', 0.13);
+      });
+
+      harmony.forEach((freq, i) => {
+        if (freq > 0) bgmNote(freq, eighth * 0.6, t + i * eighth, 'sawtooth', 0.03);
+      });
+
+      // Faster hi-hat
+      for (let i = 0; i < 32; i++) {
+        bgmNote(13000 + Math.random() * 3000, 0.025, t + i * eighth, 'square', 0.018);
+      }
+
+      const loopLen = 32 * eighth * 1000;
+      return loopLen;
+    }
+
+    function startBGM(mode = 'normal') {
+      ensureAudio();
+      if (!audioCtx) return;
+      stopBGM();
+      bgmPlaying = true;
+      bgmMode = mode;
+
+      function loop() {
+        if (!bgmPlaying) return;
+        const len = bgmMode === 'powerup' ? playPowerUpBGM() : playNormalBGM();
+        bgmLoopId = setTimeout(loop, len - 50); // slight overlap for seamless loop
+      }
+      loop();
+    }
+
+    function stopBGM() {
+      bgmPlaying = false;
+      if (bgmLoopId) { clearTimeout(bgmLoopId); bgmLoopId = null; }
+    }
+
+    function switchBGM(mode) {
+      if (bgmMode === mode && bgmPlaying) return;
+      bgmMode = mode;
+      if (bgmPlaying) {
+        stopBGM();
+        startBGM(mode);
       }
     }
 
+    let musicMuted = false;
+
+    function toggleMusic() {
+      const btn = document.getElementById('musicToggle');
+      if (musicMuted) {
+        musicMuted = false;
+        if (masterGain) masterGain.gain.value = 0.18;
+        btn.textContent = '🔊';
+        if (!bgmPlaying && !gameOver) startBGM(bgmMode);
+      } else {
+        musicMuted = true;
+        if (masterGain) masterGain.gain.value = 0;
+        btn.textContent = '🔇';
+      }
+    }
+
+    // SFX — kept as one-shot sounds
     function playSound(type) {
       ensureAudio();
       if (!audioCtx) return;
       if (type === 'correct') {
-        playTone(523, 0.12, 0);        // C5
-        playTone(659, 0.12, 0.1);      // E5
-        playTone(784, 0.18, 0.2);      // G5
+        playTone(523, 0.12, 0); playTone(659, 0.12, 0.1); playTone(784, 0.18, 0.2);
       } else if (type === 'wrong') {
-        playTone(311, 0.1,  0,    'sawtooth', 0.2);
-        playTone(233, 0.18, 0.12, 'sawtooth', 0.2);
+        playTone(311, 0.1, 0, 'sawtooth', 0.2); playTone(233, 0.18, 0.12, 'sawtooth', 0.2);
       } else if (type === 'streak') {
-        playTone(523,  0.08, 0);
-        playTone(659,  0.08, 0.08);
-        playTone(784,  0.08, 0.16);
-        playTone(1047, 0.22, 0.24);    // C6 — high flourish
+        playTone(523, 0.08, 0); playTone(659, 0.08, 0.08); playTone(784, 0.08, 0.16); playTone(1047, 0.22, 0.24);
       } else if (type === 'timeout') {
-        playTone(440, 0.08, 0,    'square', 0.2);
-        playTone(349, 0.08, 0.09, 'square', 0.2);
-        playTone(294, 0.18, 0.18, 'square', 0.2);
+        playTone(440, 0.08, 0, 'square', 0.2); playTone(349, 0.08, 0.09, 'square', 0.2); playTone(294, 0.18, 0.18, 'square', 0.2);
+      } else if (type === 'gameover') {
+        playTone(494, 0.15, 0, 'square', 0.3);
+        playTone(440, 0.15, 0.18, 'square', 0.3);
+        playTone(392, 0.15, 0.36, 'square', 0.3);
+        playTone(330, 0.4, 0.54, 'square', 0.3);
+      } else if (type === 'victory') {
+        playTone(523, 0.1, 0, 'square', 0.25);
+        playTone(659, 0.1, 0.1, 'square', 0.25);
+        playTone(784, 0.1, 0.2, 'square', 0.25);
+        playTone(1047, 0.15, 0.3, 'square', 0.25);
+        playTone(988, 0.1, 0.48, 'square', 0.25);
+        playTone(1047, 0.3, 0.6, 'square', 0.3);
       }
     }
 
@@ -1670,39 +2233,32 @@
       timerInterval = setInterval(() => {
         timeLeft = Math.max(0, timeLeft - 0.1);
         updateTimerDisplay();
-        if (timeLeft <= 0) {
-          stopTimer();
-          handleTimerExpired();
-        }
+        if (timeLeft <= 0) { stopTimer(); handleTimerExpired(); }
       }, 100);
     }
 
     function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     }
 
     function updateTimerDisplay() {
-      const bar   = document.getElementById('timerBar');
+      const bar = document.getElementById('timerBar');
       const count = document.getElementById('timerCount');
       if (!bar) return;
       const pct = (timeLeft / QUESTION_TIME) * 100;
       bar.style.width = pct + '%';
       if (timeLeft > 10) {
-        bar.style.backgroundColor = '#27ae60';
-        if (count) count.style.color = '#7f8c8d';
+        bar.style.backgroundColor = '#22c55e';
+        if (count) count.style.color = 'var(--ink-muted)';
       } else if (timeLeft > 5) {
-        bar.style.backgroundColor = '#f39c12';
-        if (count) count.style.color = '#e67e22';
+        bar.style.backgroundColor = '#f59e0b';
+        if (count) count.style.color = '#f59e0b';
       } else {
-        bar.style.backgroundColor = '#e74c3c';
-        if (count) count.style.color = '#e74c3c';
+        bar.style.backgroundColor = '#ef4444';
+        if (count) count.style.color = '#ef4444';
       }
       if (count) count.textContent = Math.ceil(timeLeft) + 's';
-      // B. Heartbeat pulse at low time  +  4. Timer glow
-      const card = document.querySelector('.quizCard');
+      const card = document.getElementById('quizCard');
       if (timeLeft <= 5 && timeLeft > 0) {
         bar.classList.add('heartbeat', 'danger-glow');
         if (card) card.classList.add('urgency');
@@ -1720,6 +2276,9 @@
       strikes++;
       streak = 0;
 
+      // Streak broken — back to normal music
+      switchBGM('normal');
+
       const _fb = document.getElementById('feedbackText');
       _fb.className = 'feedback reveal';
       _fb.innerText = `⏰ Time's up! Correct: ${q.c[q.a]}`;
@@ -1730,33 +2289,27 @@
       playSound('timeout');
       setChickenMood('angry');
 
-      if (strikes <= 3) {
-        // A. Shatter egg animation
-        shatterEgg(document.getElementById('egg' + strikes));
-      }
+      // Screen shake
+      triggerScreenShake();
 
-      // 2. Mark current progress dot as wrong
-      const _dots = document.getElementById('progressDots');
-      if (_dots) {
-        const _currentDot = _dots.querySelector('.progressDot.current');
-        if (_currentDot) { _currentDot.classList.remove('current'); _currentDot.classList.add('wrong'); }
-      }
+      if (strikes <= 3) shatterEgg(document.getElementById('egg' + strikes));
 
       document.getElementById('submitBtn').disabled = true;
+      disablePowerUps();
 
       if (strikes >= 3) {
         gameOver = true;
         setTimeout(() => finishQuiz(false), 1500);
       } else {
-        setTimeout(() => {
-          currentIdx++;
-          renderQuestion();
-          setChickenMood('wink');
-        }, 2000);
+        setTimeout(() => { currentIdx++; transitionToNextQuestion(); setChickenMood('wink'); }, 2000);
       }
     }
 
     // === STREAK & POINTS ===
+    let bestStreak = 0;
+    let fastestAnswer = Infinity;
+    let wrongCount = 0;
+
     function updateStreakDisplay() {
       const badge = document.getElementById('streakBadge');
       if (!badge) return;
@@ -1767,7 +2320,7 @@
       } else if (streak >= 3) {
         badge.style.display = 'inline-block';
         badge.textContent = '🔥 2x';
-        badge.className = 'streakBadge warm';
+        badge.className = 'streakBadge';
       } else if (streak >= 2) {
         badge.style.display = 'inline-block';
         badge.textContent = `🔥 ${streak} streak`;
@@ -1776,19 +2329,19 @@
         badge.style.display = 'none';
         badge.className = 'streakBadge';
       }
+      if (streak > bestStreak) bestStreak = streak;
     }
 
     function calculatePoints() {
       const elapsed = (Date.now() - questionStartTime) / 1000;
+      if (elapsed < fastestAnswer) fastestAnswer = elapsed;
       const base = 100;
       let speedBonus = 0;
-      if (elapsed <= 5)       speedBonus = 50;
+      if (elapsed <= 5) speedBonus = 50;
       else if (elapsed <= 10) speedBonus = 25;
-
       let multiplier = 1;
-      if (streak >= 5)      multiplier = 3;
+      if (streak >= 5) multiplier = 3;
       else if (streak >= 3) multiplier = 2;
-
       return { base, speedBonus, multiplier, total: (base + speedBonus) * multiplier };
     }
 
@@ -1797,12 +2350,189 @@
       popup.className = 'scorePopup';
       let html = `+${pts.total} pts`;
       const extras = [];
-      if (pts.speedBonus > 0)  extras.push(`⚡ +${pts.speedBonus} speed`);
-      if (pts.multiplier > 1)  extras.push(`🔥 ${pts.multiplier}x streak`);
-      if (extras.length) html += `<br><small style="font-size:13px; opacity:0.9;">${extras.join('  ')}</small>`;
+      if (pts.speedBonus > 0) extras.push(`⚡ +${pts.speedBonus} speed`);
+      if (pts.multiplier > 1) extras.push(`🔥 ${pts.multiplier}x streak`);
+      if (extras.length) html += `<br><small style="font-size:12px; opacity:0.9;">${extras.join('  ')}</small>`;
       popup.innerHTML = html;
-      document.querySelector('.quizCard').appendChild(popup);
+      document.getElementById('quizCard').appendChild(popup);
       setTimeout(() => popup.remove(), 1400);
+    }
+
+    // === 2. CONFETTI BURST (mini burst from score area) ===
+    function launchMiniConfetti(count = 12) {
+      const card = document.getElementById('quizCard');
+      if (!card) return;
+      const colors = ['#f5d76e','#22c55e','#3b82f6','#ef4444','#a855f7','#f97316'];
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'miniConfetti';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.right = '30px';
+        p.style.top = '50px';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random() * 80;
+        p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
+        p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
+        card.appendChild(p);
+        setTimeout(() => p.remove(), 900);
+      }
+    }
+
+    function launchStreakConfetti(count = 24) {
+      const card = document.getElementById('quizCard');
+      if (!card) return;
+      const colors = ['#f5d76e','#f97316','#ef4444','#22c55e','#a855f7','#3b82f6'];
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const p = document.createElement('div');
+          p.className = 'miniConfetti';
+          p.style.background = colors[Math.floor(Math.random() * colors.length)];
+          p.style.left = (Math.random() * 100) + '%';
+          p.style.top = '50%';
+          p.style.width = '6px';
+          p.style.height = '6px';
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 60 + Math.random() * 120;
+          p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
+          p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
+          card.appendChild(p);
+          setTimeout(() => p.remove(), 900);
+        }, Math.random() * 300);
+      }
+    }
+
+    // === 3. SCREEN SHAKE ===
+    function triggerScreenShake() {
+      const card = document.getElementById('quizCard');
+      if (!card) return;
+      card.classList.remove('screen-shake');
+      void card.offsetWidth;
+      card.classList.add('screen-shake');
+      card.addEventListener('animationend', () => card.classList.remove('screen-shake'), { once: true });
+    }
+
+    // === 4. POWER-UPS ===
+    let shieldUsed = false;
+    let spotlightUsed = false;
+
+    function resetPowerUps() {
+      shieldUsed = false;
+      spotlightUsed = false;
+      const shieldBtn = document.getElementById('shieldBtn');
+      const spotlightBtn = document.getElementById('spotlightBtn');
+      if (shieldBtn) { shieldBtn.disabled = false; shieldBtn.classList.remove('used'); }
+      if (spotlightBtn) { spotlightBtn.disabled = false; spotlightBtn.classList.remove('used'); }
+    }
+
+    function disablePowerUps() {
+      document.getElementById('shieldBtn').disabled = true;
+      document.getElementById('spotlightBtn').disabled = true;
+    }
+
+    function enablePowerUps() {
+      const shieldBtn = document.getElementById('shieldBtn');
+      const spotlightBtn = document.getElementById('spotlightBtn');
+      if (!shieldUsed) shieldBtn.disabled = false;
+      if (!spotlightUsed) spotlightBtn.disabled = false;
+    }
+
+    function useShield() {
+      if (shieldUsed || gameOver || questionAnswered) return;
+      shieldUsed = true;
+      questionAnswered = true;
+      stopTimer();
+
+      const btn = document.getElementById('shieldBtn');
+      btn.disabled = true;
+      btn.classList.add('used');
+
+      const fb = document.getElementById('feedbackText');
+      fb.className = 'feedback reveal';
+      fb.innerText = '🛡️ Shield activated! Skipping question...';
+      fb.style.color = 'var(--accent)';
+
+      disablePowerUps();
+      document.getElementById('submitBtn').disabled = true;
+
+      setTimeout(() => { currentIdx++; transitionToNextQuestion(); }, 1200);
+    }
+
+    function useSpotlight() {
+      if (spotlightUsed || gameOver || questionAnswered) return;
+      spotlightUsed = true;
+
+      const btn = document.getElementById('spotlightBtn');
+      btn.disabled = true;
+      btn.classList.add('used');
+
+      const q = questions[currentIdx];
+      const choices = document.querySelectorAll('.choice');
+      const wrongIndices = [];
+      choices.forEach((c, i) => { if (i !== q.a) wrongIndices.push(i); });
+
+      // Eliminate one random wrong answer
+      if (wrongIndices.length > 0) {
+        const removeIdx = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+        choices[removeIdx].classList.add('eliminated');
+        const radio = choices[removeIdx].querySelector('input');
+        if (radio) { radio.disabled = true; radio.checked = false; }
+      }
+
+      const fb = document.getElementById('feedbackText');
+      fb.className = 'feedback reveal';
+      fb.innerText = '⚡ One wrong answer eliminated!';
+      fb.style.color = 'var(--accent)';
+      setTimeout(() => { if (!questionAnswered) { fb.innerText = ''; fb.className = 'feedback'; } }, 1500);
+    }
+
+    // === 5. RANK / TITLE ===
+    function getRank(points) {
+      if (points >= 1200) return 'Breakfast Legend 🏆';
+      if (points >= 900)  return 'Breakfast Pro ⭐';
+      if (points >= 600)  return 'Solid Server 🐔';
+      if (points >= 300)  return 'Getting There 🥚';
+      return 'Still Learning 🍳';
+    }
+
+    // === 7. STATS SUMMARY ===
+    function buildStatsHTML() {
+      const fastest = fastestAnswer === Infinity ? '—' : fastestAnswer.toFixed(1) + 's';
+      return `
+        <div class="statBox"><div class="statVal">${score}</div><div class="statLabel">Correct</div></div>
+        <div class="statBox"><div class="statVal">${wrongCount}</div><div class="statLabel">Wrong</div></div>
+        <div class="statBox"><div class="statVal">${bestStreak}x</div><div class="statLabel">Best Streak</div></div>
+        <div class="statBox"><div class="statVal">${fastest}</div><div class="statLabel">Fastest</div></div>
+      `;
+    }
+
+    // === 9. STREAK MILESTONE BANNER ===
+    function showStreakBanner(streakLevel) {
+      const card = document.getElementById('quizCard');
+      if (!card) return;
+      const banner = document.createElement('div');
+      if (streakLevel >= 5) {
+        banner.className = 'streakBanner fire5';
+        banner.textContent = '🔥🔥 UNSTOPPABLE! 3x Multiplier!';
+      } else {
+        banner.className = 'streakBanner fire3';
+        banner.textContent = '🔥 ON FIRE! 2x Multiplier!';
+      }
+      card.appendChild(banner);
+      setTimeout(() => banner.remove(), 2000);
+    }
+
+    // === 10. SMOOTH QUESTION TRANSITIONS ===
+    function transitionToNextQuestion() {
+      const area = document.getElementById('questionArea');
+      if (!area) { renderQuestion(); return; }
+      area.classList.remove('slide-in');
+      area.classList.add('slide-out');
+      setTimeout(() => {
+        renderQuestion();
+        area.classList.remove('slide-out');
+        area.classList.add('slide-in');
+        area.addEventListener('animationend', () => area.classList.remove('slide-in'), { once: true });
+      }, 250);
     }
 
     // === ANSWER HIGHLIGHT ===
@@ -1811,14 +2541,13 @@
         label.style.pointerEvents = 'none';
         const radio = label.querySelector('input[type="radio"]');
         if (radio) radio.disabled = true;
+        if (label.classList.contains('eliminated')) return;
         if (i === correctIdx) {
           label.classList.add('correct-highlight');
-          // E. Glow pulse on correct answer
           setTimeout(() => label.classList.add('glow-pulse'), 30);
         } else if (i === selectedIdx) {
           label.classList.add('wrong-highlight');
         } else {
-          // 5. Dim irrelevant choices
           label.classList.add('dimmed');
         }
       });
@@ -1839,9 +2568,9 @@
 
     let questions = [];
     let currentIdx = 0;
-    let score = 0;          // correct answer count
-    let totalPoints = 0;    // accumulated points
-    let streak = 0;         // consecutive correct answers
+    let score = 0;
+    let totalPoints = 0;
+    let streak = 0;
     let strikes = 0;
     let gameOver = false;
     let questionAnswered = false;
@@ -1854,10 +2583,7 @@
     async function startQuiz() {
       const input = document.getElementById('playerNameInput');
       const name = input.value.trim();
-      if (!name) {
-        alert('Please enter your name!');
-        return;
-      }
+      if (!name) { alert('Please enter your name!'); return; }
       ensureAudio();
       playerName = name;
       document.getElementById('playerNameDisplay').innerText = `Player: ${playerName}`;
@@ -1876,114 +2602,94 @@
     async function init() {
       try {
         const remote = await sbLoadQuestions();
-        if (Array.isArray(remote) && remote.length) {
-          questions = remote;
-        } else {
+        if (Array.isArray(remote) && remote.length) questions = remote;
+        else {
           const stored = localStorage.getItem('handsPlease_quiz_v5');
           questions = stored ? JSON.parse(stored) : [...DEFAULT_BANK];
         }
       } catch(err) {
-        console.warn("Supabase load questions failed, using localStorage:", err);
         const stored = localStorage.getItem('handsPlease_quiz_v5');
         questions = stored ? JSON.parse(stored) : [...DEFAULT_BANK];
       }
 
-      questions.forEach((q, i) => {
-        if (!q.id) q.id = 'q' + Date.now() + i;
-      });
-
+      questions.forEach((q, i) => { if (!q.id) q.id = 'q' + Date.now() + i; });
       questions.sort(() => Math.random() - 0.5);
 
-      currentIdx = 0;
-      score = 0;
-      totalPoints = 0;
-      streak = 0;
-      strikes = 0;
-      gameOver = false;
-      questionAnswered = false;
+      currentIdx = 0; score = 0; totalPoints = 0; streak = 0; strikes = 0;
+      gameOver = false; questionAnswered = false;
+      bestStreak = 0; fastestAnswer = Infinity; wrongCount = 0;
 
       chickenFirstEntry = true;
       setChickenMood('wink');
+      resetPowerUps();
       document.getElementById('gameOverPopup').style.display = 'none';
       document.getElementById('victoryPopup').style.display = 'none';
-      document.querySelectorAll('.egg').forEach(e => e.className = 'egg alive-pulse');
+      document.querySelectorAll('.egg').forEach(e => {
+        e.className = 'egg alive-pulse';
+        // Remove any crack remnants (halves, yolk, whites, drips)
+        e.querySelectorAll('.eggHalf, .eggYolk, .eggWhite, .eggDrip').forEach(c => c.remove());
+      });
       document.getElementById('scoreDisplay').innerText = '0 pts';
       updateStreakDisplay();
-
       renderQuestion();
+      startBGM('normal');
+    }
+
+    // === 6. XP PROGRESS BAR UPDATE ===
+    function updateXPBar() {
+      const fill = document.getElementById('xpBarFill');
+      const label = document.getElementById('xpLabel');
+      if (!fill) return;
+      const pct = ((currentIdx) / questions.length) * 100;
+      fill.style.width = pct + '%';
+      if (label) label.textContent = `Q ${currentIdx + 1} / ${questions.length}`;
     }
 
     // === RENDER QUESTION ===
     function renderQuestion() {
-      if (currentIdx >= questions.length) {
-        finishQuiz(true);
-        return;
-      }
+      if (currentIdx >= questions.length) { finishQuiz(true); return; }
 
       questionAnswered = false;
       questionStartTime = Date.now();
 
-      // Clean up urgency / glow state from previous question
       const _timerBar = document.getElementById('timerBar');
       if (_timerBar) _timerBar.classList.remove('heartbeat', 'danger-glow');
-      const _card = document.querySelector('.quizCard');
+      const _card = document.getElementById('quizCard');
       if (_card) _card.classList.remove('urgency');
 
       const q = questions[currentIdx];
 
-      // 10. Bold current question number
-      const qNumEl = document.getElementById('qNum');
-      qNumEl.innerHTML = `Q <span class="qCurrent">${currentIdx + 1}</span>/${questions.length}`;
+      // XP bar
+      updateXPBar();
 
       document.getElementById('scoreDisplay').innerText = `${totalPoints} pts`;
 
-      // 3. Fade-in question text
       const questionTextEl = document.getElementById('questionText');
-      questionTextEl.classList.remove('fade-in');
-      void questionTextEl.offsetWidth;
       questionTextEl.innerText = q.q;
-      questionTextEl.classList.add('fade-in');
 
-      // 7. Reset feedback
       const feedbackEl = document.getElementById('feedbackText');
       feedbackEl.innerText = '';
       feedbackEl.className = 'feedback';
 
       const container = document.getElementById('choicesContainer');
       container.innerHTML = '';
-      container.classList.remove('fade-in');
-      void container.offsetWidth;
-      container.classList.add('fade-in');
 
-      // D. Stagger choices in
       q.c.forEach((choice, i) => {
         const label = document.createElement('label');
         label.className = 'choice stagger-in';
-        label.style.animationDelay = (i * 65) + 'ms';
+        label.style.animationDelay = (i * 55) + 'ms';
         label.innerHTML = `<input type="radio" name="answer" value="${i}"> ${choice}`;
         container.appendChild(label);
       });
 
-      // 2. Progress dots
-      const dotsContainer = document.getElementById('progressDots');
-      if (dotsContainer) {
-        dotsContainer.innerHTML = '';
-        questions.forEach((_, i) => {
-          const dot = document.createElement('div');
-          dot.className = 'progressDot';
-          if (i < currentIdx) dot.classList.add('done');
-          else if (i === currentIdx) dot.classList.add('current');
-          dotsContainer.appendChild(dot);
-        });
-      }
-
       document.getElementById('submitBtn').disabled = false;
+      enablePowerUps();
       startTimer();
     }
 
     // === SUBMIT ===
     document.getElementById('submitBtn').addEventListener('click', (e) => {
-      // F. Ripple effect
+      // Ripple
       const _btn = e.currentTarget;
       const _rect = _btn.getBoundingClientRect();
       const _r = document.createElement('span');
@@ -2003,6 +2709,7 @@
 
       questionAnswered = true;
       stopTimer();
+      disablePowerUps();
 
       const answer = parseInt(selected.value);
       const q = questions[currentIdx];
@@ -2018,78 +2725,58 @@
         const prevPoints = totalPoints;
         totalPoints += pts.total;
 
-        // 7. Feedback fade-in
         const fbEl = document.getElementById('feedbackText');
         fbEl.className = 'feedback reveal';
         fbEl.innerText = '✅ Correct!';
         fbEl.style.color = 'var(--ok)';
 
-        // C. Score roll-up  +  9. Score display pop
         animateScore(prevPoints, totalPoints);
         const scoreEl = document.getElementById('scoreDisplay');
-        scoreEl.classList.remove('pop');
-        void scoreEl.offsetWidth;
-        scoreEl.classList.add('pop');
+        scoreEl.classList.remove('pop'); void scoreEl.offsetWidth; scoreEl.classList.add('pop');
 
         showScorePopup(pts);
+        launchMiniConfetti(10);
         updateStreakDisplay();
         setChickenMood('happy');
 
-        // 6. Streak flash on milestone
+        // Switch to power-up music when streak hits 2+
+        if (streak >= 2) switchBGM('powerup');
+
         if (streak === 3 || streak === 5) {
           playSound('streak');
-          const flashCard = document.querySelector('.quizCard');
-          if (flashCard) {
-            flashCard.classList.remove('streak-flash');
-            void flashCard.offsetWidth;
-            flashCard.classList.add('streak-flash');
-            flashCard.addEventListener('animationend', () => flashCard.classList.remove('streak-flash'), { once: true });
-          }
+          showStreakBanner(streak);
+          launchStreakConfetti(30);
         } else {
           playSound('correct');
         }
 
-        setTimeout(() => {
-          currentIdx++;
-          renderQuestion();
-          setChickenMood('wink');
-        }, 1500);
+        setTimeout(() => { currentIdx++; transitionToNextQuestion(); setChickenMood('wink'); }, 1500);
 
       } else {
         strikes++;
+        wrongCount++;
         streak = 0;
 
-        // 7. Feedback fade-in
+        // Streak broken — back to normal music
+        switchBGM('normal');
+
         const fbEl2 = document.getElementById('feedbackText');
         fbEl2.className = 'feedback reveal';
         fbEl2.innerText = `❌ Wrong! Correct: ${q.c[q.a]}`;
         fbEl2.style.color = 'var(--danger)';
 
-        if (strikes <= 3) {
-          // A. Shatter egg animation
-          shatterEgg(document.getElementById('egg' + strikes));
-        }
+        if (strikes <= 3) shatterEgg(document.getElementById('egg' + strikes));
 
+        triggerScreenShake();
         updateStreakDisplay();
         setChickenMood('angry');
         playSound('wrong');
-
-        // 2. Mark current progress dot as wrong
-        const dots = document.getElementById('progressDots');
-        if (dots) {
-          const currentDot = dots.querySelector('.progressDot.current');
-          if (currentDot) { currentDot.classList.remove('current'); currentDot.classList.add('wrong'); }
-        }
 
         if (strikes >= 3) {
           gameOver = true;
           setTimeout(() => finishQuiz(false), 1000);
         } else {
-          setTimeout(() => {
-            currentIdx++;
-            renderQuestion();
-            setChickenMood('wink');
-          }, 2000);
+          setTimeout(() => { currentIdx++; transitionToNextQuestion(); setChickenMood('wink'); }, 2000);
         }
       }
     });
@@ -2097,21 +2784,22 @@
     // === FINISH ===
     function finishQuiz(completed) {
       stopTimer();
+      stopBGM();
       const maxPoints = questions.length * 100;
+      const rank = getRank(totalPoints);
 
       if (strikes >= 3) {
-        document.getElementById('gameOverScore').innerText = `Score: ${score}/${questions.length} correct  •  ${totalPoints} pts`;
+        playSound('gameover');
+        document.getElementById('gameOverRank').innerText = rank;
+        document.getElementById('gameOverStats').innerHTML = buildStatsHTML();
         const goPopup = document.getElementById('gameOverPopup');
         goPopup.style.display = 'block';
-        // Dramatic game-over entrance
-        goPopup.classList.remove('entering');
-        void goPopup.offsetWidth; // reflow
+        goPopup.classList.remove('entering'); void goPopup.offsetWidth;
         goPopup.classList.add('entering');
         setChickenMood('peck');
         saveScore(totalPoints, maxPoints);
       } else if (completed) {
-        // G. Victory celebration sequence
-        showVictory();
+        showVictory(rank);
         setChickenMood('happy');
         saveScore(totalPoints, maxPoints);
       }
@@ -2119,10 +2807,7 @@
 
     // === LEADERBOARD ===
     async function saveScore(score, total) {
-      try {
-        await sbInsertScore(playerName, score, total);
-      } catch(err) {
-        console.warn("Supabase saveScore failed:", err);
+      try { await sbInsertScore(playerName, score, total); } catch(err) {
         const leaderboard = getLeaderboard();
         leaderboard.push({ name: playerName, score, total, date: new Date().toISOString() });
         leaderboard.sort((a, b) => b.score - a.score);
@@ -2144,34 +2829,36 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
+    // === 8. LEADERBOARD WITH MEDALS ===
     async function renderLeaderboard() {
       const list = document.getElementById('leaderboardList');
       list.innerHTML = '<div class="emptyLeaderboard"><p>Loading...</p></div>';
 
       let leaderboard = [];
-      try {
-        leaderboard = await sbFetchLeaderboard(50);
-      } catch(err) {
-        console.warn("Supabase fetch leaderboard failed, using localStorage:", err);
-        leaderboard = getLeaderboard();
-      }
+      try { leaderboard = await sbFetchLeaderboard(50); } catch(err) { leaderboard = getLeaderboard(); }
 
       if (!leaderboard || leaderboard.length === 0) {
         list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet!</p><p>Be the first to complete the quiz!</p></div>';
         return;
       }
 
+      const medals = ['🥇', '🥈', '🥉'];
+      const medalClasses = ['medal-gold', 'medal-silver', 'medal-bronze'];
+
       list.innerHTML = '';
       leaderboard.forEach((entry, index) => {
         const item = document.createElement('div');
         item.className = 'leaderboardItem';
         if (index === 0) item.classList.add('champion');
+        if (index < 3) item.classList.add(medalClasses[index]);
 
         const date = new Date(entry.date);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+        const rankDisplay = index < 3 ? medals[index] : (index + 1);
 
         item.innerHTML = `
-          <div class="leaderboardRank">${index + 1}</div>
+          <div class="leaderboardRank">${rankDisplay}</div>
           <div class="leaderboardInfo">
             <div class="leaderboardName">${entry.name}</div>
             <div class="leaderboardDate">${dateStr}</div>
@@ -2185,10 +2872,7 @@
     // === ADMIN ===
     function openAdmin() {
       const password = prompt('Enter admin password:');
-      if (password !== ADMIN_PASSWORD) {
-        alert('Incorrect password!');
-        return;
-      }
+      if (password !== ADMIN_PASSWORD) { alert('Incorrect password!'); return; }
       document.getElementById('adminModal').style.display = 'flex';
       switchAdminTab('questions');
       refreshQuestionsList();
@@ -2216,36 +2900,26 @@
     async function renderLeaderboardAdmin() {
       const list = document.getElementById('leaderboardAdminList');
       list.innerHTML = '<div class="emptyLeaderboard"><p>Loading...</p></div>';
-
       let leaderboard = [];
-      try {
-        leaderboard = await sbFetchLeaderboard(200);
-      } catch(err) {
-        console.warn("Supabase admin fetch failed, using localStorage:", err);
-        leaderboard = getLeaderboard();
-      }
-
+      try { leaderboard = await sbFetchLeaderboard(200); } catch(err) { leaderboard = getLeaderboard(); }
       if (!leaderboard || leaderboard.length === 0) {
         list.innerHTML = '<div class="emptyLeaderboard"><p>No scores yet</p></div>';
         return;
       }
-
       list.innerHTML = '';
       leaderboard.forEach((entry, index) => {
         const item = document.createElement('div');
         item.className = 'leaderboardAdminItem';
         if (index === 0) item.classList.add('champion');
-
         const date = new Date(entry.date);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
+        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         item.innerHTML = `
           <div class="leaderboardAdminInfo">
             <div class="leaderboardAdminName">${index === 0 ? '👑 ' : ''}${entry.name}</div>
             <div class="leaderboardAdminDate">${dateStr}</div>
           </div>
           <div class="leaderboardAdminScore">${entry.score} pts</div>
-          <button class="btnDanger" style="padding: 8px 12px; font-size: 13px;" onclick="deleteScoreById('${entry.id}')">Delete</button>
+          <button class="btnDanger" style="padding:6px 10px; font-size:12px;" onclick="deleteScoreById('${entry.id}')">Delete</button>
         `;
         list.appendChild(item);
       });
@@ -2253,24 +2927,12 @@
 
     async function deleteScoreById(id) {
       if (!confirm('Delete this score?')) return;
-      try {
-        await sbDeleteScoreById(id);
-        await renderLeaderboardAdmin();
-      } catch(err) {
-        alert("Delete failed. Check the hp_quiz_leaderboard DELETE policy.");
-        console.error(err);
-      }
+      try { await sbDeleteScoreById(id); await renderLeaderboardAdmin(); } catch(err) { alert("Delete failed."); }
     }
 
     async function clearAllScores() {
-      if (!confirm('Clear ALL scores from the leaderboard? This cannot be undone!')) return;
-      try {
-        await sbClearAllScores();
-        await renderLeaderboardAdmin();
-      } catch(err) {
-        alert("Clear all failed. Check the hp_quiz_leaderboard DELETE policy.");
-        console.error(err);
-      }
+      if (!confirm('Clear ALL scores? This cannot be undone!')) return;
+      try { await sbClearAllScores(); await renderLeaderboardAdmin(); } catch(err) { alert("Clear all failed."); }
     }
 
     function refreshQuestionsList() {
@@ -2285,9 +2947,7 @@
         card.innerHTML = `
           <div class="qText">${idx + 1}. ${q.q}</div>
           <div class="qChoices">${choicesHTML}</div>
-          <div class="qActions">
-            <button class="btnSecondary" onclick="editQuestion('${q.id}')">Edit</button>
-          </div>
+          <div class="qActions"><button class="btnSecondary" onclick="editQuestion('${q.id}')">Edit</button></div>
         `;
         list.appendChild(card);
       });
@@ -2329,61 +2989,43 @@
     async function saveQuestion() {
       const qText = document.getElementById('editQuestionText').value.trim();
       if (!qText) { alert('Question text is required'); return; }
-
       const rows = document.getElementById('choiceEditor').querySelectorAll('.choiceRow');
-      const choices = [];
-      let correctIdx = -1;
-
-      rows.forEach((row, i) => {
+      const choices = []; let correctIdx = -1;
+      rows.forEach((row) => {
         const input = row.querySelector('input[type="text"]');
         const radio = row.querySelector('input[type="radio"]');
         const text = input.value.trim();
-        if (text) {
-          choices.push(text);
-          if (radio.checked) correctIdx = choices.length - 1;
-        }
+        if (text) { choices.push(text); if (radio.checked) correctIdx = choices.length - 1; }
       });
-
       if (choices.length < 2) { alert('Need at least 2 choices'); return; }
       if (correctIdx === -1) { alert('Please mark one answer as correct'); return; }
-
       if (editingId) {
         const q = questions.find(x => x.id === editingId);
         q.q = qText; q.c = choices; q.a = correctIdx;
       } else {
         questions.push({ id: 'q' + Date.now(), q: qText, c: choices, a: correctIdx });
       }
-
       await sbSaveQuestions(questions);
       localStorage.setItem('handsPlease_quiz_v5', JSON.stringify(questions));
-      cancelEdit();
-      refreshQuestionsList();
+      cancelEdit(); refreshQuestionsList();
     }
 
-    function cancelEdit() {
-      document.getElementById('editorForm').classList.remove('active');
-      editingId = null;
-    }
+    function cancelEdit() { document.getElementById('editorForm').classList.remove('active'); editingId = null; }
 
     function deleteCurrentQuestion() {
       if (!editingId) return;
       if (!confirm('Delete this question?')) return;
       questions = questions.filter(q => q.id !== editingId);
       localStorage.setItem('handsPlease_quiz_v5', JSON.stringify(questions));
-      sbSaveQuestions(questions).catch(err => console.warn("Supabase save questions failed:", err));
-      cancelEdit();
-      refreshQuestionsList();
+      sbSaveQuestions(questions).catch(() => {});
+      cancelEdit(); refreshQuestionsList();
     }
 
     async function resetToDefaults() {
-      if (!confirm('Reset to default questions? This will delete all custom questions.')) return;
+      if (!confirm('Reset to default questions?')) return;
       questions = [...DEFAULT_BANK];
       localStorage.setItem('handsPlease_quiz_v5', JSON.stringify(questions));
-      try {
-        await sbSaveQuestions(questions);
-      } catch(err) {
-        console.warn("Supabase reset questions failed:", err);
-      }
+      try { await sbSaveQuestions(questions); } catch(err) {}
       location.reload();
     }
 
@@ -2391,16 +3033,13 @@
       const json = JSON.stringify(questions, null, 2);
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'quiz-questions.json'; a.click();
+      const a = document.createElement('a'); a.href = url; a.download = 'quiz-questions.json'; a.click();
     }
 
     function importQuestions() {
-      const input = document.createElement('input');
-      input.type = 'file'; input.accept = '.json';
+      const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
       input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+        const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (event) => {
           try {
@@ -2408,9 +3047,8 @@
             if (!Array.isArray(imported)) { alert('Invalid format'); return; }
             questions = imported;
             localStorage.setItem('handsPlease_quiz_v5', JSON.stringify(questions));
-            sbSaveQuestions(questions).catch(err => console.warn("Supabase save questions failed:", err));
-            refreshQuestionsList();
-            alert('Import successful!');
+            sbSaveQuestions(questions).catch(() => {});
+            refreshQuestionsList(); alert('Import successful!');
           } catch(err) { alert('Error parsing JSON'); }
         };
         reader.readAsText(file);
@@ -2418,27 +3056,48 @@
       input.click();
     }
 
-    // =====================================================
-    // A. SHATTER EGG
-    // =====================================================
+    // === EGG SHATTER ===
     function shatterEgg(eggEl) {
       if (!eggEl) return;
+      // Phase 1: shake
       eggEl.classList.add('shattering');
-
-      const drip = document.createElement('div');
-      drip.className = 'yolkDrip';
-      eggEl.appendChild(drip);
-
       setTimeout(() => {
         eggEl.classList.remove('shattering');
+        // Phase 2: crack open — add halves, yolk, whites
         eggEl.classList.add('cracked');
-        setTimeout(() => drip.remove(), 1500);
-      }, 650);
+
+        // Top half shell
+        const topHalf = document.createElement('div');
+        topHalf.className = 'eggHalf top';
+        eggEl.appendChild(topHalf);
+
+        // Bottom half shell
+        const bottomHalf = document.createElement('div');
+        bottomHalf.className = 'eggHalf bottom';
+        eggEl.appendChild(bottomHalf);
+
+        // Yolk
+        const yolk = document.createElement('div');
+        yolk.className = 'eggYolk';
+        eggEl.appendChild(yolk);
+
+        // Egg white puddle
+        const white = document.createElement('div');
+        white.className = 'eggWhite';
+        eggEl.appendChild(white);
+
+        // Drips from shell edges
+        const dripL = document.createElement('div');
+        dripL.className = 'eggDrip left';
+        eggEl.appendChild(dripL);
+
+        const dripR = document.createElement('div');
+        dripR.className = 'eggDrip right';
+        eggEl.appendChild(dripR);
+      }, 500);
     }
 
-    // =====================================================
-    // C. SCORE ROLL-UP
-    // =====================================================
+    // === SCORE ROLL-UP ===
     function animateScore(from, to, duration = 550) {
       const el = document.getElementById('scoreDisplay');
       if (!el) return;
@@ -2464,11 +3123,9 @@
       requestAnimationFrame(tick);
     }
 
-    // =====================================================
-    // G. CONFETTI + TYPEWRITER + VICTORY SEQUENCE
-    // =====================================================
+    // === FULL CONFETTI (victory) ===
     function launchConfetti() {
-      const colors = ['#f39c12','#e74c3c','#27ae60','#3498db','#9b59b6','#e67e22','#1abc9c','#f06292'];
+      const colors = ['#f5d76e','#ef4444','#22c55e','#3b82f6','#a855f7','#f97316','#14b8a6','#ec4899'];
       for (let i = 0; i < 80; i++) {
         setTimeout(() => {
           const piece = document.createElement('div');
@@ -2484,23 +3141,21 @@
       }
     }
 
-    function typewriterText(el, text, speed = 45) {
+    function typewriterText(el, text, speed = 40) {
       el.innerText = '';
       let i = 0;
       function next() {
-        if (i < text.length) {
-          el.innerText += text[i];
-          i++;
-          setTimeout(next, speed);
-        }
+        if (i < text.length) { el.innerText += text[i]; i++; setTimeout(next, speed); }
       }
       next();
     }
 
-    function showVictory() {
-      const popup        = document.getElementById('victoryPopup');
+    function showVictory(rank) {
+      const popup = document.getElementById('victoryPopup');
       const finalScoreEl = document.getElementById('finalScore');
-      const msgEl        = document.getElementById('victoryMessage');
+      const msgEl = document.getElementById('victoryMessage');
+      const rankEl = document.getElementById('victoryRank');
+      const statsEl = document.getElementById('victoryStats');
 
       const percent = (score / questions.length) * 100;
       let message = '';
@@ -2511,17 +3166,20 @@
 
       finalScoreEl.innerText = '0 pts';
       msgEl.innerText = '';
+      rankEl.innerText = rank;
+      statsEl.innerHTML = buildStatsHTML();
 
       popup.classList.remove('celebrating');
-      void popup.offsetWidth; // reflow to restart animation
+      void popup.offsetWidth;
       popup.style.display = 'block';
       popup.classList.add('celebrating');
 
+      playSound('victory');
       setTimeout(() => launchConfetti(), 350);
       setTimeout(() => animateScoreEl(finalScoreEl, 0, totalPoints), 500);
       setTimeout(() => typewriterText(msgEl, message), 1400);
     }
-
   </script>
+
 </body>
 </html>
