@@ -68,12 +68,10 @@ body{
 /* =====================================================
    EGGS HUD
    ===================================================== */
-.eggsHUD{
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
-  align-items: center;
-}
+.eggsHUD{ display: flex; flex-direction: column; gap: 26px; align-items: center; }
+.eggsInline{ display: none; gap: 8px; align-items: center; }
+.eggsInline .egg{ width: 36px; height: 44px; border-width: 1.5px; }
+.eggsInline .egg::after{ top: 8px; left: 8px; width: 7px; height: 9px; }
 
 .egg{
   width: 74px;
@@ -108,191 +106,228 @@ body{
 
 .egg.cracked::after{ display: none; }
 
-/* Egg half shells */
+/* Egg half shells — visible with good contrast */
 .eggHalf{
   position: absolute;
   width: 100%;
   height: 55%;
-  background: linear-gradient(145deg, rgba(240,230,210,0.25), rgba(200,190,170,0.12));
-  border: 2px solid rgba(212,175,55,0.3);
+  background: linear-gradient(145deg, rgba(245,240,230,0.35), rgba(230,220,200,0.2));
+  border: 2px solid rgba(212,195,160,0.5);
   overflow: hidden;
 }
 
 .eggHalf::after{
   content: '';
   position: absolute;
-  width: 8px;
-  height: 10px;
-  background: rgba(255,255,255,0.15);
+  width: 8px; height: 10px;
+  background: rgba(255,255,255,0.2);
   border-radius: 50%;
   transform: rotate(-30deg);
 }
 
 .eggHalf.top{
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   border-radius: 50% 50% 10% 30%;
   transform-origin: bottom left;
-  animation: eggHalfFallLeft 0.7s cubic-bezier(0.4,0,0.8,0.6) forwards;
+  animation: eggHalfFallLeft 0.8s cubic-bezier(0.4,0,0.8,0.6) forwards;
 }
-
 .eggHalf.top::after{ top: 10px; left: 12px; }
 
 .eggHalf.bottom{
-  bottom: 0;
-  right: 0;
+  bottom: 0; right: 0;
   border-radius: 30% 10% 45% 45%;
   transform-origin: bottom right;
-  animation: eggHalfFallRight 0.7s cubic-bezier(0.4,0,0.8,0.6) forwards;
+  animation: eggHalfFallRight 0.8s cubic-bezier(0.4,0,0.8,0.6) forwards;
 }
-
 .eggHalf.bottom::after{ top: 6px; right: 10px; left: auto; }
+
+/* Inner shell surface (slightly different shade for realism) */
+.eggHalf.top .innerShell,
+.eggHalf.bottom .innerShell{
+  position: absolute;
+  inset: 2px;
+  background: linear-gradient(180deg, rgba(255,250,240,0.1), rgba(240,235,220,0.05));
+  border-radius: inherit;
+}
 
 /* Jagged edge on the crack line */
 .eggHalf.top::before{
   content: '';
   position: absolute;
-  bottom: -3px;
-  left: -2px;
-  right: -2px;
-  height: 8px;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 74 8"><path d="M0 4 L8 1 L15 6 L22 2 L30 7 L37 0 L44 5 L52 2 L60 6 L67 1 L74 4" stroke="rgba(212,175,55,0.3)" stroke-width="1.5" fill="none"/></svg>') no-repeat;
+  bottom: -4px; left: -2px; right: -2px; height: 10px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 74 10"><path d="M0 5 L8 1 L15 7 L22 2 L30 8 L37 1 L44 6 L52 2 L60 7 L67 1 L74 5" stroke="rgba(220,210,190,0.6)" stroke-width="2" fill="none"/></svg>') no-repeat;
   background-size: 100% 100%;
 }
 
 .eggHalf.bottom::before{
   content: '';
   position: absolute;
-  top: -3px;
-  left: -2px;
-  right: -2px;
-  height: 8px;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 74 8"><path d="M0 4 L8 7 L15 2 L22 6 L30 1 L37 8 L44 3 L52 6 L60 2 L67 7 L74 4" stroke="rgba(212,175,55,0.3)" stroke-width="1.5" fill="none"/></svg>') no-repeat;
+  top: -4px; left: -2px; right: -2px; height: 10px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 74 10"><path d="M0 5 L8 9 L15 3 L22 8 L30 2 L37 9 L44 4 L52 8 L60 3 L67 9 L74 5" stroke="rgba(220,210,190,0.6)" stroke-width="2" fill="none"/></svg>') no-repeat;
   background-size: 100% 100%;
 }
 
 @keyframes eggHalfFallLeft{
-  0%  { transform: rotate(0deg) translateY(0); opacity: 1; }
-  30% { transform: rotate(-15deg) translateY(2px); }
-  60% { transform: rotate(-35deg) translateX(-12px) translateY(14px); opacity: 1; }
-  100%{ transform: rotate(-55deg) translateX(-18px) translateY(24px); opacity: 0.6; }
+  0%  { transform: rotate(0deg) translate(0,0); opacity: 1; }
+  25% { transform: rotate(-18deg) translate(-4px, 3px); }
+  50% { transform: rotate(-40deg) translate(-14px, 16px); opacity: 1; }
+  75% { transform: rotate(-52deg) translate(-20px, 22px); }
+  90% { transform: rotate(-48deg) translate(-18px, 28px); opacity: 0.7; }
+  100%{ transform: rotate(-50deg) translate(-20px, 30px); opacity: 0.5; }
 }
 
 @keyframes eggHalfFallRight{
-  0%  { transform: rotate(0deg) translateY(0); opacity: 1; }
-  30% { transform: rotate(12deg) translateY(2px); }
-  60% { transform: rotate(30deg) translateX(10px) translateY(12px); opacity: 1; }
-  100%{ transform: rotate(50deg) translateX(16px) translateY(22px); opacity: 0.6; }
+  0%  { transform: rotate(0deg) translate(0,0); opacity: 1; }
+  25% { transform: rotate(15deg) translate(3px, 3px); }
+  50% { transform: rotate(35deg) translate(12px, 14px); opacity: 1; }
+  75% { transform: rotate(48deg) translate(18px, 20px); }
+  90% { transform: rotate(44deg) translate(16px, 26px); opacity: 0.7; }
+  100%{ transform: rotate(46deg) translate(18px, 28px); opacity: 0.5; }
 }
 
-/* Yolk blob */
+/* Yolk blob — realistic with gloss and shadow */
 .eggYolk{
   position: absolute;
   width: 30px;
   height: 28px;
-  background: radial-gradient(ellipse at 40% 35%, #f5d76e 0%, #e6a817 50%, #d4950c 100%);
-  border-radius: 50% 50% 50% 50%;
+  background: radial-gradient(ellipse at 35% 30%, #ffe066 0%, #f5c518 35%, #e6a817 55%, #cc8800 80%, #b37300 100%);
+  border-radius: 50%;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0);
   z-index: 5;
   animation: yolkAppear 0.8s 0.15s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  box-shadow: 0 3px 10px rgba(212,175,55,0.4);
+  box-shadow: 
+    0 4px 12px rgba(180,120,0,0.5),
+    inset 0 -4px 8px rgba(150,80,0,0.3),
+    inset 0 2px 4px rgba(255,240,150,0.5);
 }
 
+/* Yolk highlight / gloss */
 .eggYolk::after{
   content: '';
   position: absolute;
-  top: 5px;
-  left: 8px;
-  width: 8px;
-  height: 6px;
-  background: rgba(255,255,255,0.4);
+  top: 4px;
+  left: 7px;
+  width: 10px;
+  height: 7px;
+  background: radial-gradient(ellipse, rgba(255,255,230,0.7) 0%, rgba(255,255,200,0.3) 50%, transparent 100%);
   border-radius: 50%;
-  transform: rotate(-20deg);
+  transform: rotate(-25deg);
+}
+
+/* Secondary yolk highlight */
+.eggYolk::before{
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 8px;
+  width: 5px;
+  height: 4px;
+  background: rgba(255,255,220,0.4);
+  border-radius: 50%;
 }
 
 @keyframes yolkAppear{
   0%  { transform: translate(-50%, -50%) scale(0); }
-  50% { transform: translate(-50%, -40%) scale(1.15); }
-  70% { transform: translate(-50%, -30%) scale(0.95); }
-  100%{ transform: translate(-50%, -20%) scale(1); }
+  40% { transform: translate(-50%, -35%) scale(1.2); }
+  55% { transform: translate(-50%, -25%) scale(0.9, 1.05); }
+  70% { transform: translate(-50%, -20%) scale(1.05, 0.95); }
+  85% { transform: translate(-50%, -18%) scale(0.98, 1.02); }
+  100%{ transform: translate(-50%, -15%) scale(1); }
 }
 
-/* Egg white puddle */
+/* Egg white puddle — gooey and irregular */
 .eggWhite{
   position: absolute;
-  width: 50px;
-  height: 22px;
-  background: radial-gradient(ellipse, rgba(255,255,255,0.2) 0%, rgba(220,230,240,0.12) 60%, transparent 100%);
-  border-radius: 50%;
-  bottom: -14px;
+  width: 56px;
+  height: 28px;
+  bottom: -18px;
   left: 50%;
   transform: translateX(-50%) scaleX(0);
   z-index: 3;
-  animation: whiteSpread 1s 0.25s ease-out forwards;
+  animation: whiteSpread 1s 0.2s ease-out forwards;
+  background: none;
 }
 
+/* Main white blob */
 .eggWhite::before{
   content: '';
   position: absolute;
-  width: 35px;
-  height: 16px;
-  background: radial-gradient(ellipse, rgba(255,255,255,0.15) 0%, transparent 70%);
-  border-radius: 50%;
-  top: -6px;
-  left: -8px;
-  transform: rotate(-15deg);
+  width: 48px;
+  height: 22px;
+  background: radial-gradient(ellipse at 50% 40%, 
+    rgba(255,255,255,0.28) 0%, 
+    rgba(240,245,250,0.18) 40%, 
+    rgba(220,230,240,0.08) 70%, 
+    transparent 100%);
+  border-radius: 60% 40% 50% 45%;
+  top: 0;
+  left: 2px;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
+/* Secondary drool extension */
 .eggWhite::after{
   content: '';
   position: absolute;
-  width: 28px;
-  height: 14px;
-  background: radial-gradient(ellipse, rgba(255,255,255,0.12) 0%, transparent 70%);
-  border-radius: 50%;
+  width: 30px;
+  height: 16px;
+  background: radial-gradient(ellipse at 40% 50%, 
+    rgba(255,255,255,0.2) 0%, 
+    rgba(235,240,245,0.1) 50%, 
+    transparent 100%);
+  border-radius: 45% 55% 50% 50%;
   top: -4px;
   right: -6px;
-  transform: rotate(10deg);
+  transform: rotate(12deg);
 }
 
 @keyframes whiteSpread{
   0%  { transform: translateX(-50%) scaleX(0) scaleY(0.3); opacity: 0; }
-  40% { transform: translateX(-50%) scaleX(1.15) scaleY(0.9); opacity: 1; }
-  70% { transform: translateX(-50%) scaleX(1.3) scaleY(1.05); }
-  100%{ transform: translateX(-50%) scaleX(1.2) scaleY(1); opacity: 0.8; }
+  30% { transform: translateX(-50%) scaleX(0.8) scaleY(0.7); opacity: 1; }
+  60% { transform: translateX(-50%) scaleX(1.15) scaleY(1.05); }
+  80% { transform: translateX(-50%) scaleX(1.25) scaleY(0.95); }
+  100%{ transform: translateX(-50%) scaleX(1.2) scaleY(1); opacity: 0.9; }
 }
 
-/* Drip from shell */
+/* Drip from crack — realistic egg drip */
 .eggDrip{
   position: absolute;
-  width: 6px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(245,215,110,0.3));
+  width: 8px;
+  background: linear-gradient(to bottom, 
+    rgba(255,255,240,0.35), 
+    rgba(255,240,180,0.25),
+    rgba(245,215,110,0.15));
   border-radius: 0 0 50% 50%;
   z-index: 4;
-  animation: dripFall 1.2s 0.3s ease-in forwards;
+  animation: dripFall 1.5s 0.25s ease-in forwards;
   opacity: 0;
 }
 
-.eggDrip.left{
-  left: 8px;
-  top: 55%;
-  height: 0;
-}
+.eggDrip.left{ left: 6px; top: 50%; height: 0; }
+.eggDrip.right{ right: 8px; top: 45%; height: 0; }
 
-.eggDrip.right{
-  right: 10px;
-  top: 50%;
-  height: 0;
+/* Drip droplet at tip */
+.eggDrip::after{
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 8px;
+  background: radial-gradient(ellipse, rgba(255,250,220,0.3) 0%, transparent 70%);
+  border-radius: 50%;
 }
 
 @keyframes dripFall{
   0%  { height: 0; opacity: 0; }
-  15% { height: 4px; opacity: 0.7; }
-  50% { height: 18px; opacity: 0.6; }
-  80% { height: 26px; opacity: 0.4; }
-  100%{ height: 30px; opacity: 0; }
+  10% { height: 3px; opacity: 0.8; }
+  40% { height: 16px; opacity: 0.7; }
+  65% { height: 28px; opacity: 0.5; }
+  85% { height: 34px; opacity: 0.3; }
+  100%{ height: 38px; opacity: 0; }
 }
 
 /* =====================================================
@@ -484,9 +519,9 @@ body{
 }
 
 .questionText{
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   line-height: 1.4;
   color: var(--ink);
 }
@@ -501,12 +536,12 @@ body{
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 13px;
+  padding: 12px 14px;
   border: 1.5px solid rgba(255,255,255,0.08);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 14px;
+  font-size: 15px;
   background: rgba(255,255,255,0.03);
   color: var(--ink);
 }
@@ -1624,9 +1659,7 @@ body.peck .chickenImage.angry{
   filter: drop-shadow(0 0 5px var(--danger-glow));
 }
 
-/* =====================================================
-   MOBILE RESPONSIVE — COMPACT FOR IPHONE
-   ===================================================== */
+/* === MOBILE — NO SCROLL, BIGGER TEXT === */
 @media (max-width: 1200px) {
   .mainContainer{ gap: 20px; }
   .chickenStage{ width: 230px; height: 230px; }
@@ -1635,78 +1668,180 @@ body.peck .chickenImage.angry{
 }
 
 @media (max-width: 900px) {
-  html, body{ overflow-y: auto; }
+  html, body{ overflow: hidden; }
   .mainContainer{
     flex-direction: column;
-    gap: 12px;
-    padding: 6px;
+    gap: 0;
+    padding: 4px;
     height: auto;
-    min-height: 100%;
+    min-height: 0;
+    justify-content: flex-start;
+    align-items: stretch;
   }
-  .eggsHUD{
-    flex-direction: row;
-    gap: 16px;
-    order: -1;
-  }
-  .egg{
-    width: 50px;
-    height: 62px;
-  }
-  .chickenStage{
-    width: 140px;
-    height: 140px;
-    order: -2;
-  }
+  /* Hide sidebar eggs & chicken on mobile */
+  .eggsHUD{ display: none !important; }
+  .chickenStage{ display: none !important; }
+  /* Show inline eggs in card header */
+  .eggsInline{ display: flex; }
+  .eggsInline .egg{ width: 36px; height: 44px; }
+  /* Hide title on mobile */
+  .quizTitle{ display: none; }
+  .playerName{ display: none; }
+  /* Card should NOT stretch — fit content only */
   .quizCard{
-    padding: 16px 16px 14px;
-    max-height: none;
-    border-radius: 16px;
+    padding: 14px 16px 12px;
+    border-radius: 14px;
+    max-width: 100%;
+    flex: none;
   }
-  .quizTitle{ font-size: 14px; margin-bottom: 2px; }
-  .playerName{ font-size: 11px; margin-bottom: 6px; }
-  .questionText{ font-size: 15px; margin-bottom: 10px; }
-  .choice{ font-size: 13px; padding: 10px 11px; gap: 8px; }
-  .choice input{ width: 16px; height: 16px; }
-  .choices{ gap: 6px; margin-bottom: 8px; }
-  .submitBtn{ font-size: 15px; padding: 12px; }
-  .feedback{ font-size: 13px; margin-top: 6px; }
+  .questionArea{ flex: none; }
+  .questionText{ font-size: 18px; margin-bottom: 12px; line-height: 1.35; }
+  .choice{ font-size: 16px; padding: 13px 14px; gap: 9px; }
+  .choice input{ width: 18px; height: 18px; }
+  .choices{ gap: 7px; margin-bottom: 10px; }
+  .submitBtn{ font-size: 16px; padding: 14px; }
+  .feedback{ font-size: 14px; margin-top: 6px; min-height: 18px; }
   .leaderboardBtn{ padding: 7px 14px; font-size: 11px; }
   .musicToggleBtn{ left: 110px; padding: 7px 10px; font-size: 14px; }
   .powerUpsRow{ margin-bottom: 8px; }
-  .powerUpBtn{ padding: 5px 10px; font-size: 12px; }
+  .powerUpBtn{ padding: 6px 10px; font-size: 18px; }
+  .powerUpBtn .puLabel{ display: none; }
   .xpBarWrap{ margin-bottom: 10px; }
+  .xpLabel{ font-size: 10px; top: -15px; }
+  .timerWrap{ margin-bottom: 10px; }
   .timerCount{ font-size: 11px; top: 6px; }
-  body{ padding: 8px; }
-}
-
-@media (max-width: 500px) {
-  .quizTitle{ font-size: 13px; }
-  .questionText{ font-size: 14px; }
-  .choice{ font-size: 12px; padding: 9px 10px; }
-  .submitBtn{ font-size: 14px; padding: 11px; }
-  .nameEntryCard{ padding: 28px 18px; }
-  .nameEntryCard h2{ font-size: 22px; }
-  .gameOverPopup, .victoryPopup{ padding: 24px 18px; }
-  .victoryPopup .finalScore{ font-size: 36px; }
-  .statBox .statVal{ font-size: 18px; }
-  .statBox .statLabel{ font-size: 10px; }
-  .leaderboardRank{ font-size: 18px; min-width: 34px; }
-  .leaderboardScore{ font-size: 20px; }
-  .chickenStage{ width: 110px; height: 110px; }
-  .egg{ width: 42px; height: 52px; }
+  .quizHeader{ margin-bottom: 4px; }
   .streakBanner{ font-size: 16px; padding: 10px; }
+  body{ padding: 6px; align-items: flex-start; padding-top: 45px; }
 }
 
-/* Extra small phones */
-@media (max-height: 700px) and (max-width: 500px) {
-  .chickenStage{ width: 90px; height: 90px; }
-  .eggsHUD{ gap: 10px; }
-  .egg{ width: 36px; height: 44px; }
-  .quizCard{ padding: 12px 14px 10px; }
-  .questionText{ font-size: 13px; margin-bottom: 8px; }
-  .choice{ padding: 8px 9px; font-size: 11px; }
-  .choices{ gap: 5px; }
-  .submitBtn{ padding: 10px; font-size: 13px; }
+@media (max-width: 400px) {
+  .questionText{ font-size: 17px; }
+  .choice{ font-size: 15px; padding: 12px 13px; }
+  .submitBtn{ padding: 13px; font-size: 15px; }
+  .nameEntryCard{ padding: 28px 18px; }
+  .gameOverPopup, .victoryPopup{ padding: 24px 18px; }
+}
+
+/* === RULES PAGE === */
+.rulesScreen{
+  position: fixed; inset: 0; background: var(--bg-deep);
+  background-image: radial-gradient(ellipse at 50% 30%, rgba(212,175,55,0.06) 0%, transparent 60%);
+  display: none; align-items: center; justify-content: center; z-index: 499; padding: 16px; overflow-y: auto;
+}
+.rulesCard{
+  background: var(--bg-card); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border); border-radius: 20px; padding: 28px 24px; max-width: 500px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: nameCardDrop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.rulesCard h2{ text-align: center; font-size: 24px; font-weight: 900; color: var(--accent); margin-bottom: 16px; }
+.rulesSection{ margin-bottom: 14px; }
+.rulesSection h3{ font-size: 13px; font-weight: 800; color: var(--accent-bright); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.rulesGrid{ display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.ruleBox{ background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px; text-align: center; }
+.ruleBox .ruleVal{ font-size: 16px; font-weight: 800; color: var(--accent-bright); }
+.ruleBox .ruleLabel{ font-size: 10px; color: var(--ink-muted); margin-top: 2px; }
+.lifelineRow{ display: flex; gap: 6px; }
+.lifelineBox{ flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px 6px; text-align: center; }
+.lifelineBox .llIcon{ font-size: 22px; }
+.lifelineBox .llName{ font-size: 11px; font-weight: 800; color: var(--ink); margin: 3px 0 1px; }
+.lifelineBox .llDesc{ font-size: 9px; color: var(--ink-muted); line-height: 1.3; }
+.ranksList{ display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+.rankTag{ padding: 4px 8px; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.15); border-radius: 6px; font-size: 10px; font-weight: 700; color: var(--accent-bright); white-space: nowrap; }
+
+/* === CHICKEN ENHANCEMENTS === */
+/* Rage mode */
+body.rage .chickenImage.angry{
+  display: block;
+  animation: rageChicken 0.3s ease-in-out infinite;
+  filter: saturate(2) hue-rotate(-20deg) brightness(1.1);
+}
+@keyframes rageChicken{
+  0%{ transform: scale(1.15) rotate(-2deg); }
+  25%{ transform: scale(1.2) rotate(2deg); }
+  50%{ transform: scale(1.25) rotate(-1deg); }
+  75%{ transform: scale(1.2) rotate(1deg); }
+  100%{ transform: scale(1.15) rotate(-2deg); }
+}
+/* Victory dance */
+body.victory .chickenImage.happy{
+  display: block;
+  animation: victoryDance 1s ease-in-out infinite;
+}
+@keyframes victoryDance{
+  0%{ transform: translateY(0) rotate(0) scale(1); }
+  15%{ transform: translateY(-20px) rotate(-8deg) scale(1.1); }
+  30%{ transform: translateY(0) rotate(8deg) scale(1); }
+  45%{ transform: translateY(-25px) rotate(-5deg) scale(1.15); }
+  60%{ transform: translateY(0) rotate(5deg) scale(1); }
+  75%{ transform: translateY(-15px) scale(1.05); }
+  100%{ transform: translateY(0) scale(1); }
+}
+/* Reaction emojis */
+.chickenEmoji{
+  position: absolute; font-size: 28px; pointer-events: none; z-index: 20;
+  animation: emojiFloat 1.2s ease-out forwards;
+}
+@keyframes emojiFloat{
+  0%{ opacity: 1; transform: translate(0,0) scale(0.5); }
+  30%{ opacity: 1; transform: translate(var(--ex), -30px) scale(1.2); }
+  100%{ opacity: 0; transform: translate(var(--ex), -80px) scale(0.7); }
+}
+/* Chicken peek from right edge */
+.chickenPeek{
+  position: fixed; right: -160px; bottom: 20px; width: 120px; z-index: 501;
+  transition: right 0.6s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none;
+  visibility: hidden;
+}
+.chickenPeek.loaded{ visibility: visible; }
+.chickenPeek.visible{ right: -25px; }
+.chickenPeek img{ width: 100%; transform: scaleX(-1); display: block; }
+
+/* Timer frozen state */
+.timerBar.frozen{
+  background: #38bdf8 !important;
+  filter: drop-shadow(0 0 8px rgba(56,189,248,0.5));
+  animation: none !important;
+}
+
+/* === END SCREEN CHICKEN === */
+.endScreenChickenWrap{
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 8px;
+  display: block;
+  overflow: visible;
+  position: relative;
+}
+.endScreenChickenWrap img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.gameOverPopup .endScreenChickenWrap{
+  animation: rageChickenEnd 0.4s ease-in-out infinite;
+}
+.gameOverPopup .endScreenChickenWrap img{
+  filter: saturate(1.5) hue-rotate(-10deg);
+}
+.victoryPopup .endScreenChickenWrap{
+  animation: victoryChickenEnd 1s ease-in-out infinite;
+}
+@keyframes rageChickenEnd{
+  0%{ transform: rotate(-3deg) scale(1); }
+  25%{ transform: rotate(3deg) scale(1.05); }
+  50%{ transform: rotate(-2deg) scale(1.02); }
+  75%{ transform: rotate(2deg) scale(1.04); }
+  100%{ transform: rotate(-3deg) scale(1); }
+}
+@keyframes victoryChickenEnd{
+  0%{ transform: translateY(0) rotate(0) scale(1); }
+  20%{ transform: translateY(-12px) rotate(-5deg) scale(1.08); }
+  40%{ transform: translateY(0) rotate(5deg) scale(1); }
+  60%{ transform: translateY(-8px) rotate(-3deg) scale(1.05); }
+  80%{ transform: translateY(0) rotate(2deg) scale(1); }
+  100%{ transform: translateY(0) rotate(0) scale(1); }
 }
 ```
 
@@ -1716,6 +1851,14 @@ body.peck .chickenImage.angry{
 
 <body class="wink">
 
+  <!-- CHICKEN PEEK (slides in from right) -->
+
+  <div class="chickenPeek" id="chickenPeek">
+    <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png" alt="" 
+      onload="this.parentElement.classList.add('loaded')" 
+      onerror="this.parentElement.style.display='none'">
+  </div>
+
   <!-- NAME ENTRY SCREEN -->
 
   <div class="nameEntryScreen" id="nameEntryScreen">
@@ -1723,7 +1866,47 @@ body.peck .chickenImage.angry{
       <h2>🐔 Hands Please! Quiz</h2>
       <p>Enter your name to join the competition!</p>
       <input type="text" id="playerNameInput" placeholder="Your name..." maxlength="30" />
-      <button class="submitBtn" onclick="startQuiz()">Start Quiz</button>
+      <button class="submitBtn" onclick="goToRules()">Next →</button>
+    </div>
+  </div>
+
+  <!-- RULES PAGE -->
+
+  <div class="rulesScreen" id="rulesScreen">
+    <div class="rulesCard">
+      <h2>📋 How to Play</h2>
+      <div class="rulesSection">
+        <h3>⚡ Scoring</h3>
+        <div class="rulesGrid">
+          <div class="ruleBox"><div class="ruleVal">100</div><div class="ruleLabel">Base Points</div></div>
+          <div class="ruleBox"><div class="ruleVal">+50</div><div class="ruleLabel">Speed Bonus (≤5s)</div></div>
+          <div class="ruleBox"><div class="ruleVal">2x</div><div class="ruleLabel">3-Streak Multiplier</div></div>
+          <div class="ruleBox"><div class="ruleVal">3x</div><div class="ruleLabel">5-Streak Multiplier</div></div>
+        </div>
+      </div>
+      <div class="rulesSection">
+        <h3>🥚 Lives</h3>
+        <p style="font-size:13px; color:var(--ink-muted); line-height:1.5;">You have <strong style="color:var(--ink);">3 eggs</strong> (lives). Each wrong answer or timeout cracks one. Lose all 3 and it's game over!</p>
+      </div>
+      <div class="rulesSection">
+        <h3>🎮 Lifelines (1 use each)</h3>
+        <div class="lifelineRow">
+          <div class="lifelineBox"><div class="llIcon">🛡️</div><div class="llName">Shield</div><div class="llDesc">Skip question, no penalty</div></div>
+          <div class="lifelineBox"><div class="llIcon">⚡</div><div class="llName">Spotlight</div><div class="llDesc">Eliminate 1 wrong answer</div></div>
+          <div class="lifelineBox"><div class="llIcon">⏳</div><div class="llName">Time Freeze</div><div class="llDesc">Pause the timer</div></div>
+        </div>
+      </div>
+      <div class="rulesSection">
+        <h3>🏆 Ranks</h3>
+        <div class="ranksList">
+          <div class="rankTag">🍳 &lt;300 Still Learning</div>
+          <div class="rankTag">🥚 300+ Getting There</div>
+          <div class="rankTag">🐔 600+ Solid Server</div>
+          <div class="rankTag">⭐ 900+ Breakfast Pro</div>
+          <div class="rankTag">🏆 1200+ Legend</div>
+        </div>
+      </div>
+      <button class="submitBtn" onclick="startQuizFromRules()" style="margin-top:8px;">Let's Go! 🐔</button>
     </div>
   </div>
 
@@ -1747,6 +1930,12 @@ body.peck .chickenImage.angry{
   </div>
 
   <div class="quizHeader">
+    <!-- Inline eggs for mobile -->
+    <div class="eggsInline" id="eggsInline">
+      <div class="egg" id="eggM1"></div>
+      <div class="egg" id="eggM2"></div>
+      <div class="egg" id="eggM3"></div>
+    </div>
     <span id="streakBadge" class="streakBadge"></span>
     <span id="scoreDisplay">0 pts</span>
   </div>
@@ -1762,8 +1951,9 @@ body.peck .chickenImage.angry{
 
   <!-- Power-Ups -->
   <div class="powerUpsRow" id="powerUpsRow">
-    <button class="powerUpBtn" id="shieldBtn" onclick="useShield()">🛡️ Shield</button>
-    <button class="powerUpBtn" id="spotlightBtn" onclick="useSpotlight()">⚡ Spotlight</button>
+    <button class="powerUpBtn" id="shieldBtn" onclick="useShield()">🛡️<span class="puLabel"> Shield</span></button>
+    <button class="powerUpBtn" id="spotlightBtn" onclick="useSpotlight()">⚡<span class="puLabel"> Spotlight</span></button>
+    <button class="powerUpBtn" id="freezeBtn" onclick="useFreeze()">⏳<span class="puLabel"> Freeze</span></button>
   </div>
 
   <!-- Question Area (for slide transitions) -->
@@ -1777,10 +1967,10 @@ body.peck .chickenImage.angry{
   <div class="feedback" id="feedbackText"></div>
 </div>
 
-<div class="chickenStage">
-  <img class="chickenImage happy" id="happyImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png" alt="Happy Chicken">
-  <img class="chickenImage angry" id="angryImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2036a4c0-36eb-4538-bfd4-94ccb3f03b24.png" alt="Angry Chicken">
-  <img class="chickenImage wink" id="winkImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png" alt="Wink Chicken">
+<div class="chickenStage" id="chickenStage">
+  <img class="chickenImage happy" id="happyImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3e87e01e-4024-482b-a8ff-2413dc23cf56.png" alt="" onerror="this.style.display='none'">
+  <img class="chickenImage angry" id="angryImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2036a4c0-36eb-4538-bfd4-94ccb3f03b24.png" alt="" onerror="this.style.display='none'">
+  <img class="chickenImage wink" id="winkImg" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e8433c9-0f98-4b40-8646-dcec028601b8.png" alt="" onerror="this.style.display='none'">
 </div>
 ```
 
@@ -1789,6 +1979,7 @@ body.peck .chickenImage.angry{
   <!-- GAME OVER POPUP -->
 
   <div class="gameOverPopup" id="gameOverPopup">
+    <div class="endScreenChickenWrap" id="gameOverChickenWrap"></div>
     <h2>Strike 3!</h2>
     <p>Oh oh! The chicken is NOT happy.</p>
     <div class="endRank" id="gameOverRank"></div>
@@ -1800,6 +1991,7 @@ body.peck .chickenImage.angry{
   <!-- VICTORY POPUP -->
 
   <div class="victoryPopup" id="victoryPopup">
+    <div class="endScreenChickenWrap" id="victoryChickenWrap"></div>
     <h2>🎉 Quiz Complete!</h2>
     <div class="finalScore" id="finalScore">0 pts</div>
     <div class="endRank" id="victoryRank"></div>
@@ -2000,6 +2192,71 @@ body.peck .chickenImage.angry{
         }
       }
       startChickenAnimation(mood);
+      
+      // On mobile: briefly show chicken peeking in for reactions
+      const stage = document.querySelector('.chickenStage');
+      const isMobile = !stage || getComputedStyle(stage).display === 'none';
+      if (isMobile && (mood === 'happy' || mood === 'angry' || mood === 'rage' || mood === 'victory')) {
+        showMobileChickenPeek(mood);
+      }
+    }
+
+    // Mobile chicken peek-in for reactions
+    let mobileChickenTimeout = null;
+    function showMobileChickenPeek(mood) {
+      const peek = document.getElementById('chickenPeek');
+      if (!peek || !peek.classList.contains('loaded')) return;
+      // Update peek image based on mood
+      const img = peek.querySelector('img');
+      if (mood === 'angry' || mood === 'rage') {
+        img.src = CHICKEN_IMAGES.angry[0];
+        if (mood === 'rage') img.style.filter = 'saturate(2) hue-rotate(-20deg) brightness(1.1)';
+        else img.style.filter = '';
+      } else {
+        img.src = CHICKEN_IMAGES.happy[0];
+        img.style.filter = '';
+      }
+      clearTimeout(mobileChickenTimeout);
+      peek.classList.add('visible');
+      const duration = mood === 'victory' ? 4000 : 1500;
+      mobileChickenTimeout = setTimeout(() => peek.classList.remove('visible'), duration);
+    }
+
+    // === CHICKEN REACTION EMOJIS ===
+    const REACTION_EMOJIS = {
+      correct: ['❤️','✨','🌟','💛','🙌'],
+      wrong: ['😤','💢','😠','🤬','💥'],
+      streak: ['🔥','⚡','💯','🌈','✨'],
+      timeout: ['😰','💦','⏰','😓','😬']
+    };
+
+    function spawnChickenEmoji(type) {
+      const stage = document.querySelector('.chickenStage');
+      const isMobile = !stage || getComputedStyle(stage).display === 'none';
+      const target = isMobile ? document.getElementById('quizCard') : stage;
+      if (!target) return;
+      
+      const emojis = REACTION_EMOJIS[type] || REACTION_EMOJIS.correct;
+      const count = type === 'streak' ? 3 : 2;
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const el = document.createElement('div');
+          el.className = 'chickenEmoji';
+          el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          if (isMobile) {
+            // Spawn from top area of card
+            el.style.top = '5px';
+            el.style.left = (15 + Math.random() * 70) + '%';
+            el.style.fontSize = '24px';
+          } else {
+            el.style.top = (30 + Math.random() * 40) + '%';
+            el.style.left = (20 + Math.random() * 60) + '%';
+          }
+          el.style.setProperty('--ex', (Math.random() * 60 - 30) + 'px');
+          target.appendChild(el);
+          setTimeout(() => el.remove(), 1300);
+        }, i * 200);
+      }
     }
 
     // === AUDIO — CHIPTUNE BGM ENGINE ===
@@ -2229,8 +2486,12 @@ body.peck .chickenImage.angry{
     function startTimer() {
       stopTimer();
       timeLeft = QUESTION_TIME;
+      timerFrozen = false;
+      const bar = document.getElementById('timerBar');
+      if (bar) bar.classList.remove('frozen');
       updateTimerDisplay();
       timerInterval = setInterval(() => {
+        if (timerFrozen) return; // Skip countdown when frozen
         timeLeft = Math.max(0, timeLeft - 0.1);
         updateTimerDisplay();
         if (timeLeft <= 0) { stopTimer(); handleTimerExpired(); }
@@ -2288,6 +2549,7 @@ body.peck .chickenImage.angry{
       updateStreakDisplay();
       playSound('timeout');
       setChickenMood('angry');
+      spawnChickenEmoji('timeout');
 
       // Screen shake
       triggerScreenShake();
@@ -2299,6 +2561,7 @@ body.peck .chickenImage.angry{
 
       if (strikes >= 3) {
         gameOver = true;
+        setChickenMood('rage');
         setTimeout(() => finishQuiz(false), 1500);
       } else {
         setTimeout(() => { currentIdx++; transitionToNextQuestion(); setChickenMood('wink'); }, 2000);
@@ -2414,26 +2677,35 @@ body.peck .chickenImage.angry{
     // === 4. POWER-UPS ===
     let shieldUsed = false;
     let spotlightUsed = false;
+    let freezeUsed = false;
+    let timerFrozen = false;
 
     function resetPowerUps() {
       shieldUsed = false;
       spotlightUsed = false;
+      freezeUsed = false;
+      timerFrozen = false;
       const shieldBtn = document.getElementById('shieldBtn');
       const spotlightBtn = document.getElementById('spotlightBtn');
+      const freezeBtn = document.getElementById('freezeBtn');
       if (shieldBtn) { shieldBtn.disabled = false; shieldBtn.classList.remove('used'); }
       if (spotlightBtn) { spotlightBtn.disabled = false; spotlightBtn.classList.remove('used'); }
+      if (freezeBtn) { freezeBtn.disabled = false; freezeBtn.classList.remove('used'); }
     }
 
     function disablePowerUps() {
       document.getElementById('shieldBtn').disabled = true;
       document.getElementById('spotlightBtn').disabled = true;
+      document.getElementById('freezeBtn').disabled = true;
     }
 
     function enablePowerUps() {
       const shieldBtn = document.getElementById('shieldBtn');
       const spotlightBtn = document.getElementById('spotlightBtn');
+      const freezeBtn = document.getElementById('freezeBtn');
       if (!shieldUsed) shieldBtn.disabled = false;
       if (!spotlightUsed) spotlightBtn.disabled = false;
+      if (!freezeUsed) freezeBtn.disabled = false;
     }
 
     function useShield() {
@@ -2483,6 +2755,31 @@ body.peck .chickenImage.angry{
       fb.innerText = '⚡ One wrong answer eliminated!';
       fb.style.color = 'var(--accent)';
       setTimeout(() => { if (!questionAnswered) { fb.innerText = ''; fb.className = 'feedback'; } }, 1500);
+    }
+
+    function useFreeze() {
+      if (freezeUsed || gameOver || questionAnswered) return;
+      freezeUsed = true;
+      timerFrozen = true;
+
+      const btn = document.getElementById('freezeBtn');
+      btn.disabled = true;
+      btn.classList.add('used');
+
+      // Visual: freeze the timer bar
+      const bar = document.getElementById('timerBar');
+      if (bar) {
+        bar.classList.remove('heartbeat', 'danger-glow');
+        bar.classList.add('frozen');
+      }
+      const card = document.getElementById('quizCard');
+      if (card) card.classList.remove('urgency');
+
+      const fb = document.getElementById('feedbackText');
+      fb.className = 'feedback reveal';
+      fb.innerText = '⏳ Timer frozen! Take your time...';
+      fb.style.color = '#38bdf8';
+      setTimeout(() => { if (!questionAnswered) { fb.innerText = ''; fb.className = 'feedback'; } }, 2000);
     }
 
     // === 5. RANK / TITLE ===
@@ -2579,23 +2876,37 @@ body.peck .chickenImage.angry{
     let playerName = '';
     let chickenFirstEntry = true;
 
-    // === NAME ENTRY ===
-    async function startQuiz() {
+    // === NAME ENTRY → RULES → START ===
+    function goToRules() {
       const input = document.getElementById('playerNameInput');
       const name = input.value.trim();
       if (!name) { alert('Please enter your name!'); return; }
       ensureAudio();
       playerName = name;
-      document.getElementById('playerNameDisplay').innerText = `Player: ${playerName}`;
       document.getElementById('nameEntryScreen').style.display = 'none';
+      document.getElementById('chickenPeek').classList.remove('visible');
+      document.getElementById('rulesScreen').style.display = 'flex';
+    }
+
+    async function startQuizFromRules() {
+      document.getElementById('playerNameDisplay').innerText = `Player: ${playerName}`;
+      document.getElementById('rulesScreen').style.display = 'none';
       document.getElementById('mainContainer').style.display = 'flex';
       await init();
     }
 
+    // Legacy compat
+    async function startQuiz() { goToRules(); }
+
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('playerNameInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') startQuiz();
+        if (e.key === 'Enter') goToRules();
       });
+      // Chicken peek animation on name entry
+      setTimeout(() => {
+        const peek = document.getElementById('chickenPeek');
+        if (peek) peek.classList.add('visible');
+      }, 1200);
     });
 
     // === INIT ===
@@ -2626,8 +2937,8 @@ body.peck .chickenImage.angry{
       document.getElementById('victoryPopup').style.display = 'none';
       document.querySelectorAll('.egg').forEach(e => {
         e.className = 'egg alive-pulse';
-        // Remove any crack remnants (halves, yolk, whites, drips)
-        e.querySelectorAll('.eggHalf, .eggYolk, .eggWhite, .eggDrip').forEach(c => c.remove());
+        // Remove any crack remnants
+        e.querySelectorAll('.eggHalf, .eggYolk, .eggWhite, .eggDrip, canvas').forEach(c => c.remove());
       });
       document.getElementById('scoreDisplay').innerText = '0 pts';
       updateStreakDisplay();
@@ -2738,6 +3049,7 @@ body.peck .chickenImage.angry{
         launchMiniConfetti(10);
         updateStreakDisplay();
         setChickenMood('happy');
+        spawnChickenEmoji(streak >= 3 ? 'streak' : 'correct');
 
         // Switch to power-up music when streak hits 2+
         if (streak >= 2) switchBGM('powerup');
@@ -2770,11 +3082,13 @@ body.peck .chickenImage.angry{
         triggerScreenShake();
         updateStreakDisplay();
         setChickenMood('angry');
+        spawnChickenEmoji('wrong');
         playSound('wrong');
 
         if (strikes >= 3) {
           gameOver = true;
-          setTimeout(() => finishQuiz(false), 1000);
+          setChickenMood('rage');
+          setTimeout(() => finishQuiz(false), 1200);
         } else {
           setTimeout(() => { currentIdx++; transitionToNextQuestion(); setChickenMood('wink'); }, 2000);
         }
@@ -2782,6 +3096,29 @@ body.peck .chickenImage.angry{
     });
 
     // === FINISH ===
+    function injectEndScreenChicken(wrapperId, mood) {
+      const wrap = document.getElementById(wrapperId);
+      if (!wrap) return;
+      wrap.innerHTML = ''; // clear previous
+      const srcImg = mood === 'angry' ? document.getElementById('angryImg') : document.getElementById('happyImg');
+      if (!srcImg || !srcImg.naturalWidth) {
+        // Image didn't load — try using the URL from CHICKEN_IMAGES
+        const url = mood === 'angry' ? CHICKEN_IMAGES.angry[0] : CHICKEN_IMAGES.happy[0];
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = '';
+        img.onerror = () => { wrap.style.display = 'none'; };
+        wrap.appendChild(img);
+      } else {
+        // Clone the already-loaded image
+        const clone = srcImg.cloneNode(true);
+        clone.className = '';
+        clone.style.display = 'block';
+        clone.removeAttribute('id');
+        wrap.appendChild(clone);
+      }
+    }
+
     function finishQuiz(completed) {
       stopTimer();
       stopBGM();
@@ -2790,6 +3127,7 @@ body.peck .chickenImage.angry{
 
       if (strikes >= 3) {
         playSound('gameover');
+        injectEndScreenChicken('gameOverChickenWrap', 'angry');
         document.getElementById('gameOverRank').innerText = rank;
         document.getElementById('gameOverStats').innerHTML = buildStatsHTML();
         const goPopup = document.getElementById('gameOverPopup');
@@ -2800,7 +3138,7 @@ body.peck .chickenImage.angry{
         saveScore(totalPoints, maxPoints);
       } else if (completed) {
         showVictory(rank);
-        setChickenMood('happy');
+        setChickenMood('victory');
         saveScore(totalPoints, maxPoints);
       }
     }
@@ -3056,45 +3394,136 @@ body.peck .chickenImage.angry{
       input.click();
     }
 
-    // === EGG SHATTER ===
+    // === EGG SHATTER (Canvas + CSS) ===
     function shatterEgg(eggEl) {
       if (!eggEl) return;
-      // Phase 1: shake
-      eggEl.classList.add('shattering');
-      setTimeout(() => {
-        eggEl.classList.remove('shattering');
-        // Phase 2: crack open — add halves, yolk, whites
-        eggEl.classList.add('cracked');
+      // Also crack the corresponding mobile egg
+      const id = eggEl.id;
+      const mobileEgg = document.getElementById('eggM' + id.replace('egg', ''));
+      
+      [eggEl, mobileEgg].forEach(el => {
+        if (!el) return;
+        // Phase 1: shake
+        el.classList.add('shattering');
+        setTimeout(() => {
+          el.classList.remove('shattering');
+          el.classList.add('cracked');
+          
+          // Create canvas for crack line + shell fragments
+          const w = el.offsetWidth + 20;
+          const h = el.offsetHeight + 20;
+          const cvs = document.createElement('canvas');
+          cvs.className = 'eggCanvas';
+          cvs.width = w; cvs.height = h;
+          cvs.style.width = w + 'px';
+          cvs.style.height = h + 'px';
+          el.appendChild(cvs);
+          
+          const ctx = cvs.getContext('2d');
+          
+          // Animate crack line drawing
+          drawCrackLine(ctx, w, h);
+          
+          // Shell fragments
+          spawnShellFragments(el);
+          
+          // Yolk + whites (CSS elements)
+          const yolk = document.createElement('div');
+          yolk.className = 'eggYolk';
+          el.appendChild(yolk);
+          
+          const white = document.createElement('div');
+          white.className = 'eggWhite';
+          el.appendChild(white);
+          
+          // Shell halves
+          const topHalf = document.createElement('div');
+          topHalf.className = 'eggHalf top';
+          el.appendChild(topHalf);
+          
+          const bottomHalf = document.createElement('div');
+          bottomHalf.className = 'eggHalf bottom';
+          el.appendChild(bottomHalf);
+          
+          // Drips
+          const dripL = document.createElement('div');
+          dripL.className = 'eggDrip left';
+          el.appendChild(dripL);
+          const dripR = document.createElement('div');
+          dripR.className = 'eggDrip right';
+          el.appendChild(dripR);
+        }, 500);
+      });
+    }
 
-        // Top half shell
-        const topHalf = document.createElement('div');
-        topHalf.className = 'eggHalf top';
-        eggEl.appendChild(topHalf);
+    function drawCrackLine(ctx, w, h) {
+      const cx = w / 2;
+      let y = h * 0.15;
+      const targetY = h * 0.85;
+      const points = [{x: cx, y: y}];
+      
+      // Generate zigzag path
+      while (y < targetY) {
+        y += 3 + Math.random() * 6;
+        const x = cx + (Math.random() - 0.5) * 14;
+        points.push({x, y});
+      }
+      
+      // Animate drawing
+      let i = 0;
+      function step() {
+        if (i >= points.length - 1) return;
+        ctx.strokeStyle = 'rgba(200,190,170,0.7)';
+        ctx.lineWidth = 1.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(points[i].x, points[i].y);
+        ctx.lineTo(points[i+1].x, points[i+1].y);
+        ctx.stroke();
+        
+        // Branch lines
+        if (Math.random() > 0.6) {
+          ctx.strokeStyle = 'rgba(200,190,170,0.4)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(points[i+1].x, points[i+1].y);
+          const bx = points[i+1].x + (Math.random() - 0.5) * 16;
+          const by = points[i+1].y + (Math.random() - 0.5) * 8;
+          ctx.lineTo(bx, by);
+          ctx.stroke();
+        }
+        
+        i++;
+        if (i < points.length - 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
 
-        // Bottom half shell
-        const bottomHalf = document.createElement('div');
-        bottomHalf.className = 'eggHalf bottom';
-        eggEl.appendChild(bottomHalf);
-
-        // Yolk
-        const yolk = document.createElement('div');
-        yolk.className = 'eggYolk';
-        eggEl.appendChild(yolk);
-
-        // Egg white puddle
-        const white = document.createElement('div');
-        white.className = 'eggWhite';
-        eggEl.appendChild(white);
-
-        // Drips from shell edges
-        const dripL = document.createElement('div');
-        dripL.className = 'eggDrip left';
-        eggEl.appendChild(dripL);
-
-        const dripR = document.createElement('div');
-        dripR.className = 'eggDrip right';
-        eggEl.appendChild(dripR);
-      }, 500);
+    function spawnShellFragments(eggEl) {
+      const rect = eggEl.getBoundingClientRect();
+      const colors = ['rgba(240,230,210,0.6)', 'rgba(220,210,190,0.5)', 'rgba(200,190,170,0.4)'];
+      
+      for (let i = 0; i < 6; i++) {
+        const frag = document.createElement('div');
+        frag.style.cssText = `
+          position: absolute; width: ${3 + Math.random() * 5}px; height: ${3 + Math.random() * 5}px;
+          background: ${colors[i % colors.length]}; border-radius: 30%;
+          top: ${35 + Math.random() * 30}%; left: ${30 + Math.random() * 40}%;
+          z-index: 15; pointer-events: none;
+        `;
+        const angle = (Math.random() - 0.5) * 3;
+        const dist = 20 + Math.random() * 40;
+        const dx = Math.cos(angle) * dist;
+        const dy = -Math.abs(Math.sin(angle) * dist) - 10;
+        
+        frag.animate([
+          { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1 },
+          { transform: `translate(${dx}px, ${dy}px) rotate(${Math.random()*360}deg) scale(0.3)`, opacity: 0 }
+        ], { duration: 600 + Math.random() * 400, easing: 'ease-out', fill: 'forwards' });
+        
+        eggEl.appendChild(frag);
+        setTimeout(() => frag.remove(), 1100);
+      }
     }
 
     // === SCORE ROLL-UP ===
@@ -3168,6 +3597,8 @@ body.peck .chickenImage.angry{
       msgEl.innerText = '';
       rankEl.innerText = rank;
       statsEl.innerHTML = buildStatsHTML();
+
+      injectEndScreenChicken('victoryChickenWrap', 'happy');
 
       popup.classList.remove('celebrating');
       void popup.offsetWidth;
